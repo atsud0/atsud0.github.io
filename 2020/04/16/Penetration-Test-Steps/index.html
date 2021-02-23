@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://images.atsud0.me/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://images.atsud0.me/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="https://images.atsud0.me/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="https://images.atsud0.me/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"atsud0.me","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="渗透测试步骤们整理硬盘的时候，发现TG download的文件目录下有这文章。已经忘记是哪位大佬发的了，这里发到博客上面备份下。 赞美大佬（ https:&#x2F;&#x2F;gitbook.se7ensec.cn&#x2F;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Penetration-Test-Steps">
+<meta property="og:url" content="http://atsud0.me/2020/04/16/Penetration-Test-Steps/index.html">
+<meta property="og:site_name" content="雪之下二丁目鹤岗八幡宫">
+<meta property="og:description" content="渗透测试步骤们整理硬盘的时候，发现TG download的文件目录下有这文章。已经忘记是哪位大佬发的了，这里发到博客上面备份下。 赞美大佬（ https:&#x2F;&#x2F;gitbook.se7ensec.cn&#x2F;">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200416_141813.jpg">
+<meta property="article:published_time" content="2020-04-16T06:21:07.000Z">
+<meta property="article:modified_time" content="2021-02-23T15:38:50.458Z">
+<meta property="article:author" content="atsud0">
+<meta property="article:tag" content="OSCP">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://images.atsud0.me/images/post/Screenshot_20200416_141813.jpg">
+
+<link rel="canonical" href="http://atsud0.me/2020/04/16/Penetration-Test-Steps/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>Penetration-Test-Steps | 雪之下二丁目鹤岗八幡宫</title>
+  
+    <script>
+      function sendPageView() {
+        if (CONFIG.hostname !== location.hostname) return;
+        var uid = localStorage.getItem('uid') || (Math.random() + '.' + Math.random());
+        localStorage.setItem('uid', uid);
+        navigator.sendBeacon('https://www.google-analytics.com/collect', new URLSearchParams({
+          v  : 1,
+          tid: 'UA-163969429-1',
+          cid: uid,
+          t  : 'pageview',
+          dp : encodeURIComponent(location.pathname)
+        }));
+      }
+      document.addEventListener('pjax:complete', sendPageView);
+      sendPageView();
+    </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">雪之下二丁目鹤岗八幡宫</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/index.html" rel="section"><i class="fa fa-tags fa-fw"></i>Tags<span class="badge">166</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories<span class="badge">10</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives<span class="badge">128</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://atsud0.me/2020/04/16/Penetration-Test-Steps/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://images.atsud0.me/images/atsud0-avator.jpg">
+      <meta itemprop="name" content="atsud0">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="雪之下二丁目鹤岗八幡宫">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Penetration-Test-Steps
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-04-16 14:21:07" itemprop="dateCreated datePublished" datetime="2020-04-16T14:21:07+08:00">2020-04-16</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-02-23 23:38:50" itemprop="dateModified" datetime="2021-02-23T23:38:50+08:00">2021-02-23</time>
+              </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>6.6k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>6 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="渗透测试步骤们"><a href="#渗透测试步骤们" class="headerlink" title="渗透测试步骤们"></a>渗透测试步骤们</h1><p>整理硬盘的时候，发现TG download的文件目录下有这文章。<br>已经忘记是哪位大佬发的了，这里发到博客上面备份下。</p>
+<p>赞美大佬（<br><img src="https://images.atsud0.me/images/post/Screenshot_20200416_141813.jpg" alt="喵"></p>
+<p><a href="https://gitbook.se7ensec.cn/" target="_blank" rel="noopener">https://gitbook.se7ensec.cn/</a></p>
+<a id="more"></a>
+
+
+<ul>
+<li>Reconnaissance（侦察）<ul>
+<li>Passive/Semi-Passive（被动/半被动信息收集）<ul>
+<li>Third Party Resources（第三方资源们）<ul>
+<li>Locate Target Range<ul>
+<li>ARIN - <a href="https://www.arin.net/" target="_blank" rel="noopener">https://www.arin.net/</a></li>
+</ul>
+</li>
+<li>Fingerprint Domain/Website（收集域名/网站指纹）<ul>
+<li>Shodan - <a href="https://www.shodan.io/" target="_blank" rel="noopener">https://www.shodan.io/</a></li>
+<li>Censys - <a href="https://www.censys.io/" target="_blank" rel="noopener">https://www.censys.io/</a></li>
+<li>Zoomeye - <a href="https://www.zoomeye.org" target="_blank" rel="noopener">https://www.zoomeye.org</a></li>
+<li>Netcraft - <a href="https://www.netcraft.com/" target="_blank" rel="noopener">https://www.netcraft.com/</a></li>
+<li>Extended Network Information（加强版网络信息）<ul>
+<li>Central Ops - <a href="https://centralops.net/co/DomainDossier.aspx" target="_blank" rel="noopener">https://centralops.net/co/DomainDossier.aspx</a></li>
+<li>Robtex - <a href="https://www.robtex.net/" target="_blank" rel="noopener">https://www.robtex.net/</a></li>
+</ul>
+</li>
+<li>Metasploit Scanning（Metasploit扫描）<ul>
+<li>auxiliary/scanner/*<ul>
+<li>portscan/tcp</li>
+<li>http/http_version</li>
+<li>http/tomcat_enum</li>
+<li>http/trace_axd<ul>
+<li>Google - site:<result from above> filetype:axd OR inurl:trace.axd</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Command Line Recon（命令行侦察）<ul>
+<li>Network Information （网络信息）<ul>
+<li>nslookup <target><ul>
+<li>DNS cache snooping</li>
+</ul>
+</li>
+<li>dig <target></li>
+</ul>
+</li>
+<li>Security Mechanisms （安全机制）<ul>
+<li>halberd</li>
+</ul>
+</li>
+<li>Metadata（元数据）<ul>
+<li>exiftool</li>
+<li>strings<ul>
+<li>strings -e b (big endian) OR -e l (little endian)</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>People Search（搜人）<ul>
+<li>Yahoo People Search - <a href="http://itools.com/tool/yahoo-people-search" target="_blank" rel="noopener">http://itools.com/tool/yahoo-people-search</a></li>
+<li>Switchboard - <a href="http://www.switchboard.com/person" target="_blank" rel="noopener">http://www.switchboard.com/person</a></li>
+<li>Google Finance - <a href="https://www.google.com/finance" target="_blank" rel="noopener">https://www.google.com/finance</a></li>
+<li>Zaba - <a href="http://www.zabasearch.com/" target="_blank" rel="noopener">http://www.zabasearch.com/</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Active（主动信息收集）<ul>
+<li>Command Line Recon Tools（命令行侦察工具们）<ul>
+<li>General Recon（通用侦察手段）<ul>
+<li>Recon-NG<ul>
+<li>Automated with <a href="https://github.com/jhaddix/domain" target="_blank" rel="noopener">https://github.com/jhaddix/domain</a></li>
+</ul>
+</li>
+<li>Domain/Subdomain Information（域名/子域名信息）<ul>
+<li>Fierce</li>
+<li>The Harvester</li>
+<li>Dirb</li>
+<li>Dirbuster</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Nmap<ul>
+<li>nmap -Pn -sSU -sV –top-ports 20 <target></li>
+</ul>
+</li>
+<li>Create Custom Worldlist（建立自定义字典）<ul>
+<li>cewl - <a href="https://digi.ninja/projects/cewl.php" target="_blank" rel="noopener">https://digi.ninja/projects/cewl.php</a></li>
+<li>wget - <a href="http://wiki.securityweekly.com/wiki/index.php/Episode129" target="_blank" rel="noopener">http://wiki.securityweekly.com/wiki/index.php/Episode129</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Software（软件们）<ul>
+<li>FOCA</li>
+<li>SPARTA</li>
+<li>Maltego</li>
+<li>Dirbuster</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Browser Extensions（浏览器插件们）<ul>
+<li>Chrome</li>
+<li>Firefox</li>
+<li>Safari</li>
+</ul>
+</li>
+<li>Google Searching（Google高级搜索）<ul>
+<li>site:”target name” jobs,careers,openings,etc</li>
+<li>intitle:”index of <Keyword>“<ul>
+<li>Keyword<ul>
+<li>.bash_history</li>
+<li>etc/shadow</li>
+<li>finances.xls(x)</li>
+<li>htpasswd</li>
+<li>inurl:maillog</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>site:<em>.edu filetype:</em>.bak OR <keyword><ul>
+<li>Keyword<ul>
+<li>*.conf</li>
+<li>*.backup</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Enumeration（信息枚举）<ul>
+<li>Internal（内部网络）<ul>
+<li>Scanning（扫描）<ul>
+<li>Map Internal Network（建立内网拓扑）<ul>
+<li>Command Line Tools（命令行工具们）<ul>
+<li>arp -a</li>
+<li>ip neigh show</li>
+<li>smbtree -NS 2&gt;/dev/null</li>
+<li>nbtscan -r <current_IPrange></li>
+<li>netdiscover -r <current_IPrange></li>
+<li>nmap -n -Pn -T5 -sS <current_IPrange><ul>
+<li>nmap NSE scripts<ul>
+<li>NFS</li>
+<li>SMB</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Pivoting（跳板/转发）<ul>
+<li>SSH Proxy Tunneling with Proxychain<ul>
+<li><a href="http://magikh0e.ihtb.org/pubPapers/ssh_gymnastics_tunneling.html" target="_blank" rel="noopener">http://magikh0e.ihtb.org/pubPapers/ssh_gymnastics_tunneling.html</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>External（外部网络）<ul>
+<li>Scanning（扫描）<ul>
+<li>Nmap</li>
+<li>Unicornscan</li>
+<li>OneTwoPunch<ul>
+<li>Combines nmap and unicorn scan <a href="https://github.com/superkojiman/onetwopunch/blob/master/onetwopunch.sh" target="_blank" rel="noopener">https://github.com/superkojiman/onetwopunch/blob/master/onetwopunch.sh</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Exploitation（漏洞利用）<ul>
+<li>External（外部网络）<ul>
+<li>Web Vulnerability Scanners（Web漏洞扫描器们）<ul>
+<li>Burp<ul>
+<li><a href="https://portswigger.net/burp/" target="_blank" rel="noopener">https://portswigger.net/burp/</a></li>
+<li>My Guide: <a href="http://pastebin.com/nNHYP9Jd" target="_blank" rel="noopener">http://pastebin.com/nNHYP9Jd</a></li>
+</ul>
+</li>
+<li>Wapiti<ul>
+<li><a href="http://wapiti.sourceforge.net/" target="_blank" rel="noopener">http://wapiti.sourceforge.net/</a></li>
+</ul>
+</li>
+<li>w3af<ul>
+<li><a href="http://w3af.org/" target="_blank" rel="noopener">http://w3af.org/</a></li>
+</ul>
+</li>
+<li>Nikto<ul>
+<li><a href="https://cirt.net/Nikto2" target="_blank" rel="noopener">https://cirt.net/Nikto2</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Framework（框架）<ul>
+<li>web2attack<ul>
+<li><a href="https://github.com/santatic/web2attack" target="_blank" rel="noopener">https://github.com/santatic/web2attack</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Command Line Tools（命令行工具们）<ul>
+<li>CMSmap<ul>
+<li><a href="https://github.com/Dionach/CMSmap" target="_blank" rel="noopener">https://github.com/Dionach/CMSmap</a></li>
+</ul>
+</li>
+<li>WPscan<ul>
+<li><a href="https://wpscan.org/" target="_blank" rel="noopener">https://wpscan.org/</a></li>
+</ul>
+</li>
+<li>Joomscan<ul>
+<li><a href="https://www.owasp.org/index.php/Category:OWASP_Joomla_Vulnerability_Scanner_Project" target="_blank" rel="noopener">https://www.owasp.org/index.php/Category:OWASP_Joomla_Vulnerability_Scanner_Project</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Internal（内部网络）<ul>
+<li>LAN Attacks（LAN攻击）<ul>
+<li>Local Python Server -<ul>
+<li>Serve Shells/Exploits（建立Shell和Exploits下载站）<ul>
+<li>python -m SimpleHTTPServer <port></li>
+<li>python3 -m http.server <port></li>
+<li>php -S <host>:<port></li>
+</ul>
+</li>
+<li>LLMNR/NBT-NS Poisoning（LLMNR/NBT-NS投毒）<ul>
+<li>Responder - <a href="https://github.com/SpiderLabs/Responder" target="_blank" rel="noopener">https://github.com/SpiderLabs/Responder</a><ul>
+<li>Listen/respond to LLMNR NBTNS requests</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Local Vulnerability Scanning（本地漏洞扫描）<ul>
+<li>LinEnum- <a href="https://github.com/rebootuser/LinEnum" target="_blank" rel="noopener">https://github.com/rebootuser/LinEnum</a></li>
+<li>Unix-privesc-check</li>
+<li>Linux_Exploit_Suggester</li>
+</ul>
+</li>
+<li>Comprehensive Linux Enumeration（详细，全面的Linux枚举）<ul>
+<li><a href="http://www.rebootuser.com/?p=1623" target="_blank" rel="noopener">http://www.rebootuser.com/?p=1623</a></li>
+</ul>
+</li>
+<li>Bypass AV（反病毒软件绕过）<ul>
+<li>PowerSploit - Python Powershell Shell<ul>
+<li><a href="https://www.hackingloops.com/powersploit-quick-shell-for-penetration-testing/" target="_blank" rel="noopener">https://www.hackingloops.com/powersploit-quick-shell-for-penetration-testing/</a></li>
+</ul>
+</li>
+<li>Download Files via Command Line（通过命令行下载文件）<ul>
+<li><a href="https://www.greyhathacker.net/?p=500" target="_blank" rel="noopener">https://www.greyhathacker.net/?p=500</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Reverse Shells（反向Shell）<ul>
+<li><a href="http://pentestmonkey.net/cheat-sheet/shells/reverse-shell-cheat-sheet" target="_blank" rel="noopener">http://pentestmonkey.net/cheat-sheet/shells/reverse-shell-cheat-sheet</a></li>
+<li><a href="https://highon.coffee/blog/reverse-shell-cheat-sheet/" target="_blank" rel="noopener">https://highon.coffee/blog/reverse-shell-cheat-sheet/</a></li>
+</ul>
+</li>
+<li>Attack Tools（攻击工具）<ul>
+<li>Responder - <a href="https://github.com/SpiderLabs/Responder" target="_blank" rel="noopener">https://github.com/SpiderLabs/Responder</a></li>
+<li>SMBExec - <a href="https://github.com/pentestgeek/smbexec" target="_blank" rel="noopener">https://github.com/pentestgeek/smbexec</a></li>
+<li>WCE - <a href="http://www.darknet.org.uk/2015/02/windows-credentials-editor-wce-list-add-change-logon-sessions/" target="_blank" rel="noopener">http://www.darknet.org.uk/2015/02/windows-credentials-editor-wce-list-add-change-logon-sessions/</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Post-Exploitation（后渗透阶段）<ul>
+<li>Comprehensive Wiki<ul>
+<li><a href="http://pwnwiki.io/#!index.md" target="_blank" rel="noopener">http://pwnwiki.io/#!index.md</a></li>
+</ul>
+</li>
+<li>Pivoting（跳板/平移）<ul>
+<li>Stealing Hashes（窃取hashes）<ul>
+<li>WCE - <a href="http://www.darknet.org.uk/2015/02/windows-credentials-editor-wce-list-add-change-logon-sessions/" target="_blank" rel="noopener">http://www.darknet.org.uk/2015/02/windows-credentials-editor-wce-list-add-change-logon-sessions/</a></li>
+</ul>
+</li>
+<li>Password Sniffing（密码嗅探）<ul>
+<li>Tcpdump<ul>
+<li>tcpdump -i eth0 port http or port ftp or port smtp or port imap or port pop3 -l -A | egrep –i ‘pass=|pwd=|log=|login=|user=|username=|pw=|passw=|passwd=|password=||name=|name:|pass:|user:|username:|password:|login:|pass |user ‘ –color=auto –line-</li>
+</ul>
+</li>
+<li>Ngrep<ul>
+<li>ngrep -q -W byline “GET|POST HTTP”</li>
+</ul>
+</li>
+<li>Dsniff<ul>
+<li>dsniff -m</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Attack Frameworks/Tools（攻击框架/工具）<ul>
+<li>Empire<ul>
+<li><a href="http://www.powershellempire.com/" target="_blank" rel="noopener">http://www.powershellempire.com/</a></li>
+</ul>
+</li>
+<li>Armitage<ul>
+<li><a href="http://blog.cobaltstrike.com/2016/05/25/raffis-abridged-guide-to-cobalt-strike/" target="_blank" rel="noopener">http://blog.cobaltstrike.com/2016/05/25/raffis-abridged-guide-to-cobalt-strike/</a></li>
+</ul>
+</li>
+<li>Privilege Escalation（权限提升）<ul>
+<li>PowerSploit - <a href="https://github.com/PowerShellMafia/PowerSploit" target="_blank" rel="noopener">https://github.com/PowerShellMafia/PowerSploit</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Download Files via Command Line（通过命令行下载文件）<ul>
+<li><a href="https://www.greyhathacker.net/?p=500" target="_blank" rel="noopener">https://www.greyhathacker.net/?p=500</a></li>
+</ul>
+</li>
+<li>Information Gathering（信息收集）<ul>
+<li>LinEnum - <a href="http://www.rebootuser.com/?p=1758" target="_blank" rel="noopener">http://www.rebootuser.com/?p=1758</a></li>
+<li>privilege-escalation-awesome-scripts-suite - <a href="https://github.com/carlospolop/privilege-escalation-awesome-scripts-suite" target="_blank" rel="noopener">https://github.com/carlospolop/privilege-escalation-awesome-scripts-suite</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Exfiltration（撤出）<ul>
+<li>Detection Capabilities（探测能力）<ul>
+<li>Egress-Assess<ul>
+<li><a href="https://github.com/ChrisTruncer/Egress-Assess" target="_blank" rel="noopener">https://github.com/ChrisTruncer/Egress-Assess</a></li>
+</ul>
+</li>
+<li>Outbound Port Detection (find unfiltered outbound connections)（探测出端口，指找到未被过滤的出口连接）<ul>
+<li><a href="http://www.floyd.ch/?p=352" target="_blank" rel="noopener">http://www.floyd.ch/?p=352</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Network Exfiltration（网络撤出）</li>
+</ul>
+</li>
+<li>Phishing（钓鱼）<ul>
+<li>Important: Immediately pivot from initial host（重要：应尽快从最初入侵的主机跳转/平移出去）</li>
+<li>Tools（工具们）<ul>
+<li>Empire<ul>
+<li><a href="https://enigma0x3.net/2016/03/15/phishing-with-empire/" target="_blank" rel="noopener">https://enigma0x3.net/2016/03/15/phishing-with-empire/</a></li>
+</ul>
+</li>
+<li>Gophish<ul>
+<li><a href="https://github.com/gophish/gophish" target="_blank" rel="noopener">https://github.com/gophish/gophish</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Initial Access Techniques（建立初始入侵的技术们）<ul>
+<li>Office Macros</li>
+</ul>
+</li>
+<li>Tools for Internal Use（内部使用的工具）<ul>
+<li>PowerView - stealuserhunter</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Misc.（杂项）<ul>
+<li>Find Exploits（查找漏洞利用）<ul>
+<li>Linux<ul>
+<li>Command line<ul>
+<li>searchsploit -e Windows 7<ul>
+<li>searchsploit windows 2007 | grep -i local</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Web<ul>
+<li>Exploit-db<ul>
+<li><a href="https://www.exploit-db.com/" target="_blank" rel="noopener">https://www.exploit-db.com/</a></li>
+</ul>
+</li>
+<li>Packet Storm<ul>
+<li><a href="https://packetstormsecurity.com/files/tags/exploit" target="_blank" rel="noopener">https://packetstormsecurity.com/files/tags/exploit</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Various Automation（各种自动化工具）<ul>
+<li><a href="https://github.com/leebaird/discover" target="_blank" rel="noopener">https://github.com/leebaird/discover</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="渗透测试术语"><a href="#渗透测试术语" class="headerlink" title="渗透测试术语"></a>渗透测试术语</h2><ul>
+<li>SRC(Security Response Center) 安全应急响应中心</li>
+<li>肉鸡 能被控制的实体电脑/服务器</li>
+<li>抓鸡 利用自动化方式获取肉鸡的行为</li>
+<li>提权 从低权限用户提升到高权限</li>
+<li>后门 对主机的长期控制，留下的入口</li>
+<li>跳板 使用肉鸡IP来实施攻击其他目标，隐藏自身</li>
+<li>旁站入侵 同服务器下的网站入侵，入侵后通过提权目录等手段拿到目标网站的权限</li>
+<li>C段入侵 C段内网入侵</li>
+<li>黑盒测试 </li>
+<li>白盒测试</li>
+<li>APT攻击(Advanced Persistent Thread) 高级可持续性攻击</li>
+<li>CVE 漏洞编号</li>
+<li>CVSS 漏洞评分</li>
+<li>CWE 漏洞类型编号</li>
+<li>0day 没被公布的漏洞</li>
+<li>1day 刚公布的0day，但没有修复</li>
+<li>poc 漏洞验证</li>
+<li>exp 漏洞利用</li>
+<li>payload 攻击载荷</li>
+<li>web指纹 banner</li>
+</ul>
+<h2 id="渗透测试完整测试流程"><a href="#渗透测试完整测试流程" class="headerlink" title="渗透测试完整测试流程"></a>渗透测试完整测试流程</h2><h3 id="渗透测试和入侵的区别"><a href="#渗透测试和入侵的区别" class="headerlink" title="渗透测试和入侵的区别"></a>渗透测试和入侵的区别</h3><ul>
+<li>渗透测试：出于保护系统的目的，更全面找出测试对象的安全隐患</li>
+<li>入侵：不择手段拿到系统权限</li>
+</ul>
+<h3 id="简要步骤"><a href="#简要步骤" class="headerlink" title="简要步骤"></a>简要步骤</h3><ol>
+<li>明确目标</li>
+<li>信息收集</li>
+<li>漏洞探测</li>
+<li>漏洞验证</li>
+<li>信息分析</li>
+<li>获取所需</li>
+<li>信息整理</li>
+<li>形成报告</li>
+</ol>
+<h3 id="明确目标"><a href="#明确目标" class="headerlink" title="明确目标"></a>明确目标</h3><p>测试目标的范围,ip,域名,内外网<br>确定规则：能渗透到什么程度，时间，能否修改上传？能否提权？<br>确定需求：web应用的漏洞（新上线的程序？业务逻辑漏洞？人员权限管理漏洞（针对人员，权限？等等，全方位</p>
+<h3 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h3><p>方式：主动扫描/开发搜索（被动扫描<br>开放扫描：已公开的信息，搜索引擎</p>
+<p>基础信息：IP 网段，域名，端口<br>系统信息：操作系统版本<br>应用信息：各端口的应用，如web应用，漏洞应用<br>版本信息：应用的版本信息<br>人员信息：域名注册人员信息，web应用中发帖人的id，管理员姓名等。<br>防护信息：试着看能否探测到防护设备（waf，防火墙等</p>
+<h4 id="IP"><a href="#IP" class="headerlink" title="IP"></a>IP</h4><ol>
+<li>ping域名</li>
+<li>nslookup</li>
+<li>确定对方是否使用CDN<code>(Content Delivery Network)</code>技术<ol>
+<li>怎么确定?<ol>
+<li>多地ping</li>
+<li>nslookup(如果出现多个ip就是)</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>怎么找到真实IP？<ol>
+<li>找解析记录</li>
+<li>查询子域名</li>
+<li>网站漏洞查找<ol>
+<li>网站邮件订阅查找</li>
+<li>手机端APP抓包</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>子域名<ul>
+<li>谷歌语法，子域名挖掘机，站长之家，云悉，whois查询</li>
+</ul>
+</li>
+<li>旁站查询<ul>
+<li>站长之家等</li>
+</ul>
+</li>
+<li>C段信息收集<ul>
+<li>nmap等扫描工具</li>
+</ul>
+</li>
+<li></li>
+</ol>
+<p>shodan，fofa，zoomeye</p>
+<p>cms<br>在线cms指纹识别<br>火狐插件<br>kali自带 whatweb</p>
+<h3 id="漏洞探测"><a href="#漏洞探测" class="headerlink" title="漏洞探测"></a>漏洞探测</h3><p>漏洞扫描 AWVS IBM appscan<br>结合漏洞去exploit-db网址找利用<br>在网上去寻找验证poc</p>
+<p>系统漏洞：有没有打补丁？<br>webserver:webserver配置问题<br>web应用漏洞：web应用开发问题<br>其他端口服务漏洞<br>通信安全（信息的明文传输</p>
+<h3 id="漏洞验证"><a href="#漏洞验证" class="headerlink" title="漏洞验证"></a>漏洞验证</h3><p>自动化验证：结合自动化扫描工具提供的结果<br>手工验证：根据公开资源进行验证<br>实验验证</p>
+<h3 id="信息分析"><a href="#信息分析" class="headerlink" title="信息分析"></a>信息分析</h3><p>精准打击</p>
+<h3 id="获取所需"><a href="#获取所需" class="headerlink" title="获取所需"></a>获取所需</h3><p>实施攻击<br>获取内部信息 –基础设施，网络连接，vpn，路由，拓扑<br>进一步渗透 –内网入侵，敏感目标<br>持续性存在 —rookit，后门，添加管理帐号<br>清理痕迹 – 清理相关日志(访问，操作) 上传文件等。</p>
+<h3 id="信息整理"><a href="#信息整理" class="headerlink" title="信息整理"></a>信息整理</h3><p>代码，poc，exp<br>收集信息<br>漏洞信息</p>
+<h3 id="形成报告"><a href="#形成报告" class="headerlink" title="形成报告"></a>形成报告</h3><h3 id="报告编写"><a href="#报告编写" class="headerlink" title="报告编写"></a>报告编写</h3><ol>
+<li>封皮</li>
+<li>明确重点要求</li>
+<li>给谁看？不同职位的人关注的侧重点不一样</li>
+<li>内容提要</li>
+<li>漏洞列表（最好一页列出来</li>
+<li>过程清晰明确</li>
+<li>工具（版本和功能</li>
+<li>渗透测试团队成员-联系方式</li>
+<li>修复建议</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>atsud0
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="http://atsud0.me/2020/04/16/Penetration-Test-Steps/" title="Penetration-Test-Steps">http://atsud0.me/2020/04/16/Penetration-Test-Steps/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/OSCP/" rel="tag"><i class="fa fa-tag"></i> OSCP</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/04/16/linux-shell/" rel="prev" title="linux-shell">
+      <i class="fa fa-chevron-left"></i> linux-shell
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/04/17/ssh-id-rsa%E5%AF%86%E7%A0%81%E7%A0%B4%E8%A7%A3/" rel="next" title="ssh_id_rsa密码破解">
+      ssh_id_rsa密码破解 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#渗透测试步骤们"><span class="nav-number">1.</span> <span class="nav-text">渗透测试步骤们</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#渗透测试术语"><span class="nav-number">1.1.</span> <span class="nav-text">渗透测试术语</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#渗透测试完整测试流程"><span class="nav-number">1.2.</span> <span class="nav-text">渗透测试完整测试流程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#渗透测试和入侵的区别"><span class="nav-number">1.2.1.</span> <span class="nav-text">渗透测试和入侵的区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#简要步骤"><span class="nav-number">1.2.2.</span> <span class="nav-text">简要步骤</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#明确目标"><span class="nav-number">1.2.3.</span> <span class="nav-text">明确目标</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#信息收集"><span class="nav-number">1.2.4.</span> <span class="nav-text">信息收集</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#IP"><span class="nav-number">1.2.4.1.</span> <span class="nav-text">IP</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#漏洞探测"><span class="nav-number">1.2.5.</span> <span class="nav-text">漏洞探测</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#漏洞验证"><span class="nav-number">1.2.6.</span> <span class="nav-text">漏洞验证</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#信息分析"><span class="nav-number">1.2.7.</span> <span class="nav-text">信息分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#获取所需"><span class="nav-number">1.2.8.</span> <span class="nav-text">获取所需</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#信息整理"><span class="nav-number">1.2.9.</span> <span class="nav-text">信息整理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#形成报告"><span class="nav-number">1.2.10.</span> <span class="nav-text">形成报告</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#报告编写"><span class="nav-number">1.2.11.</span> <span class="nav-text">报告编写</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="atsud0"
+      src="https://images.atsud0.me/images/atsud0-avator.jpg">
+  <p class="site-author-name" itemprop="name">atsud0</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">128</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/index.html">
+          
+        <span class="site-state-item-count">166</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/atsud0" title="GitHub → https://github.com/atsud0" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:admin@atsud0.me" title="E-Mail → mailto:admin@atsud0.me"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/atsud0" title="Twitter → https://twitter.com/atsud0" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/MindworkshopBot" title="Telegram → https://t.me/MindworkshopBot" rel="noopener" target="_blank"><i class="fab fa-telegram fa-fw"></i>Telegram</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.ajin.cloud/" title="https://blog.ajin.cloud/" rel="noopener" target="_blank">ajin</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://leiblog.wang/" title="https://leiblog.wang/" rel="noopener" target="_blank">LeiWang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://esonhugh.github.io/" title="https://esonhugh.github.io/" rel="noopener" target="_blank">Esonhugh</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://isabellainori.github.io/" title="https://isabellainori.github.io/" rel="noopener" target="_blank">Isabella Ross</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2020 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">atsud0</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">Symbols count total: </span>
+    <span title="Symbols count total">407k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">Reading time total &asymp;</span>
+    <span title="Reading time total">6:10</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

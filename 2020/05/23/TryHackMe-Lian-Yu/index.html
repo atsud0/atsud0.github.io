@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://images.atsud0.me/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://images.atsud0.me/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="https://images.atsud0.me/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="https://images.atsud0.me/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"atsud0.me","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="靶机链接：Lian_Yu 靶机难度：简单 卡了我一天的简单难度靶机？我真的菜。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="TryHackMe-Lian_Yu">
+<meta property="og:url" content="http://atsud0.me/2020/05/23/TryHackMe-Lian-Yu/index.html">
+<meta property="og:site_name" content="雪之下二丁目鹤岗八幡宫">
+<meta property="og:description" content="靶机链接：Lian_Yu 靶机难度：简单 卡了我一天的简单难度靶机？我真的菜。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200523_202923.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200523_203411.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200523_203645.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200523_204216.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200523_204007.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200523_204307.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200523_204353.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200523_204701-1.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200523_204857.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200523_205451.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200523_210056.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200523_210251.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200523_210729.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200523_210845.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200523_211045.jpg">
+<meta property="og:image" content="https://img2018.cnblogs.com/blog/1047246/201910/1047246-20191022152758694-430075689.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200523_212103.jpg">
+<meta property="article:published_time" content="2020-05-23T13:33:35.000Z">
+<meta property="article:modified_time" content="2021-02-23T15:38:50.460Z">
+<meta property="article:author" content="atsud0">
+<meta property="article:tag" content="GTFOBins-pkexec">
+<meta property="article:tag" content="CVE-2019-13272">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://images.atsud0.me/images/post/Screenshot_20200523_202923.jpg">
+
+<link rel="canonical" href="http://atsud0.me/2020/05/23/TryHackMe-Lian-Yu/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>TryHackMe-Lian_Yu | 雪之下二丁目鹤岗八幡宫</title>
+  
+    <script>
+      function sendPageView() {
+        if (CONFIG.hostname !== location.hostname) return;
+        var uid = localStorage.getItem('uid') || (Math.random() + '.' + Math.random());
+        localStorage.setItem('uid', uid);
+        navigator.sendBeacon('https://www.google-analytics.com/collect', new URLSearchParams({
+          v  : 1,
+          tid: 'UA-163969429-1',
+          cid: uid,
+          t  : 'pageview',
+          dp : encodeURIComponent(location.pathname)
+        }));
+      }
+      document.addEventListener('pjax:complete', sendPageView);
+      sendPageView();
+    </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">雪之下二丁目鹤岗八幡宫</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/index.html" rel="section"><i class="fa fa-tags fa-fw"></i>Tags<span class="badge">166</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories<span class="badge">10</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives<span class="badge">128</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://atsud0.me/2020/05/23/TryHackMe-Lian-Yu/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://images.atsud0.me/images/atsud0-avator.jpg">
+      <meta itemprop="name" content="atsud0">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="雪之下二丁目鹤岗八幡宫">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          TryHackMe-Lian_Yu
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-05-23 21:33:35" itemprop="dateCreated datePublished" datetime="2020-05-23T21:33:35+08:00">2020-05-23</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-02-23 23:38:50" itemprop="dateModified" datetime="2021-02-23T23:38:50+08:00">2021-02-23</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%9D%B6%E6%9C%BA%E5%AE%9E%E9%AA%8C/" itemprop="url" rel="index"><span itemprop="name">靶机实验</span></a>
+                </span>
+                  , 
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%9D%B6%E6%9C%BA%E5%AE%9E%E9%AA%8C/TryHackMe/" itemprop="url" rel="index"><span itemprop="name">TryHackMe</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>2.6k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>2 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <a href="https://tryhackme.com/room/lianyu" title="" target="">靶机链接：Lian_Yu</a>
+<p>靶机难度：简单 <del>卡了我一天的简单难度靶机？</del><br><del><strong>我真的菜。</strong></del></p>
+<a id="more"></a>
+
+<h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line">IP=<span class="variable">$1</span></span><br><span class="line"></span><br><span class="line">ports=$(nmap -p- --min-rate=1000  -T4 <span class="variable">$&#123;IP&#125;</span> | grep ^[0-9] | cut -d <span class="string">'/'</span> -f 1 | tr <span class="string">'\n'</span> <span class="string">','</span> | sed s/,$//)  </span><br><span class="line"></span><br><span class="line">/usr/bin/nmap -sC -sV -p<span class="variable">$&#123;ports&#125;</span> <span class="variable">$&#123;IP&#125;</span></span><br></pre></td></tr></table></figure>
+<p><img src="https://images.atsud0.me/images/post/Screenshot_20200523_202923.jpg" alt="nmap"></p>
+<p>目录探测<br><img src="https://images.atsud0.me/images/post/Screenshot_20200523_203411.jpg" alt="gobu"></p>
+<p><img src="https://images.atsud0.me/images/post/Screenshot_20200523_203645.jpg" alt="index.."></p>
+<p>emmm..因为不是php的文件,不能进行传值.要不然,我就试试传值code word了..只能进行目录探测,因为题目已经提示是四个数字的目录.所以我们需要生成一个字典文件.(另外在这个页面你需要查看源代码,,否则你会遗漏点东西)<br><img src="https://images.atsud0.me/images/post/Screenshot_20200523_204216.jpg" alt=""><br>可以看到有一个用户名在这里.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">crunch 4 4 -t %%%% -o num.txt</span><br></pre></td></tr></table></figure>
+<p><img src="https://images.atsud0.me/images/post/Screenshot_20200523_204007.jpg" alt="num"></p>
+<blockquote>
+<p>How Oliver Queen finds his way to Lian_Yu?</p>
+</blockquote>
+<p>我没看过绿箭侠我怎么知道..<br><img src="https://images.atsud0.me/images/post/Screenshot_20200523_204307.jpg" alt=""></p>
+<p>继续查看源代码找线索<br><img src="https://images.atsud0.me/images/post/Screenshot_20200523_204353.jpg" alt=".ticket"></p>
+<p>.ticket? 文件后缀名?有可能是要继续进行目录下的文件探测..<br><img src="https://images.atsud0.me/images/post/Screenshot_20200523_204701-1.jpg" alt="ticket"></p>
+<p>好吧,我们拿到船票了。</p>
+<p><img src="https://images.atsud0.me/images/post/Screenshot_20200523_204857.jpg" alt=""></p>
+<p>看起来像是base加密过的可以来这里进行解码<a href="https://gchq.github.io/CyberChef/" title="" target="">各类解码</a></p>
+<p>解码获得密码后，可以直接连接ftp看看有什么东西了。</p>
+<p><img src="https://images.atsud0.me/images/post/Screenshot_20200523_205451.jpg" alt=""><br>这里只能一个一个文件下载下来看了。下载回来之后只在<code>.other_user</code>找到一个小故事，里面有几个人名。其他文件都没能找到有用的线索。<br>下载回来的图片文件，两个png和一个jpg。</p>
+<ul>
+<li>Leave_me_alone.png</li>
+<li>Queen’s_Gambit.png</li>
+<li>aa.jpg<br>其中<code>Leave_me_alone.png</code>是坏的，先不管。用<code>zsteg</code>尝试提取<code>Queen&#39;s_Gambit.png</code>，很遗憾。没有东西。<br>分析<code>aa.jpg</code><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">binwalk -e aa.jpg</span><br><span class="line">DECIMAL       HEXADECIMAL     DESCRIPTION</span><br><span class="line">--------------------------------------------------------------------------------</span><br><span class="line">0             0x0             JPEG image data, JFIF standard 1.01</span><br></pre></td></tr></table></figure>
+用空密码也提取不了文件。</li>
+</ul>
+<p>尝试修复<code>Leave_me_alone.png</code>也失败了。<br><img src="https://images.atsud0.me/images/post/Screenshot_20200523_210056.jpg" alt="wunai"></p>
+<p>我卡在这里一下午了。最后得到高人指点。。<br><img src="https://images.atsud0.me/images/post/Screenshot_20200523_210251.jpg" alt=""></p>
+<blockquote>
+<p>always try password for steghide</p>
+</blockquote>
+<p>记住了，下次遇到图片文件，都给它跑个弱密码字典提取试试。</p>
+<p>最后会提取到一个<code>ss.zip</code>解压后就是我们需要的ssh密码了。但是我们不知道用户名。结合之前，我们在<code>.other_user</code>看到的小故事，用里面的第一个人名试试<code>slade</code><br><img src="https://images.atsud0.me/images/post/Screenshot_20200523_210729.jpg" alt="ssh-log"></p>
+<p>登录成功。进来的第一件事当然是看看<code>sudo -l</code>啦<br><img src="https://images.atsud0.me/images/post/Screenshot_20200523_210845.jpg" alt=""></p>
+<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><p>有相关程序能sudo?那第一件事当然是看看<a href="https://gtfobins.github.io/#" title="" target="">GTFOBins</a>里面有没有提权姿势啦。</p>
+<p>但是很遗憾，没有。只能去看看谷歌了。<br><img src="https://images.atsud0.me/images/post/Screenshot_20200523_211045.jpg" alt=""></p>
+<p>发现有一个漏洞利用程序，而且目标机器的内核也低于5.1.17。可以尝试一下<a href="https://vulmon.com/vulnerabilitydetails?qid=CVE-2019-13272" title="" target="">CVE-2019-13272</a>兴高采烈的下好<code>exploit</code>，结果在机器上一运行就不行了。<br><img src="https://img2018.cnblogs.com/blog/1047246/201910/1047246-20191022152758694-430075689.png" alt=""></p>
+<p>好吧，认真看看漏洞描述吧。<code>loser</code></p>
+<blockquote>
+<p>In the Linux kernel before 5.1.17,<br>ptrace_link in kernel/ptrace.c mishandles the recording of the credentials of a process that wants to create a ptrace relationship,<br>which allows local users to obtain root access by leveraging certain scenarios with a parent-child process relationship,<br>where a parent drops privileges and calls execve (potentially allowing control by an attacker).<br>One contributing factor is an object lifetime issue (which can also cause a panic).<br>Another contributing factor is incorrect marking of a ptrace relationship as privileged, which is exploitable through (for example) Polkit’s pkexec helper with PTRACE_TRACEME.<br>NOTE: SELinux deny_ptrace might be a usable workaround in some environments.</p>
+</blockquote>
+<blockquote>
+<p>在5.1.17之前的Linux内核中，kernel / ptrace.c中的ptrace_link错误地处理了想要创建ptrace关系的进程的凭据记录，这允许本地用户通过利用父子的某些方案来获取root访问权限 进程关系，父进程删除权限并调用execve（可能允许攻击者控制）。一个影响因素是对象寿命问题（也可能导致恐慌）。 另一个影响因素是将ptrace关系标记为特权，这可以通过（例如）Polkit的pkexec帮助程序与PTRACE_TRACEME进行利用。<br>注意：在某些环境中，SELinux deny_ptrace可能是一种可用的解决方法。</p>
+</blockquote>
+<blockquote><p>总结<br>总体来看这个漏洞的限制还是比较大的<br>首先要找到一个内部有减权的 suid 程序就比较难了<br>pkexec 是linux 桌面 freedestop 上的验证程序，也就是说非桌面版本就可能没有这个东西，要用它也只能在桌面上。<br>像 android ，它把 suid 程序都去除了这个漏洞就几乎造不成什么影响。<br>这个漏洞和之前的 usb creator 漏洞差不多，实际应用上感觉都有点鸡肋。</p>
+<footer><strong>rtfingc</strong><cite><a href="https://www.anquanke.com/post/id/183528" target="_blank" rel="noopener">CVE-2019-13272 'PTRACE_TRACEME' 本地提权漏洞分析</a></cite></footer></blockquote>
+
+<p>而我们的目标机器是没有桌面的，那这个漏洞利用就宣告彻底失败了。不过，让我们回过头来看看，我们这可以用sudo去运行啊，为什么要纠结于这个漏洞利用呢？</p>
+<blockquote><p>pkexec 可以通过 –user 参数授权特定的用户执行命令，没有指定的话默认为root权限</p>
+<footer><strong>rtfingc</strong><cite><a href="https://www.anquanke.com/post/id/183528" target="_blank" rel="noopener">CVE-2019-13272 PTRACE_TRACEME 本地提权漏洞分析</a></cite></footer></blockquote>
+
+<p>所以其实我们可以直接</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo pkexec --user root whoami</span><br></pre></td></tr></table></figure>
+<p><img src="https://images.atsud0.me/images/post/Screenshot_20200523_212103.jpg" alt=""></p>
+<p>好，成功了。接下来怎么做还需要我说吗？直接打开一个<code>shell</code>就好啦。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ul>
+<li>always try password for steghide</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>atsud0
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="http://atsud0.me/2020/05/23/TryHackMe-Lian-Yu/" title="TryHackMe-Lian_Yu">http://atsud0.me/2020/05/23/TryHackMe-Lian-Yu/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/GTFOBins-pkexec/" rel="tag"><i class="fa fa-tag"></i> GTFOBins-pkexec</a>
+              <a href="/tags/CVE-2019-13272/" rel="tag"><i class="fa fa-tag"></i> CVE-2019-13272</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/05/20/clash-arch%E8%87%AA%E5%90%AF%E6%9B%B4%E6%96%B0%E8%AE%A2%E9%98%85/" rel="prev" title="clash-arch自启更新订阅">
+      <i class="fa fa-chevron-left"></i> clash-arch自启更新订阅
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/05/23/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/" rel="next" title="文件上传漏洞学习笔记">
+      文件上传漏洞学习笔记 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#信息收集"><span class="nav-number">1.</span> <span class="nav-text">信息收集</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#提权"><span class="nav-number">2.</span> <span class="nav-text">提权</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">3.</span> <span class="nav-text">总结</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="atsud0"
+      src="https://images.atsud0.me/images/atsud0-avator.jpg">
+  <p class="site-author-name" itemprop="name">atsud0</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">128</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/index.html">
+          
+        <span class="site-state-item-count">166</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/atsud0" title="GitHub → https://github.com/atsud0" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:admin@atsud0.me" title="E-Mail → mailto:admin@atsud0.me"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/atsud0" title="Twitter → https://twitter.com/atsud0" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/MindworkshopBot" title="Telegram → https://t.me/MindworkshopBot" rel="noopener" target="_blank"><i class="fab fa-telegram fa-fw"></i>Telegram</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.ajin.cloud/" title="https://blog.ajin.cloud/" rel="noopener" target="_blank">ajin</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://leiblog.wang/" title="https://leiblog.wang/" rel="noopener" target="_blank">LeiWang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://esonhugh.github.io/" title="https://esonhugh.github.io/" rel="noopener" target="_blank">Esonhugh</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://isabellainori.github.io/" title="https://isabellainori.github.io/" rel="noopener" target="_blank">Isabella Ross</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2020 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">atsud0</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">Symbols count total: </span>
+    <span title="Symbols count total">407k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">Reading time total &asymp;</span>
+    <span title="Reading time total">6:10</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

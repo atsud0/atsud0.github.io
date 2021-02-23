@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://images.atsud0.me/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://images.atsud0.me/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="https://images.atsud0.me/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="https://images.atsud0.me/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"atsud0.me","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="对文件上传的一个笔记总结。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="文件上传漏洞学习笔记">
+<meta property="og:url" content="http://atsud0.me/2020/05/23/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/index.html">
+<meta property="og:site_name" content="雪之下二丁目鹤岗八幡宫">
+<meta property="og:description" content="对文件上传的一个笔记总结。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://images.atsud0.me/images/post/20190527142723-7cd5273c-8048-1.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200522_133449.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200522_134019.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200522_134244.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200522_134514.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200522_135302.jpg">
+<meta property="article:published_time" content="2020-05-23T14:46:11.000Z">
+<meta property="article:modified_time" content="2021-02-23T15:38:50.458Z">
+<meta property="article:author" content="atsud0">
+<meta property="article:tag" content="upload">
+<meta property="article:tag" content="nginx-upload">
+<meta property="article:tag" content="iis-upload">
+<meta property="article:tag" content="apache-upload">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://images.atsud0.me/images/post/20190527142723-7cd5273c-8048-1.png">
+
+<link rel="canonical" href="http://atsud0.me/2020/05/23/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>文件上传漏洞学习笔记 | 雪之下二丁目鹤岗八幡宫</title>
+  
+    <script>
+      function sendPageView() {
+        if (CONFIG.hostname !== location.hostname) return;
+        var uid = localStorage.getItem('uid') || (Math.random() + '.' + Math.random());
+        localStorage.setItem('uid', uid);
+        navigator.sendBeacon('https://www.google-analytics.com/collect', new URLSearchParams({
+          v  : 1,
+          tid: 'UA-163969429-1',
+          cid: uid,
+          t  : 'pageview',
+          dp : encodeURIComponent(location.pathname)
+        }));
+      }
+      document.addEventListener('pjax:complete', sendPageView);
+      sendPageView();
+    </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">雪之下二丁目鹤岗八幡宫</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/index.html" rel="section"><i class="fa fa-tags fa-fw"></i>Tags<span class="badge">166</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories<span class="badge">10</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives<span class="badge">128</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://atsud0.me/2020/05/23/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://images.atsud0.me/images/atsud0-avator.jpg">
+      <meta itemprop="name" content="atsud0">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="雪之下二丁目鹤岗八幡宫">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          文件上传漏洞学习笔记
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-05-23 22:46:11" itemprop="dateCreated datePublished" datetime="2020-05-23T22:46:11+08:00">2020-05-23</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-02-23 23:38:50" itemprop="dateModified" datetime="2021-02-23T23:38:50+08:00">2021-02-23</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Note/" itemprop="url" rel="index"><span itemprop="name">Note</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>3k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>3 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>对文件上传的一个笔记总结。</p>
+<a id="more"></a>
+
+<h2 id="前言-amp-amp-参考"><a href="#前言-amp-amp-参考" class="headerlink" title="前言&amp;&amp;参考"></a>前言&amp;&amp;参考</h2><p>参考链接:</p>
+<ul>
+<li><a href="https://zhaijiahui.github.io/2019/01/28/upload-labs/" title="" target="">Upload-lab练习</a></li>
+<li><a href="https://fuping.site/2018/06/04/upload-labs-writeup/" title="" target="">fuping-upload-labs writeup</a></li>
+<li><a href="https://misakikata.github.io/2019/05/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E/" title="" target="">Misaki&#39;s 文件上传漏洞</a></li>
+<li><a href="https://xz.aliyun.com/t/6047" title="" target="">先知社区-浅谈常见的文件上传的检测方式与绕过方法</a></li>
+<li><a href="https://xz.aliyun.com/t/4029#toc-13" title="" target="">先知社区-Upload-labs 20关通关笔记</a></li>
+<li><a href="https://www.anquanke.com/post/id/166616#h2-0" title="" target="">安全客-部分中间件漏洞总结</a></li>
+<li><a href="https://blog.csdn.net/baidu_36847344/article/details/62416662" title="" target="">文件上传漏洞是什么？要怎样防御文件上传的漏洞攻击？</a>
+
+</li>
+</ul>
+<p><img src="https://images.atsud0.me/images/post/20190527142723-7cd5273c-8048-1.png" alt="漏洞上传"></p>
+<h2 id="前端检测"><a href="#前端检测" class="headerlink" title="前端检测"></a>前端检测</h2><p>前端限制是最不靠谱的限制办法。<br>解决办法:</p>
+<ul>
+<li>html页面删除检测javascript检测函数</li>
+<li>禁用javascript脚本</li>
+<li>先将恶意脚本后缀改为前端脚本允许的后缀。然后抓包再修改为php/asp等</li>
+</ul>
+<h2 id="后端检测"><a href="#后端检测" class="headerlink" title="后端检测"></a>后端检测</h2><p>后端限制方式较多，有检测后缀黑名单和白名单，检测内容等。</p>
+<h3 id="检查后缀黑名单"><a href="#检查后缀黑名单" class="headerlink" title="检查后缀黑名单"></a>检查后缀黑名单</h3><h4 id="上传特殊可解析后缀"><a href="#上传特殊可解析后缀" class="headerlink" title="上传特殊可解析后缀"></a>上传特殊可解析后缀</h4><p>php5 phtml等，但<strong>前提是要目标服务器有相应的配置才行</strong>。</p>
+<h4 id="上传-htaccess"><a href="#上传-htaccess" class="headerlink" title="上传.htaccess"></a>上传<code>.htaccess</code></h4><p>适用于:Apache服务器</p>
+<p>前提:</p>
+<ol>
+<li>要求目标服务器，没有将.htaccess加入为黑名单。</li>
+<li>要求服务器不将上传文件重命名。</li>
+</ol>
+<p>限制较多，能用的场景较少。。</p>
+<p>Nginx应该也可以使用，但前提是要求服务器有做相应的配置。例如：<a href="https://www.jb51.net/article/69220.htm" title="" target="">使Nginx服务器支持.htaccess的方法</a>，不过服务器做什么配置，不是由我们说了算的啊，还是鸡肋。</p>
+<p><code>.htaccess</code>内容如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SetHandler application&#x2F;x-httpd-php</span><br></pre></td></tr></table></figure>
+<p>将所有类型的文件，都可以当成php文件解析。</p>
+<h4 id="后缀大小写、加空格、加点绕过"><a href="#后缀大小写、加空格、加点绕过" class="headerlink" title="后缀大小写、加空格、加点绕过"></a>后缀大小写、加空格、加点绕过</h4><p>当服务器没有对后缀大小写、空格、<code>.</code>进行过滤时，可以使用。因为windows会忽略文件末尾的.和空格。</p>
+<p>例如<code>shell.php</code>改名成</p>
+<ul>
+<li>shell.pHp</li>
+<li>shell.php &lt;这里有个空格</li>
+<li>shell.php. 加多一个点</li>
+<li>shell.php. . 多加一个空格和点（如果服务器只校验一次。</li>
+<li>shell.php. .点空格和上面一致</li>
+</ul>
+<h4 id="DATA绕过"><a href="#DATA绕过" class="headerlink" title="::$DATA绕过"></a>::$DATA绕过</h4><p>::$DATA文件流绕过(<strong>仅限Windows</strong>)</p>
+<blockquote>
+<p>NTFS文件系统包括对备用数据流的支持。这不是众所周知的功能，主要包括提供与Macintosh文件系统中的文件的兼容性。备用数据流允许文件包含多个数据流。每个文件至少有一个数据流。在Windows中，此默认数据流称为：$ DATA。</p>
+</blockquote>
+<p>所有当上传<code>shell.php::$DATA</code>，服务器实际上上传之后保存的文件名是<code>shell.php</code>而不是<code>shell.php::$data</code>。</p>
+<h4 id="双写绕过"><a href="#双写绕过" class="headerlink" title="双写绕过"></a>双写绕过</h4><p>如果目标服务器会将上传文件的敏感后缀名去空，那就可以考虑双写绕过。</p>
+<p><code>.pphphp</code></p>
+<h3 id="检测后缀白名单"><a href="#检测后缀白名单" class="headerlink" title="检测后缀白名单"></a>检测后缀白名单</h3><h4 id="MIME绕过"><a href="#MIME绕过" class="headerlink" title="MIME绕过"></a>MIME绕过</h4><p>抓包修改MIME类型为允许的类型</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">jpg- image&#x2F;jpeg</span><br><span class="line">png- image&#x2F;png</span><br></pre></td></tr></table></figure>
+<p>等等。。</p>
+<h4 id="00截断"><a href="#00截断" class="headerlink" title="%00截断"></a>%00截断</h4><p>00截断是利用了php的一个漏洞。漏洞编号为<code>CVE-2015-2348</code>。使用前提要求较为严格。</p>
+<ol>
+<li>服务器<code>php</code>版本小于<code>5.3</code></li>
+<li>魔术引号<code>gpc</code>处于关闭状态,没有使用转义函数</li>
+<li>要求上传路径可控</li>
+</ol>
+<p><img src="https://images.atsud0.me/images/post/Screenshot_20200522_133449.jpg" alt="%00"></p>
+<p>这个上传路径是通过<code>GET</code>型去传值的，直接在URL中显示。所以使用url编码的<code>%00</code>对其进行截断。</p>
+<h4 id="0x00截断"><a href="#0x00截断" class="headerlink" title="0x00截断"></a>0x00截断</h4><p><code>0x00</code>截断和<code>%00</code>截断一样的，只不过区别在与<code>0x00</code>是用与上传路径为POST型的时候。</p>
+<p><img src="https://images.atsud0.me/images/post/Screenshot_20200522_134019.jpg" alt=""></p>
+<p>在<code>../upload/</code>后面写<code>shell2.php+</code>文件名随意，<code>+</code>在16进制中代表<code>0x2b</code>方便我们在hex显示时，对其进行定位修改。</p>
+<p><img src="https://images.atsud0.me/images/post/Screenshot_20200522_134244.jpg" alt=""></p>
+<p>将在hex显示的值中<code>2b</code>修改为<code>00</code>，改好之后会发现其实没什么区别。只是将+号去掉了的样子。但是发送包后会发现是上传成功的。</p>
+<p>上传后的文件名，会发现有一个特殊符号，这就是我们的<code>0x00</code><br><img src="https://images.atsud0.me/images/post/Screenshot_20200522_134514.jpg" alt=""></p>
+<p>对其进行蚁剑/菜刀等进行连接时文件名只取<code>%00/0x00</code>之前的字符。</p>
+<h3 id="检测文件内容"><a href="#检测文件内容" class="headerlink" title="检测文件内容"></a>检测文件内容</h3><h4 id="文件头检查-file-magic-number"><a href="#文件头检查-file-magic-number" class="headerlink" title="文件头检查(file magic number)"></a>文件头检查(file magic number)</h4><a href="https://gist.github.com/leommoore/f9e57ba2aa4bf197ebc5" title="" target="">file magic number</a>好像是国外的说法，国内大部分好像都是直接说改文件头?
+
+<p>如果只检查文件的前几个字节。那就直接添加图片的文件头信息就好了。</p>
+<p>添加gif89a，改成其他的也行。不过gif89a好记。<br><img src="https://images.atsud0.me/images/post/Screenshot_20200522_135302.jpg" alt=""></p>
+<a href="https://gist.github.com/leommoore/f9e57ba2aa4bf197ebc5" title="" target="">常见文件头类型</a>
+
+<h4 id="二次渲染"><a href="#二次渲染" class="headerlink" title="二次渲染"></a>二次渲染</h4><p>二次渲染会将上传后的图片马重新压缩一次，会将原有的php代码消除。</p>
+<p>绕过思路：需要用一张GIF图，生成一个图片马后，上传成功后下载下来，与原来的图片马进行HEX对比，找到相同的地方，在那里插入一句话。（用GIF是因为GIF比JPG和PNG容易。</p>
+<h2 id="中间件文件解析漏洞"><a href="#中间件文件解析漏洞" class="headerlink" title="中间件文件解析漏洞"></a>中间件文件解析漏洞</h2><p>可以通过观察IIS版本来猜测大概的系统版本</p>
+<p>IIS版本</p>
+<ul>
+<li>IIS6.0 2003</li>
+<li>IIS7.0/7.5 2008</li>
+<li>IIS8.0-8.5 2012</li>
+<li>IIS10 2016</li>
+</ul>
+<h3 id="IIS-5-x-6-0解析漏洞"><a href="#IIS-5-x-6-0解析漏洞" class="headerlink" title="IIS 5.x/6.0解析漏洞"></a>IIS 5.x/6.0解析漏洞</h3><h4 id="目录解析"><a href="#目录解析" class="headerlink" title="目录解析"></a>目录解析</h4><p>目录解析，在网站下建立文件夹的名字为 .asp、.asa 的文件夹，其目录内的任何扩展名的文件都被IIS当作asp文件来解析并执行。<br>例如创建了一个目录<code>xx.asp</code>那么可以上传一个图片马。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;xx.asp&#x2F;shell.jpg</span><br></pre></td></tr></table></figure>
+
+<h4 id="文件解析"><a href="#文件解析" class="headerlink" title="文件解析"></a>文件解析</h4><p>在IIS6.0下，分号后面的不被解析。<br>上传一个文件shell.asp;.jpg。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">shell.asp;.jpg</span><br></pre></td></tr></table></figure>
+
+<p>因为分号后面的IIS不会识别，所以就会被解析成<code>shell.asp</code></p>
+<blockquote>
+<p>IIS6.0中 asa,cer,cdx也能被当成asp解析</p>
+</blockquote>
+<h3 id="IIS-7-0-7-5-Nginx-lt-8-03畸形解析漏洞"><a href="#IIS-7-0-7-5-Nginx-lt-8-03畸形解析漏洞" class="headerlink" title="IIS 7.0/7.5/Nginx &lt;8.03畸形解析漏洞"></a>IIS 7.0/7.5/Nginx &lt;8.03畸形解析漏洞</h3><p>好像在apache中也会？</p>
+<p>在默认Fast-CGI开启状况下,上传一个图片马shell.jpg，内容为</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span> fwrite(fopen(<span class="string">'shell.php'</span>,<span class="string">'w'</span>),<span class="string">'&lt;?php eval($_POST[a])?&gt;'</span>);<span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+<p>然后访问shell.jpg/.php,在这个目录下就会生成一句话木马<code>shell.php</code></p>
+<h3 id="Apache文件解析漏洞"><a href="#Apache文件解析漏洞" class="headerlink" title="Apache文件解析漏洞"></a>Apache文件解析漏洞</h3><p>Apache从右向左去读文件后缀，不认识的后缀会丢掉。<br>假设有一个文件名为<code>shell.php.zxc.wwc</code>后面两种不认识会被舍弃掉，所以就会被识别成<code>shell.php</code>。</p>
+<h3 id="Apache多后缀解析后缀"><a href="#Apache多后缀解析后缀" class="headerlink" title="Apache多后缀解析后缀"></a>Apache多后缀解析后缀</h3><p>Apache Httpd支持一个文件拥有多个后缀,不同的后缀执行不同的命令,也就是说当我们上传的文件中只要后缀名含有php,该文件就可以被解析成php文件,利用Apache httpd这个特性,就可以绕过上传文件的白名单。<br>属于管理员配置不当造成的漏洞。如果上传<code>shell.php.jpg</code>的话将会被apache识别成<code>shell.php</code></p>
+<h4 id="修复"><a href="#修复" class="headerlink" title="修复"></a>修复</h4><ol>
+<li>apache配置文件，禁止.php.这样的文件执行 禁止.php文件执行</li>
+<li>使用SetHandler,写好正则 </li>
+</ol>
+<h3 id="FCK文件编辑器漏洞"><a href="#FCK文件编辑器漏洞" class="headerlink" title="FCK文件编辑器漏洞"></a>FCK文件编辑器漏洞</h3><p>FCK文件编辑器漏洞2.4.3/2.6.2这里都是用了IIS6.0的解析漏洞。而且FCK文件编辑器的上传路径是可控的。所以很简单的就可以利用成功了。</p>
+<h2 id="生成图片马"><a href="#生成图片马" class="headerlink" title="生成图片马"></a>生成图片马</h2><h3 id="cmd-生成图片马"><a href="#cmd-生成图片马" class="headerlink" title="cmd 生成图片马"></a>cmd 生成图片马</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">copy 1.jpg&#x2F;b+1.php&#x2F;a 2.jpg</span><br></pre></td></tr></table></figure>
+<h3 id="linux"><a href="#linux" class="headerlink" title="linux"></a>linux</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo &#39;&lt;?php eval($_POST[a])?&gt;&#39; &gt; 1.jpg</span><br></pre></td></tr></table></figure>
+
+<h2 id="防御方式"><a href="#防御方式" class="headerlink" title="防御方式"></a>防御方式</h2><p>文件上传漏洞防御方式:</p>
+<ul>
+<li>上传目录禁止执行，浏览权限</li>
+<li>判断文件类型（最好白名单</li>
+<li>使用随机数改写文件名和文件路径</li>
+<li>单独设置文件服务器</li>
+<li>二次渲染图片</li>
+<li>及时更新中间件</li>
+<li>关闭不必要的配置如nginx的畸形解析漏洞中的Fast-cgi</li>
+<li>只允许访问特定类型的文件</li>
+<li>指定特定扩展名的文件的处理方式，如.py,.php,.asp用纯文本明文显示。<code>AddType text/plain .py .php</code></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>atsud0
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="http://atsud0.me/2020/05/23/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/" title="文件上传漏洞学习笔记">http://atsud0.me/2020/05/23/文件上传/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/upload/" rel="tag"><i class="fa fa-tag"></i> upload</a>
+              <a href="/tags/nginx-upload/" rel="tag"><i class="fa fa-tag"></i> nginx-upload</a>
+              <a href="/tags/iis-upload/" rel="tag"><i class="fa fa-tag"></i> iis-upload</a>
+              <a href="/tags/apache-upload/" rel="tag"><i class="fa fa-tag"></i> apache-upload</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/05/23/TryHackMe-Lian-Yu/" rel="prev" title="TryHackMe-Lian_Yu">
+      <i class="fa fa-chevron-left"></i> TryHackMe-Lian_Yu
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/05/24/%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB%E7%AC%94%E8%AE%B0/" rel="next" title="文件包含笔记">
+      文件包含笔记 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言-amp-amp-参考"><span class="nav-number">1.</span> <span class="nav-text">前言&amp;&amp;参考</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#前端检测"><span class="nav-number">2.</span> <span class="nav-text">前端检测</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#后端检测"><span class="nav-number">3.</span> <span class="nav-text">后端检测</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#检查后缀黑名单"><span class="nav-number">3.1.</span> <span class="nav-text">检查后缀黑名单</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#上传特殊可解析后缀"><span class="nav-number">3.1.1.</span> <span class="nav-text">上传特殊可解析后缀</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#上传-htaccess"><span class="nav-number">3.1.2.</span> <span class="nav-text">上传.htaccess</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#后缀大小写、加空格、加点绕过"><span class="nav-number">3.1.3.</span> <span class="nav-text">后缀大小写、加空格、加点绕过</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#DATA绕过"><span class="nav-number">3.1.4.</span> <span class="nav-text">::$DATA绕过</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#双写绕过"><span class="nav-number">3.1.5.</span> <span class="nav-text">双写绕过</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#检测后缀白名单"><span class="nav-number">3.2.</span> <span class="nav-text">检测后缀白名单</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#MIME绕过"><span class="nav-number">3.2.1.</span> <span class="nav-text">MIME绕过</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#00截断"><span class="nav-number">3.2.2.</span> <span class="nav-text">%00截断</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#0x00截断"><span class="nav-number">3.2.3.</span> <span class="nav-text">0x00截断</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#检测文件内容"><span class="nav-number">3.3.</span> <span class="nav-text">检测文件内容</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#文件头检查-file-magic-number"><span class="nav-number">3.3.1.</span> <span class="nav-text">文件头检查(file magic number)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#二次渲染"><span class="nav-number">3.3.2.</span> <span class="nav-text">二次渲染</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#中间件文件解析漏洞"><span class="nav-number">4.</span> <span class="nav-text">中间件文件解析漏洞</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#IIS-5-x-6-0解析漏洞"><span class="nav-number">4.1.</span> <span class="nav-text">IIS 5.x&#x2F;6.0解析漏洞</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#目录解析"><span class="nav-number">4.1.1.</span> <span class="nav-text">目录解析</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#文件解析"><span class="nav-number">4.1.2.</span> <span class="nav-text">文件解析</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#IIS-7-0-7-5-Nginx-lt-8-03畸形解析漏洞"><span class="nav-number">4.2.</span> <span class="nav-text">IIS 7.0&#x2F;7.5&#x2F;Nginx &lt;8.03畸形解析漏洞</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Apache文件解析漏洞"><span class="nav-number">4.3.</span> <span class="nav-text">Apache文件解析漏洞</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Apache多后缀解析后缀"><span class="nav-number">4.4.</span> <span class="nav-text">Apache多后缀解析后缀</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#修复"><span class="nav-number">4.4.1.</span> <span class="nav-text">修复</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#FCK文件编辑器漏洞"><span class="nav-number">4.5.</span> <span class="nav-text">FCK文件编辑器漏洞</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#生成图片马"><span class="nav-number">5.</span> <span class="nav-text">生成图片马</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#cmd-生成图片马"><span class="nav-number">5.1.</span> <span class="nav-text">cmd 生成图片马</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#linux"><span class="nav-number">5.2.</span> <span class="nav-text">linux</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#防御方式"><span class="nav-number">6.</span> <span class="nav-text">防御方式</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="atsud0"
+      src="https://images.atsud0.me/images/atsud0-avator.jpg">
+  <p class="site-author-name" itemprop="name">atsud0</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">128</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/index.html">
+          
+        <span class="site-state-item-count">166</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/atsud0" title="GitHub → https://github.com/atsud0" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:admin@atsud0.me" title="E-Mail → mailto:admin@atsud0.me"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/atsud0" title="Twitter → https://twitter.com/atsud0" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/MindworkshopBot" title="Telegram → https://t.me/MindworkshopBot" rel="noopener" target="_blank"><i class="fab fa-telegram fa-fw"></i>Telegram</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.ajin.cloud/" title="https://blog.ajin.cloud/" rel="noopener" target="_blank">ajin</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://leiblog.wang/" title="https://leiblog.wang/" rel="noopener" target="_blank">LeiWang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://esonhugh.github.io/" title="https://esonhugh.github.io/" rel="noopener" target="_blank">Esonhugh</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://isabellainori.github.io/" title="https://isabellainori.github.io/" rel="noopener" target="_blank">Isabella Ross</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2020 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">atsud0</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">Symbols count total: </span>
+    <span title="Symbols count total">407k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">Reading time total &asymp;</span>
+    <span title="Reading time total">6:10</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

