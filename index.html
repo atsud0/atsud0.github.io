@@ -328,7 +328,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2021-02-24 09:43:56 / Modified: 12:22:37" itemprop="dateCreated datePublished" datetime="2021-02-24T09:43:56+08:00">2021-02-24</time>
+              <time title="Created: 2021-02-24 09:43:56 / Modified: 12:23:20" itemprop="dateCreated datePublished" datetime="2021-02-24T09:43:56+08:00">2021-02-24</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -368,54 +368,14 @@
           <blockquote>
 <p>在用markdown书写时，上传图片稍稍有点不方便，如果图片在本地，上传之后又要改图片的地址。图片不多的时候还好，多起来的时候就很麻烦。。</p>
 </blockquote>
-<!more>
-
-<p>前提：</p>
-<ul>
-<li>Mac:Upic(Other OS:PicGo)</li>
-<li>Amazon 账号</li>
-<li>一个域名 （可选操作)</li>
-<li>CloudFlare账号 （可选操作)</li>
-</ul>
-<h2 id="创建并设置Amazon-S3-Bucket"><a href="#创建并设置Amazon-S3-Bucket" class="headerlink" title="创建并设置Amazon S3 Bucket"></a>创建并设置Amazon S3 Bucket</h2><h3 id="新建Bucket并公开"><a href="#新建Bucket并公开" class="headerlink" title="新建Bucket并公开"></a>新建Bucket并公开</h3><p>名字记得要唯一，记得把”封鎖所有公有存取權的儲存貯體設定”关掉就好了。<br><img src="https://images.atsud0.me/images/post/20210224-10:05:45-_6Mr1XM_sumkm8.jpg" alt=""></p>
-<p>接着在你新建的bucket里，建立一个文件夹，并设置为公开。<br><img src="https://images.atsud0.me/images/post/20210224-11:24:39-_JmOhKJ_OphcT1.jpg" alt=""></p>
-<p>在这里将images设置为公开后，images下的所有文件，都可以被公共访问。</p>
-<h3 id="静态托管-Bucket"><a href="#静态托管-Bucket" class="headerlink" title="静态托管 Bucket"></a>静态托管 Bucket</h3><p>将bucket设置为静态托管，启用静态托管配置功能就好了<br><img src="https://images.atsud0.me/images/post/20210224-11:28:31-_ovpg10_N1HdTK.png" alt=""></p>
-<h3 id="新建IAM用户（获取Access-Key-ID和Secret-access-key"><a href="#新建IAM用户（获取Access-Key-ID和Secret-access-key" class="headerlink" title="新建IAM用户（获取Access Key ID和Secret access key"></a>新建IAM用户（获取Access Key ID和Secret access key</h3><p>然后新建一个IAM账号<br><img src="https://images.atsud0.me/images/post/20210224-10:09:10-_h6TJXa_9ULniA.jpg" alt=""></p>
-<p>勾选图中的选项，设置好名字后就可以直接下一步了。<br><img src="https://images.atsud0.me/images/post/20210224-10:10:46-_azphSF_bepjL3.png" alt=""></p>
-<p><img src="https://images.atsud0.me/images/post/20210224-10:13:47-_x8xmrX_MaHiEK.jpg" alt=""></p>
-<p><img src="https://images.atsud0.me/images/post/20210224-10:15:14-_s2HIkV_kx3Pv9.jpg" alt=""></p>
-<p>记得保存好这里会出现的Access Key ID和Secret access key<br><img src="https://images.atsud0.me/images/post/20210224-10:14:50-_YLz8W3_rDNul7.png" alt=""></p>
-<h2 id="下载Upic-amp-配置Upic"><a href="#下载Upic-amp-配置Upic" class="headerlink" title="下载Upic &amp; 配置Upic"></a>下载Upic &amp; 配置Upic</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">brew install upic</span><br></pre></td></tr></table></figure>
-<p>或者来github页面上<a href="https://github.com/gee1k/uPic/releases" target="_blank" rel="noopener">upic.dmg</a>下载dmg格式安装。</p>
-<p>安装好后到设置页面进行配置<br><img src="https://images.atsud0.me/images/post/20210224-10:19:29-_kdQIRp_Tw8RQf.png" alt=""><br>网站名称没有可不填，直接用亚马逊给的。</p>
-<p>填写完毕之后点验证就可以看成功没了。</p>
-<p>之后可以在通用页面设置个快捷键，直接一键上传，方便很多。</p>
-<p><s>不嫌麻烦的可以用aws cli。（逃</s></p>
-<h2 id="配置CloudFront"><a href="#配置CloudFront" class="headerlink" title="配置CloudFront"></a>配置CloudFront</h2><p><a href="https://console.aws.amazon.com/cloudfront/home" target="_blank" rel="noopener">CloudFront</a></p>
-<p><img src="https://images.atsud0.me/images/post/20210224-11:32:32-_CiJMPH_Or0HPr.png" alt=""></p>
-<p>点建立分布后直接下一步，<br><img src="https://images.atsud0.me/images/post/20210224-11:34:58-_jXOT6k_pj9BUt.png" alt=""></p>
-<p>源域名名称，因为刚刚设置了s3的静态托管，所以这里是可以直接选s3 bucket的website页面就好。</p>
-<p>CNAME：没有可不写，如果想自定义域名的话就要设置。<strong>如果要自定义域名的话就要自定SSL凭证，要先在ACM中申请凭证后才可以设置</strong>。</p>
-<p>SSL证书：默认就可以，<strong>自定义凭证，aws要验证你是域名的所属者才能使用</strong></p>
-<p>其他的看着配置就行。</p>
-<p>之后就会给分配一个固定cloudfront的域名。</p>
-<p>大致上就这么一个结果。<br><img src="https://images.atsud0.me/images/post/20210224-11:42:51-_quZR6u_TbHbhL.jpg" alt=""></p>
-<h2 id="ACM申请凭证"><a href="#ACM申请凭证" class="headerlink" title="ACM申请凭证"></a>ACM申请凭证</h2><p><img src="https://images.atsud0.me/images/post/20210224-11:45:43-_xF7zpR_qjHrCM.png" alt=""></p>
-<p>选dns验证，如果不能自己设置dns的话就选邮件验证（感觉更快<br><img src="https://images.atsud0.me/images/post/20210224-11:46:10-_pzlXIC_wMaw2b.png" alt=""></p>
-<p><img src="https://images.atsud0.me/images/post/20210224-11:46:47-_r5ld43_kOAyqq.png" alt=""></p>
-<p>将给的这条CNAME记录在域名服务商中配置，等dns生效就好了。<br><img src="https://images.atsud0.me/images/post/20210224-11:47:56-_aMsl59_fuVTAf.jpg" alt=""></p>
-<h2 id="自定义域名"><a href="#自定义域名" class="headerlink" title="自定义域名"></a>自定义域名</h2><p>我是在gandi买的域名，但是用了cloudflare的dns。所以直接在cloudflare上配置。</p>
-<p>配置这两条，一条是刚刚在ACM申请中给等CNAME记录（在CloudFlare中要设置成DNS Only，不要弄成了Proxied状态）</p>
-<p>另外一条则是将自己个性化域名导向到CloudFront分配的域名。</p>
-<p><img src="https://images.atsud0.me/images/post/20210224-11:56:22-_hncBE7_jMsgXt.png" alt=""></p>
-<h2 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h2><p>能正常使用，，0 0<br><img src="https://images.atsud0.me/images/post/20210224-11:59:31-_IJwUxS_Vqotms.png" alt=""></p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
-<li><a href="https://troyyang.com/2018/02/16/hosting-images-with-aws-s3/" target="_blank" rel="noopener">正确使用AWS S3的方式之打造自己的https图床</a></li>
-<li><a href="https://shisaq.github.io/personal_dev/2020/04/30/amazon-s3-with-upic-picture-bed.html" target="_blank" rel="noopener">用Amazon S3 实现快速上传图床</a></li>
-<li><a href="https://leiblog.wang/Upic%E6%90%AD%E5%BB%BA%E5%9B%BE%E5%BA%8A/" target="_blank" rel="noopener">Upic搭建图床</a></li>
-</ul>
-
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/02/24/%E4%BD%BF%E7%94%A8Amazon-S3%E5%AE%9E%E7%8E%B0%E5%9B%BE%E5%BA%8A/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
