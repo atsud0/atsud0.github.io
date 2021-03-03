@@ -6824,7 +6824,7 @@
 <p>就像这样<br><img src="https://images.atsud0.me/images/post/Screenshot_20200427_125010.jpg" alt="find-exec"></p>
 <p>我当前的目录下有两个文件，所有whoami这条命令被执行了两次。</p>
 <p>所以这条命令也能被用于提权（看情况</p>
-<h2 id="最重要的用法"><a href="#最重要的用法" class="headerlink" title="最重要的用法"></a>最重要的用法</h2><p>搜索suid位的文件</p>
+<h2 id="重要的用法"><a href="#重要的用法" class="headerlink" title="重要的用法"></a>重要的用法</h2><p>搜索suid位的文件</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">find &#x2F; -type f -perm -u&#x3D;s 2&gt;&#x2F;dev&#x2F;null</span><br></pre></td></tr></table></figure>
 ]]></content>
       <categories>
