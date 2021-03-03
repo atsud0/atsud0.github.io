@@ -28,7 +28,7 @@
 <meta property="og:description" content="用nginx作反向代理">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2021-03-03T02:28:28.000Z">
-<meta property="article:modified_time" content="2021-03-03T03:07:41.760Z">
+<meta property="article:modified_time" content="2021-03-03T03:12:11.788Z">
 <meta property="article:author" content="atsud0">
 <meta property="article:tag" content="others">
 <meta property="article:tag" content="Nginx">
@@ -236,7 +236,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2021-03-03 10:28:28 / Modified: 11:07:41" itemprop="dateCreated datePublished" datetime="2021-03-03T10:28:28+08:00">2021-03-03</time>
+              <time title="Created: 2021-03-03 10:28:28 / Modified: 11:12:11" itemprop="dateCreated datePublished" datetime="2021-03-03T10:28:28+08:00">2021-03-03</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -261,7 +261,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">Symbols count in article: </span>
-              <span>757</span>
+              <span>752</span>
             </span>
             <span class="post-meta-item" title="Reading time">
               <span class="post-meta-item-icon">
@@ -291,7 +291,7 @@
 <p>访问127.0.0.1:80没问题就行。</p>
 <h2 id="配置文件"><a href="#配置文件" class="headerlink" title="配置文件"></a>配置文件</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vim &#x2F;etc&#x2F;nginx&#x2F;site-enables&#x2F;default</span><br></pre></td></tr></table></figure>
 
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">    # 监听端口</span><br><span class="line">	listen 80 default_server;</span><br><span class="line">	listen [::]:80 default_server;</span><br><span class="line"></span><br><span class="line">    # 网站根目录</span><br><span class="line">	root &#x2F;var&#x2F;www&#x2F;html; </span><br><span class="line">    # index文件</span><br><span class="line">	index index.html index.htm index.nginx-debian.html;</span><br><span class="line">    # 服务器域名</span><br><span class="line">	server_name test.com;</span><br><span class="line">    # 路径</span><br><span class="line">	location &#x2F; &#123;</span><br><span class="line">                proxy_pass https:&#x2F;&#x2F;www.baidu.com;</span><br><span class="line">                proxy_set_header X-Real-IP $remote_addr;</span><br><span class="line">		        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;</span><br><span class="line">		        proxy_set_header X-Forwarded-Proto $http_x_forwarded_proto;</span><br><span class="line"></span><br><span class="line">                proxy_set_header Referer &#39;no-referrer-when-downgrade&#39;;</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">    # 监听端口</span><br><span class="line">	listen 80 default_server;</span><br><span class="line">	listen [::]:80 default_server;</span><br><span class="line"></span><br><span class="line">    # 网站根目录</span><br><span class="line">	root &#x2F;var&#x2F;www&#x2F;html; </span><br><span class="line">    # index文件</span><br><span class="line">	index index.html index.htm index.nginx-debian.html;</span><br><span class="line">    # 服务器域名</span><br><span class="line">	server_name test.com;</span><br><span class="line">	location &#x2F; &#123;</span><br><span class="line">                proxy_pass https:&#x2F;&#x2F;www.baidu.com;</span><br><span class="line">                proxy_set_header X-Real-IP $remote_addr;</span><br><span class="line">		        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;</span><br><span class="line">		        proxy_set_header X-Forwarded-Proto $http_x_forwarded_proto;</span><br><span class="line"></span><br><span class="line">                proxy_set_header Referer &#39;no-referrer-when-downgrade&#39;;</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
 
 <p>访问<code>www.test.com</code>就会跳转到百度了。如果有做跨域限制的话，就有些资源加载不出来咯。</p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
