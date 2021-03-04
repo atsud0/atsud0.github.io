@@ -10797,4 +10797,74 @@ column_name  列名</code></pre><p>确认表中有多少字段（order by）</p>
         <tag>PHP</tag>
       </tags>
   </entry>
+  <entry>
+    <title>HackTheBox-Delivery</title>
+    <url>/2021/03/04/HackTheBox-Delivery/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><ul>
+<li>Name:Delivery</li>
+<li>OS:Linux</li>
+</ul>
+<p><image src=https://www.hackthebox.eu/storage/avatars/c55af6eadd5b60bac831d73c1a951327_thumb.png></image></p>
+<a id="more"></a>
+
+
+<h2 id="0x01-信息收集"><a href="#0x01-信息收集" class="headerlink" title="0x01 信息收集"></a>0x01 信息收集</h2><h3 id="NMAP"><a href="#NMAP" class="headerlink" title="NMAP"></a>NMAP</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">nmap -p- delivery.htb</span><br><span class="line">22</span><br><span class="line">80</span><br><span class="line">8065</span><br><span class="line"></span><br><span class="line">nmap -p 22,80,8065  -A --script vuln delivery.htb</span><br><span class="line">22&#x2F;tcp   open  ssh     OpenSSH 7.9p1 Debian 10+deb10u2 (protocol 2.0)</span><br><span class="line">80&#x2F;tcp   open  http    nginx 1.14.2</span><br><span class="line">8065&#x2F;tcp open  unknown</span><br></pre></td></tr></table></figure>
+
+<h3 id="http-80"><a href="#http-80" class="headerlink" title="http-80"></a>http-80</h3><p>直接访问，首页是个静态页面，有个链接 访问会跳转到<code>helpdesk.delivery.htb</code>，添加到/etc/hosts上，访问之后是osTicket 这个东西。</p>
+<p>尝试一些现有的漏洞利用，无果。</p>
+<p>卡了一段时间，结果在首页的联系我们页面发现这样一段话</p>
+<blockquote>
+<p>For unregistered users, please use our HelpDesk to get in touch with our team. Once you have an @delivery.htb email address, you’ll be able to have access to our MatterMost server.</p>
+</blockquote>
+<p><img src="https://images.atsud0.me/images/post/20210304-13:46:15-_qfwWyO_cX0Meo.png" alt="20210304-13:46:15-_qfwWyO_cX0Meo"></p>
+<p>嗯，完全理解了！<s>（并没有</s></p>
+<p>它这里说，没有注册的用户，要通过HelpDesk来获得一个邮箱账号，然后利用这个邮箱账号就能访问8065端口mattermost的服务。</p>
+<h3 id="http-8065"><a href="#http-8065" class="headerlink" title="http-8065"></a>http-8065</h3><p>mattermost是个在线聊天服务，但是没有账号，需要注册，注册要收邮件的一条链接- -。</p>
+<h2 id="0x02-利用"><a href="#0x02-利用" class="headerlink" title="0x02 利用"></a>0x02 利用</h2><p>经过首页那段话的提示，终于摸到路了。</p>
+<ol>
+<li>先在osTicket中用访客用户新建一个ticket，</li>
+<li>创建好之后会得到一个<a href="mailto:xxx@delivery.htb">xxx@delivery.htb</a>，</li>
+<li>在osTicket中，打开检查创建好ticket的状态。</li>
+<li>在mattermost新建账号，邮箱就用创建票据给的。注册好要接受邮件信息</li>
+<li>刷新一下票据状态就，会收到一条激活账号信息</li>
+<li>访问，mattermost账号激活成功。</li>
+</ol>
+<p>创建票据。给到的邮箱账号就是票据<a href="mailto:id@delivery.htb">id@delivery.htb</a><br><img src="https://images.atsud0.me/images/post/20210304-13:45:16-_yJUyNe_R9DpHa.png" alt="20210304-13:45:16-_yJUyNe_R9DpHa"></p>
+<p><img src="https://images.atsud0.me/images/post/20210304-11:53:49-_F2q8Qe_myOfKS.png" alt="20210304-11:53:49-_F2q8Qe_myOfKS"></p>
+<p>登陆进来后，看下聊天，有root的发言，里面给到了服务器的账号密码。</p>
+<p><img src="https://images.atsud0.me/images/post/20210304-11:49:56-_gwZk2a_EDYr4M.png" alt="20210304-11:49:56-_gwZk2a_EDYr4M"></p>
+<blockquote>
+<p>maildeliverer:Youve_G0t_Mail! </p>
+</blockquote>
+<p><img src="https://images.atsud0.me/images/post/20210304-11:28:09-_sHHvzz_eNwgYG.png" alt="20210304-11:28:09-_sHHvzz_eNwgYG"></p>
+<h2 id="0x03-提权"><a href="#0x03-提权" class="headerlink" title="0x03 提权"></a>0x03 提权</h2><p>简单枚举一下，在/opt/mattermost/config/config.json中，发现mysql的用户的账号密码。</p>
+<p><img src="https://images.atsud0.me/images/post/20210304-12:18:45-_0oYXrt_6b9hc6.png" alt="20210304-12:18:45-_0oYXrt_6b9hc6"></p>
+<blockquote>
+<p>mmuser:Crack_The_MM_Admin_PW</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">mysql -u mmuser -p &#39;Crack_The_MM_Admin_PW&#39;</span><br><span class="line">&gt;</span><br><span class="line">&gt;use mattermost</span><br><span class="line">&gt;select username,password from Users;</span><br></pre></td></tr></table></figure>
+<p><img src="https://images.atsud0.me/images/post/20210304-12:23:41-_7u4i69_v2CwTT.png" alt="20210304-12:23:41-_7u4i69_v2CwTT"></p>
+<blockquote>
+<p>root:$2a$10$VM6EeymRxJ29r8Wjkr8Dtev0O.1STWb4.4ScG.anuu7v0EFJwgjjO</p>
+</blockquote>
+<p>呃，已经提示我们要破解他了。嗯，加上前面的聊天记录，猜测密码是<code>PleaseSubscribe!</code>的变种。可以跟着提示利用hastcat的规则来试试破解。</p>
+<p>规则我用的是<a href="https://raw.githubusercontent.com/praetorian-inc/Hob0Rules/master/d3adhob0.rule" target="_blank" rel="noopener">d3adhob0.rule</a></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">echo &#39;PleaseSubscribe!&#39; &gt; password.txt</span><br><span class="line"></span><br><span class="line">hashcat -a 0 -m 3200 &#39;$2a$10$VM6EeymRxJ29r8Wjkr8Dtev0O.1STWb4.4ScG.anuu7v0EFJwgjjO&#39; password.txt -r d3adhob0.rule --force</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://images.atsud0.me/images/post/20210304-13:41:41-_IEJFUO_0HVjcX.png" alt="20210304-13:41:41-_IEJFUO_0HVjcX"></p>
+<p><strong>rooted</strong>！</p>
+<p><img src="https://images.atsud0.me/images/post/20210304-12:46:06-_Bcs9Mr_IWf1Jz.png" alt="20210304-12:46:06-_Bcs9Mr_IWf1Jz"></p>
+<h2 id="0x04-参考"><a href="#0x04-参考" class="headerlink" title="0x04 参考"></a>0x04 参考</h2><ul>
+<li><a href="https://www.freebuf.com/sectool/154586.html" target="_blank" rel="noopener">基于统计学的Hashcat密码生成规则：Hob0Rules</a></li>
+</ul>
+]]></content>
+      <categories>
+        <category>靶机实验</category>
+        <category>HackTheBox</category>
+      </categories>
+      <tags>
+        <tag>Linux</tag>
+        <tag>hashcat</tag>
+      </tags>
+  </entry>
 </search>
