@@ -11074,7 +11074,10 @@ column_name  列名</code></pre><p>确认表中有多少字段（order by）</p>
   <entry>
     <title>CVE-2020-10977_GitLab任意文件读取导致RCE漏洞复现</title>
     <url>/2021/03/09/CVE-2020-10977%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">yum -y install policycoreutils openssh-server openssh-clients postfix</span><br></pre></td></tr></table></figure>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><p>CVE-2020-10977_GitLab任意文件读取导致RCE漏洞复现</p>
+<a id="more"></a>
+
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">yum -y install policycoreutils openssh-server openssh-clients postfix</span><br></pre></td></tr></table></figure>
 <p>分配给虚拟机的物理内存最好是4G。</p>
 <p>下载gitlab安装包</p>
 <ul>
