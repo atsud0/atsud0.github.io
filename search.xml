@@ -11131,26 +11131,4 @@ column_name  列名</code></pre><p>确认表中有多少字段（order by）</p>
         <tag>Nginx</tag>
       </tags>
   </entry>
-  <entry>
-    <title>修复允许SSL中强度加密漏洞</title>
-    <url>/2021/04/01/%E4%BF%AE%E5%A4%8D%E5%85%81%E8%AE%B8SSL%E4%B8%AD%E5%BC%BA%E5%BA%A6%E5%8A%A0%E5%AF%86%E6%BC%8F%E6%B4%9E/</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><p>客户某天收到网安发来的漏洞整改。。</p>
-<a id="more"></a>
-
-<ul>
-<li>中间件：Nginx</li>
-</ul>
-<p>修改对应监听端口的ssl_ciphers配置</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">http&#123;</span><br><span class="line">    server&#123;</span><br><span class="line">        ....</span><br><span class="line">        ssl_ciphers &quot;ECDHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA256:ECDHE-RSA-AES256-SHA:ECDHE-RSA-AES128-SHA:!ECDHE-RSA-DES-CBC3-SHA:AES256-GCM-SHA384:AES128-GCM-SHA256:AES256-SHA256:AES128-SHA256:AES256-SHA:AES128-SHA:!DES-CBC3-SHA:!aNULL:!eNULL:!EXPORT:!DES:!MD5:!PSK:!RC4&quot;;#使用给定的加密算法，前面带！的说明是不使用。</span><br><span class="line">        ....</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>可以使用nmap的ssl_enum_ciphers.nse脚本来快速检测。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">nmap -p 443 --script ssl_enum_ciphers IP</span><br></pre></td></tr></table></figure>]]></content>
-      <categories>
-        <category>note</category>
-      </categories>
-      <tags>
-        <tag>others</tag>
-        <tag>Nginx</tag>
-      </tags>
-  </entry>
 </search>
