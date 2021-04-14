@@ -20,15 +20,15 @@
     var CONFIG = {"hostname":"atsud0.me","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="linux部分命令速查 for me。 命令行的艺术">
+  <meta name="description" content="linux部分命令速查 for me。 命令行的艺术  OSCP Notes">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Linux部分实用命令">
 <meta property="og:url" content="http://atsud0.me/2020/04/14/Linux%E9%83%A8%E5%88%86%E5%AE%9E%E7%94%A8%E5%91%BD%E4%BB%A4/index.html">
 <meta property="og:site_name" content="雪之下二丁目鹤岗八幡宫">
-<meta property="og:description" content="linux部分命令速查 for me。 命令行的艺术">
+<meta property="og:description" content="linux部分命令速查 for me。 命令行的艺术  OSCP Notes">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2020-04-14T04:41:08.000Z">
-<meta property="article:modified_time" content="2021-03-25T08:31:59.158Z">
+<meta property="article:modified_time" content="2021-04-14T05:30:55.872Z">
 <meta property="article:author" content="atsud0">
 <meta property="article:tag" content="Linux">
 <meta name="twitter:card" content="summary">
@@ -142,7 +142,7 @@
   </li>
         <li class="menu-item menu-item-tags">
 
-    <a href="/tags/index.html" rel="section"><i class="fa fa-tags fa-fw"></i>Tags<span class="badge">179</span></a>
+    <a href="/tags/index.html" rel="section"><i class="fa fa-tags fa-fw"></i>Tags<span class="badge">181</span></a>
 
   </li>
         <li class="menu-item menu-item-categories">
@@ -152,7 +152,7 @@
   </li>
         <li class="menu-item menu-item-archives">
 
-    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives<span class="badge">142</span></a>
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives<span class="badge">145</span></a>
 
   </li>
       <li class="menu-item menu-item-search">
@@ -241,7 +241,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-03-25 16:31:59" itemprop="dateModified" datetime="2021-03-25T16:31:59+08:00">2021-03-25</time>
+                <time title="Modified: 2021-04-14 13:30:55" itemprop="dateModified" datetime="2021-04-14T13:30:55+08:00">2021-04-14</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -266,7 +266,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">Symbols count in article: </span>
-              <span>5k</span>
+              <span>5.4k</span>
             </span>
             <span class="post-meta-item" title="Reading time">
               <span class="post-meta-item-icon">
@@ -287,6 +287,9 @@
       
         <p>linux部分命令速查 for me。</p>
 <a href="https://github.com/jlevy/the-art-of-command-line/blob/master/README-zh.md" title="" target="">命令行的艺术</a>
+
+<a href="https://oscpnotes.infosecsanyam.in/My_OSCP_Preparation_Notes--Enumeration--OS--windows--basic_commands.html" title="" target="">OSCP Notes</a>
+
 <a id="more"></a>
 
 <p>获取命令帮助的网站<br><a href="https://gtfobins.github.io/" target="_blank" rel="noopener">gtfobins</a><br><a href="https://www.runoob.com/linux/linux-command-manual.html" target="_blank" rel="noopener">Runoob</a></p>
@@ -342,7 +345,7 @@
 
 <h3 id="python部署简易网站"><a href="#python部署简易网站" class="headerlink" title="python部署简易网站"></a>python部署简易网站</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">python -m SimpleHTTPServer # 不指定端口默认8000</span><br><span class="line">python -m http.server</span><br><span class="line">python3 -m updog --ssl --password 123456 -p 80 #不是自带库，需要安装。</span><br></pre></td></tr></table></figure>
 
-<h3 id="curl-wget-不验证证书进行https请求"><a href="#curl-wget-不验证证书进行https请求" class="headerlink" title="curl wget 不验证证书进行https请求"></a>curl wget 不验证证书进行https请求</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">wget &#39;https:&#x2F;&#x2F;x.x.x.x&#x2F;get_ips&#39; --no-check-certificate</span><br><span class="line">curl &#39;https:&#x2F;&#x2F;x.x.x.x&#x2F;get_ips&#39; -k</span><br></pre></td></tr></table></figure>
+<h3 id="不验证证书进行https请求"><a href="#不验证证书进行https请求" class="headerlink" title="不验证证书进行https请求"></a>不验证证书进行https请求</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">wget &#39;https:&#x2F;&#x2F;x.x.x.x&#x2F;get_ips&#39; --no-check-certificate</span><br><span class="line">curl &#39;https:&#x2F;&#x2F;x.x.x.x&#x2F;get_ips&#39; -k</span><br><span class="line">gobuster dir -u &#39;https:&#x2F;&#x2F;x.x.x.x&#x2F;&#39; -w ~&#x2F;big.txt -k</span><br><span class="line">feroxbuster --url &#39;https:&#x2F;&#x2F;x.x.x.x&#x2F;&#39; --wordlist ~&#x2F;big.txt -k</span><br></pre></td></tr></table></figure>
 
 <h3 id="设置term"><a href="#设置term" class="headerlink" title="设置term"></a>设置term</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">export TERM&#x3D;xterm</span><br></pre></td></tr></table></figure>
 
@@ -388,6 +391,12 @@
 <h4 id="命令行写"><a href="#命令行写" class="headerlink" title="命令行写"></a>命令行写</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysql -h 127.0.0.1 -u root -p XXXX -P 3306 -e &quot;select * from database.table&quot;  &gt; &#x2F;tmp&#x2F;test&#x2F;txt</span><br></pre></td></tr></table></figure>
 
 <h3 id="ssh-keygen生产私钥对"><a href="#ssh-keygen生产私钥对" class="headerlink" title="ssh-keygen生产私钥对"></a>ssh-keygen生产私钥对</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh-keygen rsa 4096 -f a.key</span><br></pre></td></tr></table></figure>
+
+<h3 id="SSH"><a href="#SSH" class="headerlink" title="SSH"></a>SSH</h3><p>Unable to negotiate with 10.129.131.134 port 22022: no matching key exchange method found. Their offer: gss-group1-sha1-toWM5Slw5Ew8Mqkay+al2g==,diffie-hellman-group-exchange-sha1,diffie-hellman-group1-sha1</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh -oKexAlgorithms&#x3D;+diffie-hellman-group1-sha1 a@1.1.1.1</span><br></pre></td></tr></table></figure>
+
+<h3 id="CGI-BIN"><a href="#CGI-BIN" class="headerlink" title="CGI-BIN"></a>CGI-BIN</h3><p>常见后缀</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sh,pl,py,cgi</span><br></pre></td></tr></table></figure>
     </div>
 
     
@@ -488,7 +497,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#查看用户-用户组"><span class="nav-number">1.</span> <span class="nav-text">查看用户|用户组</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#显示某个文件的第几行"><span class="nav-number">2.</span> <span class="nav-text">显示某个文件的第几行</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#删除文本换行符和空格"><span class="nav-number">3.</span> <span class="nav-text">删除文本换行符和空格</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#linux-下删除文本空行"><span class="nav-number">4.</span> <span class="nav-text">linux 下删除文本空行</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#grep"><span class="nav-number">4.1.</span> <span class="nav-text">grep</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#sed"><span class="nav-number">4.2.</span> <span class="nav-text">sed</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#awk"><span class="nav-number">4.3.</span> <span class="nav-text">awk</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#tr"><span class="nav-number">4.4.</span> <span class="nav-text">tr</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#vim"><span class="nav-number">4.5.</span> <span class="nav-text">vim</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#linux-shell-字符串反转-rev"><span class="nav-number">5.</span> <span class="nav-text">linux shell 字符串反转 rev</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#linux-shell-base64"><span class="nav-number">6.</span> <span class="nav-text">linux shell base64</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查找SUID位的文件"><span class="nav-number">7.</span> <span class="nav-text">查找SUID位的文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查看Linux内核-系统版本"><span class="nav-number">8.</span> <span class="nav-text">查看Linux内核&#x2F;系统版本</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#curl-部分用法"><span class="nav-number">9.</span> <span class="nav-text">curl 部分用法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#wget部分用法"><span class="nav-number">10.</span> <span class="nav-text">wget部分用法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#python打开tty，nc升级完全交互式的TTY"><span class="nav-number">11.</span> <span class="nav-text">python打开tty，nc升级完全交互式的TTY</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#python部署简易网站"><span class="nav-number">12.</span> <span class="nav-text">python部署简易网站</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#curl-wget-不验证证书进行https请求"><span class="nav-number">13.</span> <span class="nav-text">curl wget 不验证证书进行https请求</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#设置term"><span class="nav-number">14.</span> <span class="nav-text">设置term</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Arch-查询滚了多少次-…"><span class="nav-number">15.</span> <span class="nav-text">Arch 查询滚了多少次(…)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#渗透过程中不记录历史命令"><span class="nav-number">16.</span> <span class="nav-text">渗透过程中不记录历史命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#无文件落地执行"><span class="nav-number">17.</span> <span class="nav-text">无文件落地执行</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Dos格式文件快速转为Unix"><span class="nav-number">18.</span> <span class="nav-text">Dos格式文件快速转为Unix</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Linux使用impakcet快速开启一个SMB共享目录"><span class="nav-number">19.</span> <span class="nav-text">Linux使用impakcet快速开启一个SMB共享目录</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#PIP下载文件"><span class="nav-number">20.</span> <span class="nav-text">PIP下载文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#whois传输文件"><span class="nav-number">21.</span> <span class="nav-text">whois传输文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#切换java版本"><span class="nav-number">22.</span> <span class="nav-text">切换java版本</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#编译32位且动态链接库文件很老的二进制文件"><span class="nav-number">23.</span> <span class="nav-text">编译32位且动态链接库文件很老的二进制文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#nohup"><span class="nav-number">24.</span> <span class="nav-text">nohup</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#正则"><span class="nav-number">25.</span> <span class="nav-text">正则</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#mysql查询结果写到文件"><span class="nav-number">26.</span> <span class="nav-text">mysql查询结果写到文件</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#into-outfile"><span class="nav-number">26.1.</span> <span class="nav-text">into outfile</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#命令行写"><span class="nav-number">26.2.</span> <span class="nav-text">命令行写</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ssh-keygen生产私钥对"><span class="nav-number">27.</span> <span class="nav-text">ssh-keygen生产私钥对</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#查看用户-用户组"><span class="nav-number">1.</span> <span class="nav-text">查看用户|用户组</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#显示某个文件的第几行"><span class="nav-number">2.</span> <span class="nav-text">显示某个文件的第几行</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#删除文本换行符和空格"><span class="nav-number">3.</span> <span class="nav-text">删除文本换行符和空格</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#linux-下删除文本空行"><span class="nav-number">4.</span> <span class="nav-text">linux 下删除文本空行</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#grep"><span class="nav-number">4.1.</span> <span class="nav-text">grep</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#sed"><span class="nav-number">4.2.</span> <span class="nav-text">sed</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#awk"><span class="nav-number">4.3.</span> <span class="nav-text">awk</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#tr"><span class="nav-number">4.4.</span> <span class="nav-text">tr</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#vim"><span class="nav-number">4.5.</span> <span class="nav-text">vim</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#linux-shell-字符串反转-rev"><span class="nav-number">5.</span> <span class="nav-text">linux shell 字符串反转 rev</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#linux-shell-base64"><span class="nav-number">6.</span> <span class="nav-text">linux shell base64</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查找SUID位的文件"><span class="nav-number">7.</span> <span class="nav-text">查找SUID位的文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查看Linux内核-系统版本"><span class="nav-number">8.</span> <span class="nav-text">查看Linux内核&#x2F;系统版本</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#curl-部分用法"><span class="nav-number">9.</span> <span class="nav-text">curl 部分用法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#wget部分用法"><span class="nav-number">10.</span> <span class="nav-text">wget部分用法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#python打开tty，nc升级完全交互式的TTY"><span class="nav-number">11.</span> <span class="nav-text">python打开tty，nc升级完全交互式的TTY</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#python部署简易网站"><span class="nav-number">12.</span> <span class="nav-text">python部署简易网站</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#不验证证书进行https请求"><span class="nav-number">13.</span> <span class="nav-text">不验证证书进行https请求</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#设置term"><span class="nav-number">14.</span> <span class="nav-text">设置term</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Arch-查询滚了多少次-…"><span class="nav-number">15.</span> <span class="nav-text">Arch 查询滚了多少次(…)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#渗透过程中不记录历史命令"><span class="nav-number">16.</span> <span class="nav-text">渗透过程中不记录历史命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#无文件落地执行"><span class="nav-number">17.</span> <span class="nav-text">无文件落地执行</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Dos格式文件快速转为Unix"><span class="nav-number">18.</span> <span class="nav-text">Dos格式文件快速转为Unix</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Linux使用impakcet快速开启一个SMB共享目录"><span class="nav-number">19.</span> <span class="nav-text">Linux使用impakcet快速开启一个SMB共享目录</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#PIP下载文件"><span class="nav-number">20.</span> <span class="nav-text">PIP下载文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#whois传输文件"><span class="nav-number">21.</span> <span class="nav-text">whois传输文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#切换java版本"><span class="nav-number">22.</span> <span class="nav-text">切换java版本</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#编译32位且动态链接库文件很老的二进制文件"><span class="nav-number">23.</span> <span class="nav-text">编译32位且动态链接库文件很老的二进制文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#nohup"><span class="nav-number">24.</span> <span class="nav-text">nohup</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#正则"><span class="nav-number">25.</span> <span class="nav-text">正则</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#mysql查询结果写到文件"><span class="nav-number">26.</span> <span class="nav-text">mysql查询结果写到文件</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#into-outfile"><span class="nav-number">26.1.</span> <span class="nav-text">into outfile</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#命令行写"><span class="nav-number">26.2.</span> <span class="nav-text">命令行写</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ssh-keygen生产私钥对"><span class="nav-number">27.</span> <span class="nav-text">ssh-keygen生产私钥对</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SSH"><span class="nav-number">28.</span> <span class="nav-text">SSH</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CGI-BIN"><span class="nav-number">29.</span> <span class="nav-text">CGI-BIN</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -504,7 +513,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">142</span>
+          <span class="site-state-item-count">145</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -517,7 +526,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/index.html">
           
-        <span class="site-state-item-count">179</span>
+        <span class="site-state-item-count">181</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
@@ -587,13 +596,13 @@
       <i class="fa fa-chart-area"></i>
     </span>
       <span class="post-meta-item-text">Symbols count total: </span>
-    <span title="Symbols count total">438k</span>
+    <span title="Symbols count total">442k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
       <span class="post-meta-item-text">Reading time total &asymp;</span>
-    <span title="Reading time total">6:38</span>
+    <span title="Reading time total">6:42</span>
 </div>
   <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
   </div>

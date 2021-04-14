@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://images.atsud0.me/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://images.atsud0.me/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="https://images.atsud0.me/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="https://images.atsud0.me/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"atsud0.me","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="学习使用gpg。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="gpg笔记">
+<meta property="og:url" content="http://atsud0.me/2021/04/12/gpg%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:site_name" content="雪之下二丁目鹤岗八幡宫">
+<meta property="og:description" content="学习使用gpg。">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2021-04-12T07:53:14.000Z">
+<meta property="article:modified_time" content="2021-04-12T07:53:14.442Z">
+<meta property="article:author" content="atsud0">
+<meta property="article:tag" content="Misc">
+<meta property="article:tag" content="GPG">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://atsud0.me/2021/04/12/gpg%E7%AC%94%E8%AE%B0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>gpg笔记 | 雪之下二丁目鹤岗八幡宫</title>
+  
+    <script>
+      function sendPageView() {
+        if (CONFIG.hostname !== location.hostname) return;
+        var uid = localStorage.getItem('uid') || (Math.random() + '.' + Math.random());
+        localStorage.setItem('uid', uid);
+        navigator.sendBeacon('https://www.google-analytics.com/collect', new URLSearchParams({
+          v  : 1,
+          tid: 'UA-163969429-1',
+          cid: uid,
+          t  : 'pageview',
+          dp : encodeURIComponent(location.pathname)
+        }));
+      }
+      document.addEventListener('pjax:complete', sendPageView);
+      sendPageView();
+    </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">雪之下二丁目鹤岗八幡宫</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/index.html" rel="section"><i class="fa fa-tags fa-fw"></i>Tags<span class="badge">181</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories<span class="badge">12</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives<span class="badge">145</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://atsud0.me/2021/04/12/gpg%E7%AC%94%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://images.atsud0.me/images/atsud0-avator.jpg">
+      <meta itemprop="name" content="atsud0">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="雪之下二丁目鹤岗八幡宫">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          gpg笔记
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-04-12 15:53:14" itemprop="dateCreated datePublished" datetime="2021-04-12T15:53:14+08:00">2021-04-12</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Note/" itemprop="url" rel="index"><span itemprop="name">Note</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>2.2k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>2 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>学习使用gpg。</p>
+<a id="more"></a>
+
+<h2 id="生成密钥"><a href="#生成密钥" class="headerlink" title="生成密钥"></a>生成密钥</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gpg --full-generate-key</span><br></pre></td></tr></table></figure>
+
+<p>如果生成密钥的时候出现以下错误</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">gpg: agent_genkey failed: No such file or directory</span><br><span class="line">Key generation failed: No such file or directory</span><br></pre></td></tr></table></figure>
+
+<p>执行以下命令，解决。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gpgconf --<span class="built_in">kill</span> gpg-agent</span><br></pre></td></tr></table></figure>
+
+<h2 id="创建子密钥"><a href="#创建子密钥" class="headerlink" title="创建子密钥"></a>创建子密钥</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gpg --edit-key &lt;user-id&gt;</span><br></pre></td></tr></table></figure>
+
+<h2 id="备份密钥"><a href="#备份密钥" class="headerlink" title="备份密钥"></a>备份密钥</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gpg -o gpg_key --<span class="built_in">export</span>-options backup --<span class="built_in">export</span>-secret-keys &lt;user-id&gt;</span><br></pre></td></tr></table></figure>
+
+<p>会生成一个gpg_key文件，<code>--export-options backup</code>参数表示导出恢复gpg密钥所需的所有数据，如果有设置密钥口令，还要输入密钥才能导出。导出后，建议放在某个安全的地方保存起来。</p>
+<h2 id="备份子密钥"><a href="#备份子密钥" class="headerlink" title="备份子密钥"></a>备份子密钥</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gpg -o gpg_sub_key --<span class="built_in">export</span>-secret-subkeys &lt;user-id&gt;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>为了安全，我们应该只使用子密钥来进行加密和签名，而主密钥我们应该将其保存在一个安全的地方。</p>
+</blockquote>
+<h2 id="删除密钥"><a href="#删除密钥" class="headerlink" title="删除密钥"></a>删除密钥</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">gpg --delete-secret-keys &lt;user-id&gt; <span class="comment">#删除指定的私钥</span></span><br><span class="line">gpg --delete-keys &lt;user-id&gt; <span class="comment">#删除指定的公钥</span></span><br></pre></td></tr></table></figure>
+
+<p>删除主密钥后，记得要清理生成的吊销证书</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rm ~/.gnupg/openpgp-revocs.d/KEYID.rev</span><br></pre></td></tr></table></figure>
+
+<h2 id="恢复密钥"><a href="#恢复密钥" class="headerlink" title="恢复密钥"></a>恢复密钥</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">gpg --import-options restore --import gpg_key</span><br><span class="line"></span><br><span class="line">gpg --edit-key &lt;user-id&gt; trust quit <span class="comment">#因为是导入的，所以要设置信任状态</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="列出密钥"><a href="#列出密钥" class="headerlink" title="列出密钥"></a>列出密钥</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">gpg --list-keys <span class="comment">#列出所有</span></span><br><span class="line">gpg --list-public-keys <span class="comment">#列出公钥</span></span><br><span class="line">gpg --list-secure-keys <span class="comment">#列出私钥</span></span><br><span class="line">gpg --list-signatures <span class="comment">#列出签名</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="导出公钥"><a href="#导出公钥" class="headerlink" title="导出公钥"></a>导出公钥</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">gpg --output public.key --armor --<span class="built_in">export</span> &lt;user-id&gt;</span><br><span class="line"></span><br><span class="line">gpg --send-keys &lt;key-id&gt; <span class="comment">#将公钥注册到公钥服务器</span></span><br><span class="line"></span><br><span class="line">gpg --keyserver --send-keys &lt;key-id&gt; <span class="comment">#将公钥注册到指定公钥服务器</span></span><br><span class="line"></span><br><span class="line">gpg --fingerprint [user-id] <span class="comment">#生成验证指纹</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="导入公钥"><a href="#导入公钥" class="headerlink" title="导入公钥"></a>导入公钥</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">gpg --import public.key <span class="comment"># 导入他人的公钥</span></span><br><span class="line"></span><br><span class="line">gpg --recv-keys &lt;key-id&gt; <span class="comment">#在公钥服务器上导入他人的公钥</span></span><br><span class="line"></span><br><span class="line">gpg --search-keys &lt;key-id&gt; <span class="comment">#搜索公钥</span></span><br><span class="line"></span><br><span class="line">gpg --keyserver hkb://a.pgp.net --search-keys &lt;user-id&gt;<span class="comment">#指定公钥服务器搜索</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>Warning:</strong>  任何人都可以将公钥注册到密钥服务器上，因此不应该完全信任从密钥服务器上所检索到的某人的公钥。你应该通过将你检索到的公钥的指纹与该公钥所有者在可信任的来源（如该公钥所有者的博客或网站）所发布的指纹进行比较，或是直接通过电话或邮件联系该公钥所有者进行确认，以确保你检索到的公钥的真实性。使用多种方式进行验证可以提高你所检索到的公钥的可信度。更多相关信息，请参见<a href="https://en.wikipedia.org/wiki/Public_key_fingerprint" target="_blank" rel="noopener">Wikipedia:Public key fingerprint</a>.</p>
+</blockquote>
+<h2 id="加密与解密"><a href="#加密与解密" class="headerlink" title="加密与解密"></a>加密与解密</h2><p><strong>公钥加密，私钥解密</strong>。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">gpg -r &lt;user-id&gt; -e &lt;file-name&gt; <span class="comment">#使用指定userid的公钥加密文件。</span></span><br><span class="line">gpg -r &lt;user-id&gt; -d &lt;file-name&gt; <span class="comment">#使用指定userid的私钥来解密文件。</span></span><br></pre></td></tr></table></figure>
+
+<p>比如，你需要发一个保存密码的文件给张三，那你就可以用张三的发布在公钥服务器上的公钥来加密。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">gpg --recv-keys 张三keyid</span><br><span class="line">gpg -r 张三 -e password.txt</span><br></pre></td></tr></table></figure>
+
+<p>之后会生成一个<code>password.txt.gpg</code>文件，你把这个加密过的文件发给张三。张三可以这样解密。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gpg -r 张三 -d password.txt.gpg</span><br></pre></td></tr></table></figure>
+
+<p>然后就会要求输入只有张三知道的私钥口令。输入正确后解密完成。如果私钥泄露，那么就要吊销整个密钥。</p>
+<h2 id="签名"><a href="#签名" class="headerlink" title="签名"></a>签名</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">gpg --sign a.txt <span class="comment">#执行后会生成a.txt.gpg，二进制存储。</span></span><br><span class="line">gpg --clearsign a.txt <span class="comment">#以ascii码存储。生成a.txt.asc</span></span><br><span class="line">gpg --detach-sign a.txt <span class="comment">#单独生成签名文件，输出a.txt.sig</span></span><br><span class="line">gpg --armor --detach-sith a.txt <span class="comment">#以ascii码生成一个单独的签名文件输出a.txt.asc</span></span><br><span class="line"></span><br><span class="line"><span class="comment">##同时加密和签名</span></span><br><span class="line">gpg -u [user-id] -r [user-id] -a -s -e a.txt <span class="comment">#-u 是--local-user的缩写，指定发信者的私钥签名，-r 是 --recipient的缩写，指定接收者的公钥加密，-a 是 --armor的缩写，表示用ascii码形式显示，-s 是 --sign的缩写，表示需要签名，-e 是--encrypt的缩写，指定源文件。</span></span><br><span class="line"></span><br><span class="line"><span class="comment">##验证签名</span></span><br><span class="line">gpg --verify a.txt.asc a.txt</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="https://mogeko.me/2019/068/" target="_blank" rel="noopener">GPG的正确使用方式</a></li>
+<li><a href="https://www.ruanyifeng.com/blog/2013/07/gpg.html" target="_blank" rel="noopener">GPG入门教程-阮一峰的网络日志</a></li>
+<li><a href="https://wiki.archlinux.org/index.php/GnuPG_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87)#%E5%88%9B%E5%BB%BA%E5%AF%86%E9%92%A5%E5%AF%B9" target="_blank" rel="noopener">GnuPG-ArchWiki</a></li>
+<li><a href="https://www.chan.im/post/11262/" target="_blank" rel="noopener">GPG备份恢复教程</a></li>
+<li><a href="https://bg6cq.github.io/ITTS/security/gpg/" target="_blank" rel="noopener">从一个简单的备份需求演示GPG的使用</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>atsud0
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="http://atsud0.me/2021/04/12/gpg%E7%AC%94%E8%AE%B0/" title="gpg笔记">http://atsud0.me/2021/04/12/gpg笔记/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/Misc/" rel="tag"><i class="fa fa-tag"></i> Misc</a>
+              <a href="/tags/GPG/" rel="tag"><i class="fa fa-tag"></i> GPG</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/04/11/HackTheBox-CTF-Templated/" rel="prev" title="HackTheBox-CTF-Templated">
+      <i class="fa fa-chevron-left"></i> HackTheBox-CTF-Templated
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/04/13/GCP%E4%B8%8A%E4%BC%A0%E8%87%AA%E5%AE%9A%E4%B9%89%E6%98%A0%E5%83%8F/" rel="next" title="GCP上传自定义映像部署Kali">
+      GCP上传自定义映像部署Kali <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#生成密钥"><span class="nav-number">1.</span> <span class="nav-text">生成密钥</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#创建子密钥"><span class="nav-number">2.</span> <span class="nav-text">创建子密钥</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#备份密钥"><span class="nav-number">3.</span> <span class="nav-text">备份密钥</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#备份子密钥"><span class="nav-number">4.</span> <span class="nav-text">备份子密钥</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#删除密钥"><span class="nav-number">5.</span> <span class="nav-text">删除密钥</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#恢复密钥"><span class="nav-number">6.</span> <span class="nav-text">恢复密钥</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#列出密钥"><span class="nav-number">7.</span> <span class="nav-text">列出密钥</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#导出公钥"><span class="nav-number">8.</span> <span class="nav-text">导出公钥</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#导入公钥"><span class="nav-number">9.</span> <span class="nav-text">导入公钥</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#加密与解密"><span class="nav-number">10.</span> <span class="nav-text">加密与解密</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#签名"><span class="nav-number">11.</span> <span class="nav-text">签名</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">12.</span> <span class="nav-text">参考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="atsud0"
+      src="https://images.atsud0.me/images/atsud0-avator.jpg">
+  <p class="site-author-name" itemprop="name">atsud0</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">145</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/index.html">
+          
+        <span class="site-state-item-count">181</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/atsud0" title="GitHub → https://github.com/atsud0" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:admin@atsud0.me" title="E-Mail → mailto:admin@atsud0.me"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/atsud0" title="Twitter → https://twitter.com/atsud0" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/MindworkshopBot" title="Telegram → https://t.me/MindworkshopBot" rel="noopener" target="_blank"><i class="fab fa-telegram fa-fw"></i>Telegram</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.ajin.cloud/" title="https://blog.ajin.cloud/" rel="noopener" target="_blank">ajin</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://leiblog.wang/" title="https://leiblog.wang/" rel="noopener" target="_blank">LeiWang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://esonhugh.github.io/" title="https://esonhugh.github.io/" rel="noopener" target="_blank">Esonhugh</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://isabellainori.github.io/" title="https://isabellainori.github.io/" rel="noopener" target="_blank">Isabella Ross</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2020 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">atsud0</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">Symbols count total: </span>
+    <span title="Symbols count total">442k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">Reading time total &asymp;</span>
+    <span title="Reading time total">6:42</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
