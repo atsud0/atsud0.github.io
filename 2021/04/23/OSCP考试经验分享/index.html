@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://images.atsud0.me/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://images.atsud0.me/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="https://images.atsud0.me/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="https://images.atsud0.me/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"atsud0.me","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta property="og:type" content="article">
+<meta property="og:title" content="OSCP考试经验分享">
+<meta property="og:url" content="http://atsud0.me/2021/04/23/OSCP%E8%80%83%E8%AF%95%E7%BB%8F%E9%AA%8C%E5%88%86%E4%BA%AB/index.html">
+<meta property="og:site_name" content="雪之下二丁目鹤岗八幡宫">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://images.atsud0.me/images/post/20210423-18:26:40-_VNH3UU_VNH3UU_VNH3UU_offensive-security-certified-professional-oscp-1.png">
+<meta property="og:image" content="https://images.atsud0.me/images/post/20210423-21:42:24-_2qUapl_2qUapl_2qUapl_H3o6H6.png">
+<meta property="article:published_time" content="2021-04-23T13:47:59.000Z">
+<meta property="article:modified_time" content="2021-04-23T13:47:59.081Z">
+<meta property="article:author" content="atsud0">
+<meta property="article:tag" content="OSCP">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://images.atsud0.me/images/post/20210423-18:26:40-_VNH3UU_VNH3UU_VNH3UU_offensive-security-certified-professional-oscp-1.png">
+
+<link rel="canonical" href="http://atsud0.me/2021/04/23/OSCP%E8%80%83%E8%AF%95%E7%BB%8F%E9%AA%8C%E5%88%86%E4%BA%AB/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>OSCP考试经验分享 | 雪之下二丁目鹤岗八幡宫</title>
+  
+    <script>
+      function sendPageView() {
+        if (CONFIG.hostname !== location.hostname) return;
+        var uid = localStorage.getItem('uid') || (Math.random() + '.' + Math.random());
+        localStorage.setItem('uid', uid);
+        navigator.sendBeacon('https://www.google-analytics.com/collect', new URLSearchParams({
+          v  : 1,
+          tid: 'UA-163969429-1',
+          cid: uid,
+          t  : 'pageview',
+          dp : encodeURIComponent(location.pathname)
+        }));
+      }
+      document.addEventListener('pjax:complete', sendPageView);
+      sendPageView();
+    </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">雪之下二丁目鹤岗八幡宫</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/index.html" rel="section"><i class="fa fa-tags fa-fw"></i>Tags<span class="badge">191</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories<span class="badge">12</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives<span class="badge">150</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://atsud0.me/2021/04/23/OSCP%E8%80%83%E8%AF%95%E7%BB%8F%E9%AA%8C%E5%88%86%E4%BA%AB/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://images.atsud0.me/images/atsud0-avator.jpg">
+      <meta itemprop="name" content="atsud0">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="雪之下二丁目鹤岗八幡宫">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          OSCP考试经验分享
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-04-23 21:47:59" itemprop="dateCreated datePublished" datetime="2021-04-23T21:47:59+08:00">2021-04-23</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Misc/" itemprop="url" rel="index"><span itemprop="name">Misc</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>2.8k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>3 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><img src="https://images.atsud0.me/images/post/20210423-18:26:40-_VNH3UU_VNH3UU_VNH3UU_offensive-security-certified-professional-oscp-1.png" alt="20210423-18:26:40-_VNH3UU_VNH3UU_VNH3UU_offensive-security-certified-professional-oscp-1"></p>
+<a id="more"></a>
+
+<h2 id="讲废话"><a href="#讲废话" class="headerlink" title="讲废话"></a>讲废话</h2><p>不知道OSCP是啥的可以先去google一下，这里不再赘述。</p>
+<p>我是在2020年4月左右开始学习的渗透，，然后听群里的大佬说了这个证书，萌生了挑战的意思，从计划考试到考试的前一天我都一直有打靶机练习，最后TryHackme打了有20000多分，HTB也打了30多台，Vulnhub的靶机少说也有20台。</p>
+<p>在我说想考之后，夏姐姐，pek姐姐都丢了一些靶机清单出来。很感谢，因为这样就省去了找靶机练习的时间了。。当时pek姐姐还没退群，奶猫大佬，pek姐姐，夏姐姐都会经常在群里分享一些技术，很感谢他们。</p>
+<p>先说说考试注册吧。</p>
+<p>考试注册我用的是公司的企业邮箱，因为我懒。这样就省去了上传护照/英语身份证图片的步骤了。。然后我是在2020年10月左右办理的护照，期间一开始说是不给办理的，我用了offsec发的邮件（说要双语证件那封）作为证明材料，说我是考试要用。然后还要和出入境的警察（？我也不知道是不是警察）说我不出国，只是远程考试，需要验证，才给我开始办理。然后还让我写了封保证书，保证自己确实是因为考试需要才办理的护照，并且在近期不会出国。。。</p>
+<p>我2020年10月注册的课程，但是我拖到了11月月中才开始Lab练习。因为自己平时比较摸鱼加上那段时间工作较忙的原因，，所以12月中旬lab结束的时候只拿了30台机器。。至于官方教程，我每天上下班地铁路上都会抽点时间看。因为自己英语不算很好，看的也是一知半解，不过还算是勉强能看懂，在考试前算是终于把它看完了。。不过官方的视频教程我就没看下去了，我真英语废物。。所以我觉得这也是可惜的一点，没有完整的体验到整个pwk的教程。</p>
+<p>说实话在备考期间很感谢群里的小伙伴对我的鼓励，eson就经常找我聊天让我加油，，然后我也经常高强度的找Z4yn:)和ajin两位大佬输出负能量。。。很感谢两位没有把我拉黑。。。</p>
+<p>然后今年3月的时候我觉得我自己准备的差不多了，本想预约个清明考试，没想到早已被人预约了，所以我只能预约在4月17日凌晨两点，（（自己选了一个尴尬的时间。。</p>
+<p>周五和公司请了一天假，周五早上胸开始有点痛（但是也没留意）。下午补了会觉，下午其实能睡久点，结果硬是被楼下施工给吵醒了。。本来晚上也想补觉，但是临近考试比较紧张，加上胸痛的原因一直睡不着。</p>
+<p>睡不着就睡不着吧，但是靶机也不想打，书也看不进去，我就只能躺在床上闭眼休息。一直在幻想自己考过之后干嘛干嘛。不过每次想到一半，理智都打断了我的幻想。“万一不过呢，你现在就想这些，岂不是很sb？”，想到自己要是考不过，心就慌了，于是开始安慰自己会过的会过的。。。周五晚上我就差不多处在这个循环中。。</p>
+<p>终于熬到了凌晨两点，其实我一点五十六分就进了官方给的监考链接，等待考官了，考官好像是在两点二十多分才来的。。差不多晚了有20多分钟。。我佛。。</p>
+<p>不过也没差，考官进来后，就打招呼啊啥的，然后给他看看我周围的环境（抱着笔记本转了两圈）。工作台的环境他也要看，如果桌子上有其他电脑的话，考官会让你把电脑挪远一点，不要放旁边。然后他还问了我手机放在哪。。</p>
+<p>这些都好了之后，就会开始验证身份了，把提前准备好的双语证件给他看，我放摄像头边，他也看不清，最后还是拍了个照片给他看。</p>
+<p>验证好身份之后，就发一封邮件给你，里面会有vpn的连接包，考试的目标，还有一个内网链接，内网链接是提交flag的地方，上面也有考试须知，有写每台机器对应的分数。我一开始是用Google云机器连的vpn，一开始连上了，让我执行一个脚本（和vpn连接包放一起的，会检测当前机器的环境，是不是虚拟机啊啥的）这一检测，好家伙，让我换环境。我当时立马就说了在我在中国大陆地区，连接可能有问题，但是他说我很抱歉，这是规定。。</p>
+<p>好吧，我心想估计得卡死，这怎么考。但是也没办法只能本地连给他看了，结果本地一直连不上，，后来又让我用回vps。</p>
+<p>这时候总算能开始考试了，结果屏幕共享一直掉线，，，掉线一次就折腾了好久。。太要命了。反正整完这些都快3点半了。。</p>
+<p>刚开始考试的时候，我没看考试须知，只看了邮件上面有六个ip，我还以为考试改版了，从五台机器变成了六台。。也没多想，就抓紧时间nmap扫描开起来。</p>
+<p>一开始因为太紧张的原因，进展一直都很不顺利，每台机器我都有扫，有看，但是一台都没拿下来。我心都凉了。最后总算在8点多的时候，拿下一台25分机器的user，9点多左右拿下这台的root。期间去厕所休息了一下，问夏姐姐为什么会有六台机器，，夏姐姐告诉我有个考试须知，，我才知道。。原来是我错过了考试须知。</p>
+<p>休息回来后，把考试须知看了，找到了调试机和bof的机器，花了两个小时才拿下。。因为太心急，挑坏字符的环节没挑全，导致后面浪费了很多时间。</p>
+<p>这时候也12点多了，问了下考官还剩多少时间，考官说我还剩12个小时。然后我就下楼买了两瓶红牛，随便吃了个三明治补给补给。回来后，立马就拿下了一台10分的机器。</p>
+<p>到现在就只剩下两台20分的，因为我没有交lab报告，所以我还得完全的拿下一台机器，或者是拿两台机器的user。</p>
+<p>最后下午4点半的时候，把一台20分的机器给完全拿下来了。</p>
+<p>25+25+10+20，就算剩下一台拿不下也能过了。因为我一直没睡觉很困，考试的时候都打起瞌睡来了。。迷迷糊糊的。真要命。</p>
+<p>拿下四台机器后，也不能松懈，要回去截图步骤。按照考试须知提交截图flag这些。搞完这些后，我在11点左右提前结束了考试。</p>
+<p>和女朋友，还有其他小伙伴通报了下分数，聊了会天，一沾床上就睡着了。。</p>
+<p>第二天7点多醒了，虽然报告还没写，但是不想起床。。。玩了会游戏，看了点漫画，放松了心情。12点爬起来开始写报告，写了一会报告，突然间又感觉胸口很痛，于是急急忙忙的抱着笔记本叫了个车去医院，打算在车上也写报告。。结果到了医院还没号挂，，没办法只能打车回来。。折腾了这么一下都到5点多了。。</p>
+<p>然后报告我写到10点多才写完。按照要求打包好，上传。。收到邮件，，考试结束。</p>
+<p>说实话很累，真的很累，17号考试这天，我只喝了四瓶红牛，吃了两个三明治，基本上没有怎么吃过东西。。睡觉就更不用说了，，差不多从周五18点到周六晚上23点都没好好休息到。。然后我周一去医院看病的时候，结果左侧气胸，肺压缩20%。。。医生建议住院一周。。</p>
+<p>太尬了。。。如果再给我一次机会的话，我绝对不会选择这么一个反生物钟的时间考试了。。</p>
+<p>考完试的第二天（周二）就收到考试通过的邮件了。<br><img src="https://images.atsud0.me/images/post/20210423-21:42:24-_2qUapl_2qUapl_2qUapl_H3o6H6.png" alt="20210423-21:42:24-_2qUapl_2qUapl_2qUapl_H3o6H6"></p>
+<p><strong>不过OSCP并不是旅途的结束，它是旅途的开始</strong>。</p>
+<h2 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h2><p>感谢群里的小伙伴在我学习过程中的指导和提供建议和各种资料等等，差不多也是在去年这个时间点开始学的渗透。很感谢当初群里的各位大佬，没有嫌弃我菜，而拒绝和我聊天🤣🤣还对我各种悉心教导（意味深），真的很感谢你们。。另外也很感谢女朋友一直以来的陪伴啦。</p>
+<p>接下来的目标就打算定为oswe先。。。不过在这之前，，我想不干驻场的工作。。</p>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>atsud0
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="http://atsud0.me/2021/04/23/OSCP%E8%80%83%E8%AF%95%E7%BB%8F%E9%AA%8C%E5%88%86%E4%BA%AB/" title="OSCP考试经验分享">http://atsud0.me/2021/04/23/OSCP考试经验分享/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/OSCP/" rel="tag"><i class="fa fa-tag"></i> OSCP</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/04/16/HackTheBox-Poison/" rel="prev" title="HackTheBox-Poison">
+      <i class="fa fa-chevron-left"></i> HackTheBox-Poison
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#讲废话"><span class="nav-number">1.</span> <span class="nav-text">讲废话</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#最后"><span class="nav-number">2.</span> <span class="nav-text">最后</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="atsud0"
+      src="https://images.atsud0.me/images/atsud0-avator.jpg">
+  <p class="site-author-name" itemprop="name">atsud0</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">150</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/index.html">
+          
+        <span class="site-state-item-count">191</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/atsud0" title="GitHub → https://github.com/atsud0" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:admin@atsud0.me" title="E-Mail → mailto:admin@atsud0.me"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/atsud0" title="Twitter → https://twitter.com/atsud0" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/MindworkshopBot" title="Telegram → https://t.me/MindworkshopBot" rel="noopener" target="_blank"><i class="fab fa-telegram fa-fw"></i>Telegram</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.ajin.cloud/" title="https://blog.ajin.cloud/" rel="noopener" target="_blank">ajin</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://leiblog.wang/" title="https://leiblog.wang/" rel="noopener" target="_blank">LeiWang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://esonhugh.github.io/" title="https://esonhugh.github.io/" rel="noopener" target="_blank">Esonhugh</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://isabellainori.github.io/" title="https://isabellainori.github.io/" rel="noopener" target="_blank">Isabella Ross</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2020 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">atsud0</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">Symbols count total: </span>
+    <span title="Symbols count total">461k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">Reading time total &asymp;</span>
+    <span title="Reading time total">6:59</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
