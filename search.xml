@@ -12540,7 +12540,10 @@ column_name  列名</code></pre><p>确认表中有多少字段（order by）</p>
   <entry>
     <title>Shodan-Cli</title>
     <url>/2021/05/22/Shodan-cli/</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><p>初始化</p>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><p>shodan简单用法</p>
+<a id="more"></a>
+
+<p>初始化</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">shodan init &#123;YOUR_API_KEY&#125;</span><br></pre></td></tr></table></figure>
 
 <h2 id="查看剩余用量"><a href="#查看剩余用量" class="headerlink" title="查看剩余用量"></a>查看剩余用量</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">shodan info</span><br></pre></td></tr></table></figure>
@@ -12638,7 +12641,7 @@ column_name  列名</code></pre><p>确认表中有多少字段（order by）</p>
         <category>Tools</category>
       </categories>
       <tags>
-        <tag>shoran</tag>
+        <tag>shodan</tag>
       </tags>
   </entry>
 </search>
