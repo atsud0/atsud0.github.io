@@ -20,18 +20,20 @@
     var CONFIG = {"hostname":"atsud0.me","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="记录遇到的问题。">
+  <meta name="description" content="记录使用mac时遇到的问题。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Mac OS使用过程中遇到的问题">
 <meta property="og:url" content="http://atsud0.me/2021/04/15/Mac-OS%E4%BD%BF%E7%94%A8%E8%BF%87%E7%A8%8B%E4%B8%AD%E9%81%87%E5%88%B0%E7%9A%84%E9%97%AE%E9%A2%98/index.html">
 <meta property="og:site_name" content="雪之下二丁目鹤岗八幡宫">
-<meta property="og:description" content="记录遇到的问题。">
+<meta property="og:description" content="记录使用mac时遇到的问题。">
 <meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://images.atsud0.me/images/post/20210514-12:38:15-_LaxZbi_image-20210514123815531_LaxZbi_1620967095770_LaxZbi_image-20210514123815531.png">
 <meta property="article:published_time" content="2021-04-15T13:28:29.000Z">
-<meta property="article:modified_time" content="2021-04-23T14:25:19.052Z">
+<meta property="article:modified_time" content="2021-05-17T01:05:22.963Z">
 <meta property="article:author" content="atsud0">
 <meta property="article:tag" content="MacOS">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://images.atsud0.me/images/post/20210514-12:38:15-_LaxZbi_image-20210514123815531_LaxZbi_1620967095770_LaxZbi_image-20210514123815531.png">
 
 <link rel="canonical" href="http://atsud0.me/2021/04/15/Mac-OS%E4%BD%BF%E7%94%A8%E8%BF%87%E7%A8%8B%E4%B8%AD%E9%81%87%E5%88%B0%E7%9A%84%E9%97%AE%E9%A2%98/">
 
@@ -142,7 +144,7 @@
   </li>
         <li class="menu-item menu-item-tags">
 
-    <a href="/tags/index.html" rel="section"><i class="fa fa-tags fa-fw"></i>Tags<span class="badge">207</span></a>
+    <a href="/tags/index.html" rel="section"><i class="fa fa-tags fa-fw"></i>Tags<span class="badge">208</span></a>
 
   </li>
         <li class="menu-item menu-item-categories">
@@ -152,7 +154,7 @@
   </li>
         <li class="menu-item menu-item-archives">
 
-    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives<span class="badge">163</span></a>
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives<span class="badge">164</span></a>
 
   </li>
       <li class="menu-item menu-item-search">
@@ -241,7 +243,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-04-23 22:25:19" itemprop="dateModified" datetime="2021-04-23T22:25:19+08:00">2021-04-23</time>
+                <time title="Modified: 2021-05-17 09:05:22" itemprop="dateModified" datetime="2021-05-17T09:05:22+08:00">2021-05-17</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -266,14 +268,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">Symbols count in article: </span>
-              <span>1.2k</span>
+              <span>3.3k</span>
             </span>
             <span class="post-meta-item" title="Reading time">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">Reading time &asymp;</span>
-              <span>1 mins.</span>
+              <span>3 mins.</span>
             </span>
 
         </div>
@@ -285,11 +287,32 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>记录遇到的问题。</p>
+        <p>记录使用mac时遇到的问题。</p>
 <a id="more"></a>
 <h3 id="查看端口占用"><a href="#查看端口占用" class="headerlink" title="查看端口占用"></a>查看端口占用</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">netstat -an -p tcp</span><br><span class="line"># 要等很久- -</span><br><span class="line">sudo lsof -i -P | grep -i &quot;LISTEN&quot; </span><br><span class="line"></span><br><span class="line">sudo netstat -an|grep &quot;LISTEN&quot;</span><br></pre></td></tr></table></figure>
 
-<h3 id="homebrew"><a href="#homebrew" class="headerlink" title="homebrew"></a>homebrew</h3><h4 id="打开终端时出现compinit-503-no-such-file-or-directory-usr-local-share-zsh-site-functions-brew-cask"><a href="#打开终端时出现compinit-503-no-such-file-or-directory-usr-local-share-zsh-site-functions-brew-cask" class="headerlink" title="打开终端时出现compinit:503: no such file or directory: /usr/local/share/zsh/site-functions/_brew_cask"></a>打开终端时出现<code>compinit:503: no such file or directory: /usr/local/share/zsh/site-functions/_brew_cask</code></h4><h5 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h5><p>打开终端时有时候会出现</p>
+<h3 id="homebrew"><a href="#homebrew" class="headerlink" title="homebrew"></a>homebrew</h3><p>用brew安装的软件记录</p>
+<ul>
+<li>rustscan</li>
+<li>Feroxbuster</li>
+<li>gobuster</li>
+<li>Freerdp</li>
+<li>Hydra</li>
+<li>upic(brew install –cask upic)</li>
+<li>p7zip</li>
+<li>curl</li>
+<li>wget</li>
+<li>Foremost(CTF分离隐藏图片用)</li>
+<li>pngcheck(CTF用)</li>
+<li>exiftool(CTF用)</li>
+<li>ip2routemac（ip a）</li>
+<li>tmux</li>
+<li>aria2c</li>
+<li>Swaks</li>
+<li>gnupg</li>
+<li>Awscli</li>
+</ul>
+<h4 id="打开终端时出现compinit-503-no-such-file-or-directory-usr-local-share-zsh-site-functions-brew-cask"><a href="#打开终端时出现compinit-503-no-such-file-or-directory-usr-local-share-zsh-site-functions-brew-cask" class="headerlink" title="打开终端时出现compinit:503: no such file or directory: /usr/local/share/zsh/site-functions/_brew_cask"></a>打开终端时出现<code>compinit:503: no such file or directory: /usr/local/share/zsh/site-functions/_brew_cask</code></h4><h5 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h5><p>打开终端时有时候会出现</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Last login: Fri Mar 19 18:44:46 on ttys004</span><br><span class="line">compinit:503: no such file or directory: &#x2F;usr&#x2F;local&#x2F;share&#x2F;zsh&#x2F;site-functions&#x2F;_brew_cask</span><br><span class="line">compinit:503: no such file or directory: &#x2F;usr&#x2F;local&#x2F;share&#x2F;zsh&#x2F;site-functions&#x2F;_brew_cask</span><br></pre></td></tr></table></figure>
 
 <h5 id="修复方法"><a href="#修复方法" class="headerlink" title="修复方法"></a>修复方法</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">brew clenup</span><br></pre></td></tr></table></figure>
@@ -297,6 +320,32 @@
 <p>或者</p>
 <p>手动修复这两个符号文件的链接地址。</p>
 <p>来源:<a href="https://github.com/ohmyzsh/ohmyzsh/issues/9602" target="_blank" rel="noopener">compinit:503: no such file or directory: /usr/local/share/zsh/site-functions/_brew #9602</a></p>
+<h4 id="brew-update无法更新"><a href="#brew-update无法更新" class="headerlink" title="brew update无法更新"></a>brew update无法更新</h4><p>错误提示</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">brew update</span><br><span class="line">Error: Fetching &#x2F;usr&#x2F;local&#x2F;Homebrew failed!</span><br><span class="line">homebrew&#x2F;homebrew-core does not exist! Run &#96;brew untap homebrew&#x2F;homebrew-core&#96; to remove it.</span><br><span class="line">homebrew&#x2F;homebrew-cask does not exist! Run &#96;brew untap homebrew&#x2F;homebrew-cask&#96; to remove it.</span><br></pre></td></tr></table></figure>
+
+<p>其实这里是两个问题了，我这里原本是打算一个个慢慢解决。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">brew untap homebrew&#x2F;homebrew-cask</span><br></pre></td></tr></table></figure>
+
+<p>如果先前没有使用cask安装过软件的话，应该可以正常运行，如果安装过了则要先<code>brew rm</code>掉才行，执行untap之后。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">brew reinstall cask</span><br></pre></td></tr></table></figure>
+
+<p>再update，只剩下core的错误提示了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">homebrew&#x2F;homebrew-core does not exist! Run &#96;brew untap homebrew&#x2F;homebrew-core&#96; to remove it.</span><br></pre></td></tr></table></figure>
+
+<p>但是，untap core是不允许的。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Error: Untapping homebrew&#x2F;core is not allowed</span><br></pre></td></tr></table></figure>
+
+<p>所以这时候我的想法是，破罐子破摔，干脆卸载重新安装brew算了。(((代价极大，我这大部分软件都得重新安装了，不建议直接卸载brew。)))</p>
+<p>当我执行安装脚本的时候，也同样出现了 brew update faild失败的问题，这个坎是绕不过去了。。但是我看到错误提示是访问homebrew-core的git库失败。根据brew网站给出的安装文档，可以指定homebrew-core和homebrew的目录环境变量来加速安装，于是</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">gcl https:&#x2F;&#x2F;github.com&#x2F;Homebrew&#x2F;homebrew-core</span><br><span class="line">export HOMEBREW_CORE_GIT_REMOTE&#x3D;&#x2F;tmp&#x2F;homebrew-core</span><br></pre></td></tr></table></figure>
+
+<p>再次update，正常了。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">brew update</span><br><span class="line">Already up-to-date.</span><br></pre></td></tr></table></figure>
+
+<p>参考</p>
+<ul>
+<li><a href="https://docs.brew.sh/Installation" target="_blank" rel="noopener">brew install</a></li>
+</ul>
 <h3 id="metasploit"><a href="#metasploit" class="headerlink" title="metasploit"></a>metasploit</h3><h4 id="msfupdate"><a href="#msfupdate" class="headerlink" title="msfupdate"></a>msfupdate</h4><p>某次用<code>msfupdate</code>升级后出现以下错误</p>
 <p>问题详情:<a href="https://github.com/rapid7/metasploit-framework/issues/14796" target="_blank" rel="noopener"> expected file /opt/metasploit-framework/embedded/framework/lib/rex/time.rb to define constant Rex::Time, but didn’t (Zeitwerk::NameError) #14796 </a></p>
 <p>我的修复方法</p>
@@ -304,6 +353,24 @@
 
 <p>或</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">curl https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;rapid7&#x2F;metasploit-omnibus&#x2F;master&#x2F;config&#x2F;templates&#x2F;metasploit-framework-wrappers&#x2F;msfupdate.erb &gt; msfinstall &amp;&amp; \</span><br><span class="line">  chmod 755 msfinstall &amp;&amp; \</span><br><span class="line">  .&#x2F;msfinstall</span><br></pre></td></tr></table></figure>
+
+<h4 id="Msf-db-init-失败"><a href="#Msf-db-init-失败" class="headerlink" title="Msf db init 失败"></a>Msf db init 失败</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">No local database connected, meaning some Metasploit features will not be available. A full list of the affected features &amp; database setup instructions can be found here: https:&#x2F;&#x2F;github.com&#x2F;rapid7&#x2F;metasploit-framework&#x2F;wiki&#x2F;msfdb:-Database-Features-&amp;-How-to-Set-up-a-Database-for-Metasploit</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">msfdb reinit</span><br><span class="line">输入用户名，密码。</span><br></pre></td></tr></table></figure>
+
+<h4 id="msf打开提示office365userenum模块加载失败"><a href="#msf打开提示office365userenum模块加载失败" class="headerlink" title="msf打开提示office365userenum模块加载失败"></a>msf打开提示office365userenum模块加载失败</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[!] The following modules could not be loaded!..|</span><br><span class="line">[!] 	&#x2F;opt&#x2F;metasploit-framework&#x2F;embedded&#x2F;framework&#x2F;modules&#x2F;auxiliary&#x2F;gather&#x2F;office365userenum.py</span><br><span class="line">[!] Please see &#x2F;Users&#x2F;atsud0&#x2F;.msf4&#x2F;logs&#x2F;framework.log for details.</span><br></pre></td></tr></table></figure>
+
+<p>可以看到这是一个python文件。</p>
+<p>手动查看office365userenum.py文件，发现文件头用的是python2</p>
+<img src="https://images.atsud0.me/images/post/20210514-12:38:15-_LaxZbi_image-20210514123815531_LaxZbi_1620967095770_LaxZbi_image-20210514123815531.png" alt="image-20210514123815531" style="zoom:50%;" />
+
+<p>手动执行提示缺库</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">python2 &#x2F;opt&#x2F;metasploit-framework&#x2F;embedded&#x2F;framework&#x2F;modules&#x2F;auxiliary&#x2F;gather&#x2F;office365userenum.py</span><br><span class="line">Missing Dependency! python-requests required!</span><br></pre></td></tr></table></figure>
+
+<p>解决：(具体见系统，我是把python3设置成了默认所以要指定一个pip2)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo pip2 install python-requests</span><br></pre></td></tr></table></figure>
+
+
 
 <h3 id="mactex"><a href="#mactex" class="headerlink" title="mactex"></a>mactex</h3><h4 id="安装mactex后还是出现pdflatex-not-found"><a href="#安装mactex后还是出现pdflatex-not-found" class="headerlink" title="安装mactex后还是出现pdflatex not found."></a>安装mactex后还是出现pdflatex not found.</h4><p>重启终端。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ which pdflatex</span><br><span class="line">&#x2F;Library&#x2F;TeX&#x2F;texbin&#x2F;pdflatex</span><br></pre></td></tr></table></figure>
@@ -407,7 +474,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#查看端口占用"><span class="nav-number">1.</span> <span class="nav-text">查看端口占用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#homebrew"><span class="nav-number">2.</span> <span class="nav-text">homebrew</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#打开终端时出现compinit-503-no-such-file-or-directory-usr-local-share-zsh-site-functions-brew-cask"><span class="nav-number">2.1.</span> <span class="nav-text">打开终端时出现compinit:503: no such file or directory: &#x2F;usr&#x2F;local&#x2F;share&#x2F;zsh&#x2F;site-functions&#x2F;_brew_cask</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#问题"><span class="nav-number">2.1.1.</span> <span class="nav-text">问题</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#修复方法"><span class="nav-number">2.1.2.</span> <span class="nav-text">修复方法</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#metasploit"><span class="nav-number">3.</span> <span class="nav-text">metasploit</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#msfupdate"><span class="nav-number">3.1.</span> <span class="nav-text">msfupdate</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#mactex"><span class="nav-number">4.</span> <span class="nav-text">mactex</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#安装mactex后还是出现pdflatex-not-found"><span class="nav-number">4.1.</span> <span class="nav-text">安装mactex后还是出现pdflatex not found.</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#查看端口占用"><span class="nav-number">1.</span> <span class="nav-text">查看端口占用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#homebrew"><span class="nav-number">2.</span> <span class="nav-text">homebrew</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#打开终端时出现compinit-503-no-such-file-or-directory-usr-local-share-zsh-site-functions-brew-cask"><span class="nav-number">2.1.</span> <span class="nav-text">打开终端时出现compinit:503: no such file or directory: &#x2F;usr&#x2F;local&#x2F;share&#x2F;zsh&#x2F;site-functions&#x2F;_brew_cask</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#问题"><span class="nav-number">2.1.1.</span> <span class="nav-text">问题</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#修复方法"><span class="nav-number">2.1.2.</span> <span class="nav-text">修复方法</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#brew-update无法更新"><span class="nav-number">2.2.</span> <span class="nav-text">brew update无法更新</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#metasploit"><span class="nav-number">3.</span> <span class="nav-text">metasploit</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#msfupdate"><span class="nav-number">3.1.</span> <span class="nav-text">msfupdate</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Msf-db-init-失败"><span class="nav-number">3.2.</span> <span class="nav-text">Msf db init 失败</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#msf打开提示office365userenum模块加载失败"><span class="nav-number">3.3.</span> <span class="nav-text">msf打开提示office365userenum模块加载失败</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#mactex"><span class="nav-number">4.</span> <span class="nav-text">mactex</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#安装mactex后还是出现pdflatex-not-found"><span class="nav-number">4.1.</span> <span class="nav-text">安装mactex后还是出现pdflatex not found.</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -423,7 +490,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">163</span>
+          <span class="site-state-item-count">164</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -436,7 +503,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/index.html">
           
-        <span class="site-state-item-count">207</span>
+        <span class="site-state-item-count">208</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
@@ -506,13 +573,13 @@
       <i class="fa fa-chart-area"></i>
     </span>
       <span class="post-meta-item-text">Symbols count total: </span>
-    <span title="Symbols count total">485k</span>
+    <span title="Symbols count total">511k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
       <span class="post-meta-item-text">Reading time total &asymp;</span>
-    <span title="Reading time total">7:21</span>
+    <span title="Reading time total">7:45</span>
 </div>
   <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
   </div>

